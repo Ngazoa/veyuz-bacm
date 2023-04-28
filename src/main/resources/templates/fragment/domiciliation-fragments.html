@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <div th:fragment="domiciliations">
+        <table id="datatables-reponsive" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Type</th>
+                    <th>Client</th>
+                    <th>Beneficiaire</th>
+                    <th>Date creation</th>
+                    <th>Montant</th>
+                    <th>Devise</th>
+                    <th>Montant restant</th>
+                    <th>Date d'expiration</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="d, state : ${domiciliations}">
+                    <td th:utext="${d.reference}"></td>
+                    <td th:utext="${d.typeDeTransaction.name}"></td>
+                    <td th:utext="${d.client.denomination}"></td>
+                    <td th:utext="${d.beneficiaire.name}"></td>
+                    <td th:text="${d.dateCreation}"></td>
+                    <td class="montant_format" th:text="${d.montant}"></td>
+                    <td th:text="${d.devise.name}"></td>
+                    <td class="montant_format"  th:text="${d.montantRestant}"></td>
+                    <td th:text="${d.dateExpiration}"></td>
+
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Select
+                            </button>
+                            <div class="dropdown-menu" style="">
+                                <a class="dropdown-item" th:href="@{/domiciliation-{id}/details(id=${d.id})}">Afficher les details</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table th:fragment="list" class="table">
+        <thead>
+            <tr>
+                <th>Reference</th>
+                <th>Beneficiaire</th>
+                <th>Date Execution</th>
+                <th>Devise</th>
+                <th>Montant </th>
+            </tr>
+        </thead>
+        <tbody>
+            <th:block th:if="${domiciliation != null}">
+            <tr th:each="d, state : ${domiciliation.transactions}">
+                <td th:text="${d.reference}"></td>
+                <td th:text="${d.beneficiaire.name}"></td>
+                <td th:text="${d.dateCreation}"></td>
+                <td th:text="${d.devise.name}"></td>
+                <td class="montant_format" th:text="${d.montant}"></td>
+            </tr>
+            </th:block>
+        </tbody>
+    </table>
+
+    <div th:fragment="details" class="col-md-5">
+        <p>
+            <span>Reference</span>
+            <b th:utext="${domiciliation.reference}"></b>
+        </p>
+        <p>
+            <span>Type</span>
+            <b th:utext="${domiciliation.typeDeTransaction.name}"></b>
+        </p>
+        <p>
+            <span>Client</span>
+            <b th:utext="${domiciliation.client.denomination}"></b>
+        </p>
+        <p>
+            <span>Date expiration</span>
+            <b th:utext="${domiciliation.dateExpiration}"></b>
+        </p>
+        <p>
+            <span>Montant</span>
+            <b class="montant_format" th:utext="${domiciliation.montant}"></b>
+        </p>
+        <p>
+            <span>Devise</span>
+            <b th:utext="${domiciliation.devise.name}"></b>
+        </p>
+
+        <p>
+            <span>Montant Restant</span>
+            <b class="montant_format" style="color:blue" th:text="${domiciliation.montantRestant}"></b>
+        </p>
+    </div>
+
+    <div th:fragment="form">
+        <form method="post" id="domiciliation" th:action="@{/save-domiciliation}" th:object="${domiciliationForm}">
+            <div class="form-group mb-3">
+                <label>Selectionner le type:</label>
+                <select id="typeDomiciliation" class="form-control form-select " th:field="*{importation}">
+                    <option value="1">Importation</option>
+                    <option value="0">Exportation</option>
+                </select>
+                <span th:if="${#fields.hasErrors('importation')}" style="float:right;margin-top:-24px" class="text-danger">Ce champ est obligatoire</span>
+                <input type="hidden" name="banque" th:value="${banque.id}">
+            </div>
+            <div class="mb-3">
+                <label>Date de creation</label>
+                <input type="date" class="form-control" th:field="*{dateCreationStr}">
+                <span style="float:right;margin-top:-24px" th:if="${#fields.hasErrors('dateCreationStr')}" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="form-group mb-3">
+                <label>Selectionner la devise de la domiciliation</label> <br>
+                <select class="form-control form-select" th:field="*{devise}">
+                    <option value="">Selectionner la devise</option>
+                    <option th:each="d, state : ${devises}" th:value="${d.id}" th:text="${d.name}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('devise')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="mb-3">
+                <label>Montant (conformément à la dévise)</label>
+                <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
+                                             'groupSeparator': ',', 'digits': 2,
+                                            'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
+                       placeholder="">
+<!--                <input placeholder="Montant" type="number" class="form-control" th:field="*{montant}">-->
+<!--                <input type="text" class="form-control" min="0" th:field="*{montant}" data-inputmask="'alias': 'decimal', 'groupSeparator': ','"-->
+<!--                       style="text-align: right;" inputmode="decimal" placeholder="0">-->
+<!--                <span th:if="${#fields.hasErrors('montant')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>-->
+            </div>
+            <div class="mb-3">
+                <label>Reference de la transaction</label>
+                <input placeholder="Reference" type="text" class="form-control" th:field="*{reference}">
+                <span th:if="${#fields.hasErrors('reference')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+            <div th:if="${client != null}" class="form-group mb-3">
+                <input type="hidden" th:value="${client.id}" name="client">
+                <label>Selectionner le Beneficiaire</label>
+                <select class="form-control form-select" th:field="*{beneficiaire}">
+                    <option value="">Selectionner un beneficiaire</option>
+                    <option th:each="b, state : ${banque.beneficiaires}" th:value="${b.id}" th:text="${b.name}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('beneficiaire')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+
+            <div id="domiciliation_clients" th:unless="${client != null}" class="form-group mb-3">
+                <label>Selectionner le client</label> <br>
+                <select class="form-control form-select " th:field="*{client}">
+                    <option value="">Selectionner le client</option>
+                    <option th:each="c, state : ${clients}" th:value="${c.id}" th:text="${c.denomination}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('client')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+
+            <div id="domiciliation_beneficiaire" th:unless="${client != null}" class="form-group mb-3">
+                <label>Selectionner le Beneficiaire</label>
+                <select class="form-control form-select" th:field="*{beneficiaire}">
+                    <option value="">Selectionner le beneficiaire</option>
+                    <option th:each="b, state : ${banque.beneficiaires}" th:value="${b.id}" th:text="${b.name}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('beneficiaire')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Selectionner la nature</label> <br>
+                <select id="typesTransactions" class="form-control form-select" th:field="*{typeDeTransaction}">
+                    <option value="">Selectionner le type de transaction</option>
+                    <option th:each="t, state : ${typesDeTransaction}" th:value="${t.id}" th:text="${t.name}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('typeDeTransaction')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Créer</button>
+
+        </form>
+    </div>
+
+</body>
+</html>

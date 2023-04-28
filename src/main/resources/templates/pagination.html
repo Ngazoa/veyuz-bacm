@@ -1,0 +1,19 @@
+
+
+<ul th:fragment="pagination" class="pagination pagination-lg">
+    <li th:if="${currentPage > 1}" class="page-item">
+        <a class="page-link" th:href="@{${uri}(page=${currentPage - 1})}"> < </a>
+    </li>
+    <th:block th:each="p, s : ${pages}">
+        <li th:if="${p == currentPage}" class="page-item active">
+            <a th:text="${s.count}" class="page-link" th:href="@{${uri}(page=${p})}"></a>
+        </li>
+        <li th:unless="${p == currentPage}" class="page-item">
+            <a th:text="${s.count}" class="page-link" th:href="@{${uri}(page=${p})}"></a>
+        </li>
+    </th:block>
+
+    <li class="page-item" th:if="${currentPage < nbPages}">
+        <a class="page-link" th:href="@{${uri}(page=${currentPage + 1})}"> > </a>
+    </li>
+</ul>

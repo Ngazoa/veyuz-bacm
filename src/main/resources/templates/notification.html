@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Transaction Manager</title>
+
+<th:block id="others-static-ressource"></th:block>
+
+<th:block id="others-js"></th:block>
+
+<div id="main-content">
+
+    <div class="card">
+        <div class="card-header">
+            Total Notifications :
+            <h5 class="card-title" th:text="${nbreNotif}">
+
+            </h5>
+            <h6 class="card-subtitle text-muted"></h6>
+        </div>
+        <div class="card-body">
+            <div class="position-relative">
+                <div class="chat-messages p-4">
+                    <div th:if="${message}!=null">
+                    <div class="chat-message-left pb-4" th:each="m :${message}">
+                        <div>
+<!--                            <div class="text-muted small text-nowrap mt-2">2:39 am</div>-->
+                        </div>
+                        <div class="flex-shrink-1 bg-light rounded py-2 px-3 ms-3">
+                            <div class="font-weight-bold mb-1" th:utext="${m.dateCreation}"></div>
+                           <p th:utext="${m.message}"></p>
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</html>

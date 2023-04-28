@@ -1,0 +1,33 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Transaction Manager</title>
+
+<th:block id="others-static-ressource"></th:block>
+
+<th:block id="others-js"></th:block>
+
+<div id="main-content">
+
+
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+                Importer les transactions
+            </h5>
+            <h6 class="card-subtitle text-muted"></h6>
+        </div>
+        <div class="card-body">
+            <div th:replace="fragment/reporting-fragments::import-transaction-form"></div>
+        </div>
+    </div>
+</div>
+
+</html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name=ProgId content=Word.Document>
+    <meta name=Generator content="Microsoft Word 15">
+    <meta name=Originator content="Microsoft Word 15">
+    <title>Lettre d'engagement pour importation des services</title>
+    <style>
+        .main {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 1em;
+            line-height:25px;
+        }
+        h3 {font-size: 16px;}
+        h2 {font-size: 18px}
+        .date_jour {
+            text-align:center;
+            font-size: 16px;
+        }
+        .author-cont {
+            text-align:center;
+
+        }
+        .author_letter {
+            width: 100%;
+            max-width: 500px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+        .author_letter h2{
+            font-size:18px;
+
+        }
+        .author-cont h3{
+            font-size: 16px;
+        }
+        .objet{
+            margin-top: 50px;
+            margin-bottom: 30px;
+        }
+        .objet h3 span{
+            display:inline-block;
+            vertical-align:top
+        }
+        .objet-title {
+            width: 70px;
+            text-decoration:underline;
+            font-size: 18px;
+        }
+        .objet-intitule {
+            width: 700px;
+            font-size:18px;
+        }
+        p {
+            text-align: justify;
+            text-indent: 40px;
+        }
+        .engagement, .assurance {
+            font-weight: bold;
+        }
+        .signature{
+            text-align: center;
+            font-size: small;
+        }
+        .merci {
+            margin-top: 40px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="date_jour">
+        <h4>Douala le <span th:text="${date}">(dd/MM/yyyy)</span></h4>
+    </div>
+    <div class="author-cont">
+        <div class="author_letter">
+            <h2>
+                Monsieur le Directeur Général de la SCB Cameroun
+            </h2>
+        </div>
+        <h3>BP. 300 Douala</h3>
+    </div>
+
+    <div class="objet">
+        <div>
+            <h3 class="title">
+                <span class="objet-title">Objet:</span>
+                <span class="objet-intitule">
+                        Lettre d’engagement à fournir les justificatifs
+                        d’apurement de dossiers de transfert d’importation de services
+                    </span>
+            </h3>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <p>
+                Nous vous remercions de bien vouloir exécuter le présent transfert, en faveur de
+                <span th:text="${nomBeneficiaire}">(Nom du beneficiaire)</span>
+                conformément à notre ordre de transfert.
+            </p>
+            <p>
+                Chez
+                <span th:text="${chez}">(chez represente qui)</span>
+            </p>
+            <p>
+                Ce transfert représente le règlement de
+                <span th:text="${nomTypeTransaction}">(Motif ou objet de la transaction)</span> <br>
+                Comme indiqué sur la facture Pro Forma N° <span th:text="${numeroFacture}">(Numero de la facture)</span>
+                du <span th:text="${dateFacture}">(jour/mois/annee)</span>. D’un montant de <span th:text="${montantTransaction}">(Montant)</span>
+                <span th:text="${devise}">(Devise)</span>
+            </p>
+            <p>
+                Objet de la DI N° SGS <span th:text="${SGSNumber}">(SGSNumber)</span> du <span th:text="${dateSGS}">{dateSGS}</span>
+                domicilié chez vous sous le N° <span th:text="${referenceDomiciliation}">(referenceDomiciliation)</span> du <span th:text="${dateDomiciliation}">(dateDomiciliation)</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="engagement">
+        <div>
+            <p>
+                Par la présente, nous nous engageons à vous remettre dans un délai de 30 jours à
+                compter de la date d’exécution du transfert, les éléments ci-après que nous ne
+                détenons pas encore conformément à la Règlementation des Changes:
+            </p>
+        </div>
+    </div>
+
+    <ul class="liste_fichier">
+        <li>Facture définitive, note de débit, note de frais, note d’honoraire ou toute autre pièce justificative</li>
+        <li>Tout document justifiant la réalisation effective de l’importation de service notamment le procès-verbal de réception provisoire ou définitive, le rapport d’étude</li>
+    </ul>
+    <i>(Rayer la mention inutile)</i>
+
+    <div class="assurance">
+        <p>
+            Nous vous assurons que nous supporterons les conséquences du non-respect des dispositions ci-dessus.
+        </p>
+    </div>
+
+    <div class="merci">
+        <div>
+            <p>
+                Veuillez agréer, Monsieur le Directeur Général, l’expression de nos sentiments
+                distingués.
+            </p>
+        </div>
+    </div>
+
+    <p class="signature">
+        <i>Signature(s) Autorisée(s) précédée de la mention « LU et APPROUVE »</i>
+    </p>
+</div>
+
+</body>
+</html>

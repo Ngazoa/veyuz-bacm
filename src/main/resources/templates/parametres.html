@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+
+<title>Settings</title>
+
+<th:block id="others-static-ressource">
+    <link rel="stylesheet" th:href="@{/css/summernote.css}">
+</th:block>
+
+<th:block id="others-js">
+
+    <th:block>
+        <script th:src="@{/js/jquery2.js}"></script>
+        <!-- Bootstrap 4 -->
+        <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"
+                th:src="@{/js/bootstrap.bundle.min.js}"></script>
+        <script src="../../static/js/datatables.js" th:src="@{/js/benito.js}"></script>
+        <script src="../../plugins/summernote/summernote-bs4.min.js" th:src="@{/js/summernote-bs4.min.js}"></script>
+        <script>
+            $(function () {
+                $('#compose-textarea').summernote()
+            })
+
+
+        </script>
+
+    </th:block>
+
+</th:block>
+
+<div id="main-content">
+
+    <div class="container-fluid p-0">
+
+        <h1 class="h3 mb-3">Settings</h1>
+        <div class="alert alert-danger alert-dismissible" th:if="${errorMessage != null}" th:text="${errorMessage}">
+            ...
+        </div>
+        <div class="alert alert-success alert-dismissible" th:if="${flashMessage != null}" th:text="${flashMessage}">
+            ...
+        </div>
+
+        <div class="row">
+            <div th:replace="fragment/setting-fragments::setting-sidebar"></div>
+
+            <th:block th:if="${profile != null}">
+                <th:block th:replace="fragment/setting-fragments::setting-profile-form">
+
+                </th:block>
+
+            </th:block>
+
+            <div class="col-md-9 col-xl-10" th:if="${showClientList != null}">
+
+                <div class="alert alert-success" th:if="${flashClient != null}">
+                    <p>Le client <b th:text="${flashClient.denomination}"></b> a ete ajouté !</p>
+                </div>
+                <div class="pull-right text-right mb-4">
+                    <a class="       btn btn-primary" th:href="@{/clients/new}" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+             or #authorization.expression('hasRole(''ROLE_CHECKER'')')
+             or #authorization.expression('hasRole(''ROLE_MACKER'')')}
+">nouveau client</a>
+                    <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+             or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
+                        <a class="btn btn-secondary float-right" th:href="@{/import-clients}">Importer les clients
+                            existant</a>
+                    </th:block>
+                    <br>
+                </div>
+                <div class="row">
+                    <form class="chat-message-right" method="post" th:action="@{/search-clients-veyuz}">
+                        <div class="input-group input-group-navbar  btn-success">
+                            <input aria-label="Search" class="form-control btn-success text-secondary" minlength="8"
+                                   name="telephone" placeholder="Rechercher par le numero de telephone du client...."
+                                   required
+                                   type="number">
+                            <button class="btn" type="submit">
+                                <svg class="feather feather-search align-middle" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                    <br><br>
+                    <form class="chat-message-right" method="post" th:action="@{/search-clients-veyuz2}">
+                        <div class="input-group input-group-navbar  btn-primary">
+                            <input aria-label="Search" class="form-control btn-success text-secondary" minlength="2"
+                                   name="telephone" placeholder="Rechercher par le nom du client...."
+                                   required type="text">
+                            <button class="btn" type="submit">
+                                <svg class="feather feather-search align-middle" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <br>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            Liste des clients
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:replace="fragment/client-fragment::list-client"></th:block>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${letterForm == 'engagement'}">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            Configuration Lettre d'engagement
+
+                        </h5>
+                        <div class="pull-right text-right">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:replace="fragment/lettre-fragment::lettre-engagement"></th:block>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${letterForm == 'mise-demeure'}">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            Configuration Mise en demeure
+
+                        </h5>
+                        <div class="pull-right text-right">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:replace="fragment/lettre-fragment::mise-en-demeure"></th:block>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${passwordForm == 'password'}">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            Edition mot de passe
+
+                        </h5>
+                        <div class="pull-right text-right">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:replace="fragment/setting-fragments::password"></th:block>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${editClient != null}">
+                <th:block th:replace="fragment/client-fragment::client-form"></th:block>
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${isImport != null}">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+
+                    <div class="alert-message">
+                        <h4 class="alert-heading">Astuce</h4>
+                        <p>
+                            Cette page vous donne la possibilité d'ajouter les transactions existentes a partir d'un
+                            fichier excel
+                        </p>
+                        <p>
+                            Assurez-vous que votre fichier soit formaté de la maniere suivante :
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Importer les données</h5>
+
+                    </div>
+                    <div class="card-body">
+                        <th:block th:replace="fragment/transaction-fragments::import-transaction-form"></th:block>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${uploadFileMiseEnDemeure != null}">
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+                    <div class="alert-message">
+                        <h4 class="alert-heading">Info</h4>
+                        <p>
+                            Dans cette partie vous allez pouvoir envoyer des mises en demeures à vos clients en
+                            utilisant un fichier
+                            excel dument remplit.
+                        </p>
+                        <p>
+                            Le fichier doit être un fichier excel donc l'extension est <b class="text-success">.xlsx</b>
+                            et il doit etre
+                            formaté de la manière suivante:
+                        </p>
+                        <ul>
+                            <li>La premiere ligne du fichier contient les entêtes</li>
+                            <ul>
+                                <li><b class="text-success">A1</b> : la reference de la transaction</li>
+                                <li><b class="text-success">B1</b> : la date de la transaction</li>
+                                <li><b class="text-success">C1</b> : le montant de la transaction</li>
+                                <li><b class="text-success">D1</b> : le nom du beneficiaire</li>
+                                <li><b class="text-success">E1</b> : le delai d'apurement</li>
+                                <li><b class="text-success">F1</b> : la liste des documents attendus (les documents
+                                    doivent être séparés par des point-virgule <b>(;)</b>)
+                                </li>
+                                <li><b class="text-success">G1</b> : l'adresse email du client</li>
+                            </ul>
+                            <li>Les données commencent à la ligne 2</li>
+                            <li>Si les clients doivents enregistrer dans veyuz alors cocher la case ci-dessous</li>
+                            <li>Dans le cas où les clients doivent être sauvegardés dans veyuz, des informations
+                                complémentaires devraient être fournies
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Liste des clients</h5>
+                    </div>
+                    <div class="card-body">
+                        <form enctype="multipart/form-data" id="importFileForm" method="post" th:action="${importUri}"
+                              th:object="${importFileForm}">
+                            <div class="form-group mb-3 mt-2">
+                                <label class="form-label">Importer votre fichier</label>
+                                <i class="text-info">(Excel avec extension xls)</i>
+                                <input accept=".xlsx" class="form-control" required th:field="*{file}" type="file">
+                                <input th:field="*{banque}" type="hidden"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check">
+                                    <input th:field="*{saveCustomer}" type="checkbox">
+                                    <span class="form-check-label">Sauvegarder les clients dans veyuz</span>
+                                </label>
+                            </div>
+                            <button class="btn btn-primary" id="submitButton" style="float:right" type="submit">Envoyer
+                                les mises en demeure
+                            </button>
+                        </form>
+                        <div class="modal fade" id="results">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Apperçu des mails envoyés</h5>
+                                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" id="closeModal"
+                                                type="button"></button>
+                                    </div>
+                                    <div class="modal-body">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button data-bs-target="#results" data-bs-toggle="modal" id="resultShow"
+                                style="display:none;"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9 col-xl-10" th:if="${isTypeTransaction != null or isTypeFichier != null}">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Liste</h5>
+                            </div>
+                            <div class="card-body">
+                                <div style="overflow:auto;">
+                                    <table class="table table-striped" style="width:100%"
+                                           th:if="${isTypeTransaction != null}">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Code</th>
+                                            <th>Type</th>
+                                            <th>Nature</th>
+                                            <th>Liste des fichiers</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="tdt, s : ${types}">
+                                            <td th:text="${s.count}"></td>
+                                            <td th:text="${tdt.name}"></td>
+                                            <td th:text="${tdt.code}"></td>
+                                            <td th:text="${tdt.import ? 'importation' : ''}"></td>
+                                            <td th:text="${tdt.type}"></td>
+                                            <td>
+                                        <span th:each="tdf : ${tdt.typeDeFichiers}">
+                                            <i class="badge bg-info" th:text="${tdf.name}"></i>
+                                        </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-striped" style="width:100%"
+                                           th:if="${isTypeFichier != null}">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Pour apurement</th>
+                                            <th>Transactions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="tdf, s : ${types}">
+                                            <td th:text="${s.count}"></td>
+                                            <td th:text="${tdf.name}"></td>
+                                            <td th:text="${tdf.obligatoireForApurement ? 'Yes' : 'No'}"></td>
+                                            <td>
+                                                <span th:each="tdt : ${tdf.typeDeTransactions}">
+                                                    <i class="badge bg-info" th:text="${tdt.name}"></i>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Edition</h5>
+                            </div>
+                            <div class="card-body">
+
+                                <form method="post" th:action="@{/post-type-transaction}"
+                                      th:if="${isTypeTransaction != null}" th:object="${typeTransactionForm}">
+                                    <div class="mb-3">
+                                        <label class="input-label">Nature de la transaction</label>
+                                        <input class="form-control" required th:field="*{name}" type="text">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="input-label">Code</label>
+                                        <input class="form-control" required th:field="*{code}" type="text">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" id="isForImportationLabel">
+                                            <input th:field="*{import}" type="checkbox">
+                                            <span class="input-label">Concerne les importations</span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="input-label">Type d'importation</label>
+                                        <select class="form-select" disabled th:field="*{type}">
+                                            <option value="">----------------------</option>
+                                            <option value="biens">Importation des biens</option>
+                                            <option value="services">Importation des services</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="input-label">Fichiers à fournir</label>
+                                        <select class="form-control choices-multiple" multiple th:field="*{fichiers}">
+                                            <option th:each="tdf : ${typesFichiersFournir}" th:value="${tdf.id}">
+                                                <th:block th:text="${tdf.name}"></th:block>
+                                                <th:block th:if="${tdf.obligatoireForApurement}">
+                                                    (fichier apurement)
+                                                </th:block>
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button class="btn btn-primary" type="submit">Enregistrer</button>
+                                    </div>
+                                </form>
+
+                                <form method="post" th:action="@{/post-type-fichier}" th:if="${isTypeFichier != null}"
+                                      th:object="${typeFichierForm}">
+                                    <div class="mb-3">
+                                        <label class="input-label">Intitulé du fichier</label>
+                                        <input class="form-control" required th:field="*{name}" type="text">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <input th:field="*{obligatoireForApurement}" type="checkbox">
+                                            <span class="input-label">Obligatoire pour apurement</span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button class="btn btn-primary" type="submit">Enregistrer</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</html>

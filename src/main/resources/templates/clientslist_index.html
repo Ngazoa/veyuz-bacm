@@ -1,0 +1,23 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Liste des clients</title>
+
+<div id="main-content">
+
+    <h1>LISTE DES CLIENTS</h1>
+    <hr>
+    <a class="btn btn-primary" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER'')')
+    or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{/banque-customers-new/banque-{id}(id=${banque.id})}">nouveau
+        client</a><br><br>
+
+    <table th:replace="fragment/client-fragment::list-client"></table>
+
+    <th:block id="others-js"></th:block>
+</div>
+</html>

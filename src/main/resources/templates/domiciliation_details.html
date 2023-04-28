@@ -1,0 +1,123 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Domiciliation Manager</title>
+
+    <th:block id="others-static-ressource">
+        <style>
+            #details-domiciliation p b{
+                text-align: left;
+                color: rgb(0, 162, 232);
+                float: right;
+            }
+            #details-transaction {
+                border-right: solid 1px #ccc;
+                padding-right: 25px;
+            }
+        </style>
+    </th:block>
+
+    <div id="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Gestion des domiciliations</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5" id="details-domiciliation" th:replace="fragment/domiciliation-fragments::details">
+
+                    </div>
+                    <div class="col-md-5">
+                        <div th:replace="fragment/domiciliation-fragments::list">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block id="others-js">
+    <script>
+            $(document).ready(function(){
+
+            })
+            $("#domiciliation").on("change", function(e){
+                var elt = $(this);
+                findDomiciliationInfo(elt);
+            })
+
+            function findDomiciliationInfo(elt) {
+                var dm = $(elt).val();
+                if(dm != "") {
+                    $.ajax({
+                        url: "/domiciliation-infos/" + dm,
+                        type: "GET",
+                        dataType: "JSON",
+                        beforeSend: function() {
+
+                        },
+                        success: function(response) {
+                            $("#typeDeTransactionV").val(response.domiciliation.typeDeTransaction.name);
+                            $("#deviseV").val(response.devise.name);
+                            $("#beneficiaireV").val(response.domiciliation.beneficiaire.name);
+
+                            $("#typeDeTransaction").val(response.domiciliation.typeDeTransaction.id);
+                            $("#devise").val(response.devise.id);
+                            $("#beneficiaire").val(response.domiciliation.beneficiaire.id);
+                            $("#montant").prop("max", response.domiciliation.montantRestant).prop("disabled", false);
+                            $("#submitButton").prop("disabled", false);
+                        },
+                        error: function() {
+                            $("#submitButton").prop("disabled", false);
+                        }
+                    })
+                }else {
+                    $("#typeDeTransactionV").val("");
+                    $("#deviseV").val('');
+                    $("#beneficiaireV").val('');
+
+                    $("#typeDeTransaction").val('');
+                    $("#devise").val('');
+                    $("#beneficiaire").val('');
+                    $("#montant").prop("max", '').prop("disabled", true);
+                    $("#submitButton").prop("disabled", true);
+                }
+            }
+
+            $("#transactionFor").on("submit", function(e){
+                e.preventDefault();
+                ajaxSubmitFormTransaction();
+            })
+
+            function ajaxSubmitFormTransaction() {
+                var form = $("#transactionForm")[0];
+                var data = new FormData(form);
+                $("#submitButton").prop("disabled", true);
+                $.ajax({
+                    type: $("#transactionForm").attr("method"),
+                    url: $("#transactionForm").attr("action"),
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    timeout: 1000000,
+                    dataType: "JSON",
+                    success: function(response) {
+                        $("#submitButton").prop("disabled", false);
+                        if(response.isSaved) {
+                            window.location.href = response.redirectUrl;
+                        }
+                    },
+                    error: function(jqXHR) {
+                        alert("Erreur : "+jqXHR.responseText)
+                    }
+                })
+            }
+        </script>
+</th:block>
+</html>

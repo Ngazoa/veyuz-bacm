@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Gestion des beneficiares</title>
+
+    <th:block id="others-static-ressource"></th:block>
+
+    <div id="main-content">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Gestion Béneficiaires</h5>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-striped" style="width:100%">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Reference</th>
+                                        <th>Nom</th>
+                                        <th>Date ajout</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:if="${beneficiaires!=null}" th:each="b, state : ${beneficiaires}">
+                                        <td th:text="${state.count}"></td>
+                                        <td th:text="${b.reference}"></td>
+                                        <td th:text="${b.name}"></td>
+                                        <td th:text="${b.dateCreation}"></td>
+                                        <td>
+                                            <a th:href="@{/rest-controller-{id}-beneficiaires-transactions(id=${b.id})}" class="show-benef-transactions">transactions</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+            <div class="col-md-5">
+                <div class="card" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')}">
+                    <div class="card-header">
+                        <h5 class="card-title">Ajouter un nouveau beneficiaire</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <form method="post" th:action="@{/post-beneficiaire}" enctype="multipart/form-data" th:object="${beneficiaireForm}">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nom du beneficiare</label>
+                                            <input th:field="*{name}" type="text" class="form-control">
+                                            <span th:if="${#fields.hasErrors('name')}" class="text-danger">Ce champs est obligatoire</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">KYC</label>
+                                            <input type="file" th:field="*{kycFile}" class="form-control">
+                                            <span th:if="${#fields.hasErrors('kycFile')}" class="text-danger">Ce champs est obligatoire</span>
+                                        </div>
+                                        <div>
+                                            <div>
+                                                <input type="hidden" th:field="*{banque}">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="sizedModalLg" tabindex="-1" role="dialog" aria-modal="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Liste des transactions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body m-3">
+                    <div id="transactions-benef" style="max-height: 400px;overflow:auto;">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <th:block id="others-js">
+
+        <script>
+            $('.show-benef-transactions').on("click", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).prop("href"),
+                    type: "GET",
+                    dataType: "JSON",
+                    beforeSend: function() {
+                        $("#transactions-benef").html('<div class="spinner-border text-secondary me-2" role="status"><span class="visually-hidden">Loading...</span></div>');
+                        $("#sizedModalLg").modal('show');
+                    },
+                    success: function(response) {
+                        if (!response.hasError) {
+                            $("#transactions-benef").html(response.transactions);
+                        }
+                        else {
+                            $("#transactions-benef").html(response.message);
+                        }
+                    },
+                    error: function() {
+                        $("#sizedModalLg").modal('hidde');
+                    }
+                })
+            })
+        </script>
+
+    </th:block>
+</html>

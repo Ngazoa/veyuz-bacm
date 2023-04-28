@@ -1,0 +1,127 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Transaction Manager</title>
+    <th:block id="others-static-ressource">
+        <style>
+            #details-transaction p b{
+                text-align: left;
+                color: rgb(0, 162, 232);
+                float: right;
+            }
+            #details-transaction {
+                border-right: solid 1px #ccc;
+                padding-right: 25px;
+            }
+            #result{
+                background-color: #000;
+                color: #fff;
+                padding: 10px 15px;
+            }
+        </style>
+    </th:block>
+
+    <div id="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Gestion des fichiers de transaction</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6" id="details-transaction">
+                        <div th:replace="fragment/transaction-fragments::details"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <p th:if="${transaction.typeDeTransaction.type != null}">
+                            Télécharger la lettre d'<a th:href="${lettreUri}" target="_blank">engagement ici</a> et ajoutez
+                            là parmis les fichiers requis si celà est necessaire
+                        </p>
+                        <div th:replace="fragment/transaction-fragments::form-transaction-files">
+
+                        </div>
+                        <div id="result" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <th:block id="others-js">
+        <script>
+            $('.make-transaction-action").on("click", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).prop("href"),
+                    type: "GET",
+                    success: function(e) {
+                        if (e == true) {
+                            window.refresh();
+                        }
+                    }
+                });
+            })
+        </script>
+        <script>
+
+            $("#addFileButton").on("click", function(e){
+                e.preventDefault();
+                var elt = $(this);
+                $.ajax({
+                    url: $(elt).attr("href"),
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(response) {
+                        $("#foms-transaction-container").append(response.form);
+                        $('.remove-file').on("click", function(){
+                            $(this).parent().remove();
+                        })
+                    },
+                    error: function() {
+                        alert("Impossible de joindre le serveur ! erreur 500");
+                    }
+                });
+            })
+            $("#submitAllButton").on("click", function(e) {
+                e.preventDefault();
+                $("#result").html("");
+                $("#fileUploadForms form").each(function() {
+                    var elt = $(this);
+                    var form = $(this)[0];
+                    var data = new FormData(form);
+                    $("#submitAllButton").prop("disabled", true);
+                    $.ajax({
+                        type: "POST",
+                        enctype: 'multipart/form-data',
+                        url: $(elt).attr("action"),
+                        data: data,
+                        // prevent jQuery from automatically transforming the data into a query string
+                        processData: false,
+                        contentType: false,
+                        cache: false,
+                        timeout: 1000000,
+                        success: function(data, textStatus, jqXHR) {
+                            $("#result").append(data);
+                            $("#submitAllButton").prop("disabled", false);
+                            $(elt)[0].reset();
+                                  showNotif("Ficihier de la transaction enregistre avec succes . Vous allez etre redirige vers vos transactions ", "success", 5000);
+                              // setTimeout(window.location.href = '/transactions', 200000);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $("#result").html(jqXHR.responseText);
+                            console.log("ERROR : ", jqXHR.responseText);
+                            $("#submitAllButton").prop("disabled", false);
+                        }
+                    })
+                })
+            });
+        </script>
+    </th:block>
+
+
+</html>

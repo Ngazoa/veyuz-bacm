@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Transaction Manager</title>
+
+<th:block id="others-static-ressource">
+
+    <style>
+        .bg-dark {
+            background-color: #222;
+            color: #fff !important;
+        }
+        .bg-dark li a{
+            color: #fff !important;
+        }
+        .bg-dark li a.active {
+            color: #3b7ddd !important;
+            background-color: #222 !important;
+        }
+    </style>
+
+</th:block>
+
+<th:block id="others-js"></th:block>
+
+<div id="main-content">
+
+    <div class="mb-3" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or
+                            #authorization.expression('hasRole(''ROLE_TREASURY_OPS'')')
+                    or #authorization.expression('hasRole(''ROLE_TRADE_DESK'')')}">
+        <div style="text-align: right;">
+            <button class="btn btn-primary" data-bs-target="#miseDemeure" data-bs-toggle="modal">
+                Envoyer les mises en demeure
+            </button>
+            <a th:if="${exportUri != null}" th:href="@{${exportUri}}" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Exporter sur excel
+            </a>
+        </div>
+        <br>
+        <form th:if="${searchUri != null}" th:action="@{${searchUri}}" method="get" class="form-inline">
+            <div class="input-group">
+                <input type="text" name="reference" class="form-control" placeholder="Entrer la reference pour recherher..." required>
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </div>
+        </form>
+
+        <div class="modal fade" id="miseDemeure" role="dialog" aria-modal="true" tabindex="-1">
+            <div class="modal-dialog modal-lg" role="document">
+                <form th:if="${importFile != null}" class="modal-content" id="apurementForm" th:action="@{/rest-apurements/mise-demeure}" enctype="multipart/form-data" th:object="${importFile}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Envoie des mises en demeure</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3 mt-3">
+
+                            <input type="hidden" th:field="*{banque}">
+                            <div class="mb-3">
+                                <label class="form-label">Selectionnez votre fichier excel (.xlsx)</label>
+                                <input class="form-control" type="file" required th:field="*{file}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                        <a href="" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <input type="hidden" id="resultShow" data-bs-target="#miseDemeureResults" data-bs-toggle="modal">
+        <div class="modal fade" id="miseDemeureResults" role="dialog" aria-modal="true" tabindex="-1">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Mises en demeure</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                        <a href="" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+                Apurements 2.0
+            </h5>
+            <h6 class="card-subtitle text-muted"></h6>
+        </div>
+        <div class="card-body">
+            <div>
+                <table id="datatables-reponsive" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')')
+                 or #authorization.expression('hasRole(''ROLE_MACKER'')') }">Reference Transaction</th>
+                            <th>Motif de la transaction</th>
+                            <th>Client</th>
+                            <th>Beneficiaire</th>
+                            <th>Dévise</th>
+                            <th>Montant</th>
+                            <th>Date Ouv</th>
+                            <th>Delai</th>
+                            <th>Statut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ap, s : ${apurements}" class="" th:classappend="${ap.isApured == false and ap.isExpired == true ? 'bg-danger' : ''}">
+                            <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${ap.referenceTransaction}"></td>
+                            <td th:text="${ap.motif}"></td>
+                            <td th:text="${ap.client.denomination}"></td>
+                            <td th:text="${ap.beneficiaire}"></td>
+                            <td th:text="${ap.devise}"></td>
+                            <td class="montant_format" th:text="${ap.montant}"></td>
+                            <td th:text="${#dates.format(ap.dateOuverture, 'dd-MM-yyyy')}"></td>
+                            <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:data="${ap.id}" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}" th:data-value="${#dates.format(ap.dateExpiration, 'yyyy-MM-dd')}" class="dateExpirationApurement"></td>
+                            <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}"></td>
+                            <td>
+                                <span th:if="${ap.isApured == false and (ap.isExpired == false or ap.isExpired == null)}" class="badge bg-info">En cours</span>
+                                <span th:if="${ap.isApured}" class="badge bg-success">Acceptée</span>
+                                <span th:if="${ap.isApured == false and ap.isExpired == true}" class="badge bg-danger">Non apurée</span>
+                            </td>
+                            <td>
+                                <a th:unless="${ap.isApured}" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm apurement-btn-action" data-bs-toggle="modal" data-bs-target="#modal">
+                                    <i data-feather="eye"></i>
+                                    details
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <nav id="pagination" th:if="${nbPages != null and nbPages > 1 }" th:data-pages="${nbPages}" th:data-uri="${uri}" th:data-current="${currentPage}" aria-label="Page navigation example">
+                    <div th:replace="pagination::pagination"></div>
+                </nav>
+
+                <div data-ref="" class="modal fade" id="modal" role="dialog" aria-modal="true" tabindex="-1">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Détails apuremment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="tab tab-vertical">
+                                    <ul class="nav nav-tabs bg-dark" role="tablist">
+                                        <li class="nav-item" title="Fichiers manquants">
+                                            <a class="nav-link active" id="fichiersManquant" href="#vertical-icon-tab-2" data-bs-toggle="tab" role="tab">
+                                                <i class="align-middle" data-feather="file-minus"></i>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" title="Charger les fichiers manquants">
+                                            <a class="nav-link" id="showFileForms" href="#vertical-icon-tab-2" data-bs-toggle="tab" role="tab">
+                                                <i class="align-middle" data-feather="file-plus"></i>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" title="Fichiers envoyés">
+                                            <a class="nav-link" id="filesSend" href="#vertical-icon-tab-2" data-bs-toggle="tab" role="tab">
+                                                <i class="align-middle" data-feather="file-text"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="vertical-icon-tab-2" role="tabpanel">
+                                            <h4 class="tab-title">Liste des fichiers manquants</h4>
+                                            <div class="mb-3 mt-4">
+                                                <ul id="waiting-files-list">
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <a th:if="${#authorization.expression('hasRole(''ROLE_MACKER'')')
+                    or #authorization.expression('hasRole(''ROLE_CHECKER'')')
+                    or #authorization.expression('hasRole(''ROLE_AGENCE'')')}" href="" class="btn btn-success" id="validerApurement">Valider l'apurement</a>
+                                <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</html>

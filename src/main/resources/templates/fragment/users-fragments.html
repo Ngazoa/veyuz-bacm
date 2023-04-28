@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<div class="card" th:fragment="users-list">
+    <div class="card-header pb-0">
+        <div class="card-actions float-end">
+            <div class="dropdown position-relative">
+                <a aria-expanded="false" class="" data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                    <svg class="feather feather-more-horizontal align-middle" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+            </div>
+        </div>
+        <a class="btn btn-primary" th:href="@{${newUserFormUri}(id=${banque.id})}">Nouvel Agence/Admin</a>
+        <h5 class="card-title mb-0">
+            Liste des Agences/Admins
+        </h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped" id="datatables-reponsive" style="width:100%">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Nom & prenom</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Genre</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u, s : ${users}">
+                <td>
+
+                    <img alt="Avatar" class="rounded-circle my-n1" height="32"
+                         th:if="${u.avatar == null}" th:src="@{/img/avatars/avatar.png}" width="32">
+                    <img alt="Avatar" class="rounded-circle my-n1"
+                         height="32" th:if="${u.avatar != null}" th:src="@{/upload/avatar/{img}(img=${u.avatar})}" width="32">
+
+                </td>
+                <td>
+                    <span th:text="${u.nom}"></span>
+                    <span th:text="${u.prenom}"></span>
+                </td>
+                <td th:text="${u.email}"></td>
+                <td>
+                    <span th:utext="${u.telephone1}"></span>
+                    <span th:utext="${u.telephone2}"></span>
+                </td>
+                <td th:utext="${u.gender}"></td>
+                <td>
+                    <span class="badge bg-success" th:if="${u.enable == true}">Actif</span>
+                    <span class="badge bg-warning" th:unless="${u.enable == true}">Inactif</span>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button aria-expanded="false" aria-haspopup="true" class="btn btn-info dropdown-toggle"
+                                data-bs-toggle="dropdown" type="button">
+                            Select
+                        </button>
+                        <div class="dropdown-menu" style="">
+                            <a class="dropdown-item config-user-access" data-bs-target="#modalRoleUser"
+                               data-bs-toggle="modal" th:data-config="@{${postUserAccessForm}}"
+                               th:href="@{${configAccessUri}(id=${u.id})}">Configurer les acces</a>
+                            <a class="dropdown-item" th:href="@{/admin/edit-{id}/user(id=${u.id})}">Details</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item ajaxHref" th:href="@{${activeUserUri}(id=${u.id})}"
+                               th:if="${u.enable}">Bloquer</a>
+                            <a class="dropdown-item ajaxHref" th:href="@{${blockUserUri}(id=${u.id})}"
+                               th:unless="${u.enable}">Activer</a>
+
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div aria-hidden="true" class="modal fade" id="modalRoleUser" tabindex="-1">
+            <div class="modal-dialog modal-md" role="document">
+                <form class="modal-content" enctype="multipart/form-data" method="post"
+                      th:action="@{${postUserAccessForm}}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Configurer les acces</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body m-3"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Enregistrer les roles</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:fragment="user_roles">
+
+    <form method="post" th:action="@{/admin/save-user-roles}" th:object="${rolesForm}">
+        <div th:each="role, s : ${roles}">
+            <input th:name="appRoles" th:value="${role.id}" type="checkbox">
+            <label th:text="${role.roleName}"></label>
+            <hr>
+        </div>
+        <input th:field="*{appUser}" type="hidden" value="${user.id}">
+        <button class="btn btn-primary form-control form-control-lg" type="submit">Soumettre</button>
+    </form>
+</div>
+
+<div class="card" th:fragment="users-form">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            Ajouter une Agence/administrateur
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="error"
+             th:if="${errorMessage != null}" th:utext="${errorMessage}">...
+        </div>
+        <div class="m-sm-4">
+            <form enctype="multipart/form-data" method="post" th:action="@{${saveUserFormUri}}" th:object="${userForm}">
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label">Nom</label>
+                        <input class="form-control" placeholder="Nom" th:field="*{nom}" type="text">
+                        <span class="text-danger" th:if="${#fields.hasErrors('nom')}">Ce champs est obligatoire</span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputLastName">Prenom</label>
+                        <input class="form-control" id="inputLastName" placeholder="Prenom" th:field="*{prenom}"
+                               type="text">
+                        <span class="text-danger"
+                              th:if="${#fields.hasErrors('prenom')}">Ce champs est obligatoire</span>
+                        <input th:field="*{banque}" th:value="${banque.id}" type="hidden">
+                        <input th:field="*{userId}" th:value="${userId}" type="hidden">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label">Date de naissance</label>
+                        <input class="form-control" th:field="*{dateNaissanceStr}" type="date">
+                        <span class="text-danger" th:if="${#fields.hasErrors('dateNaissanceStr')}">Ce champs est obligatoire</span>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label">Lieu de naissance</label>
+                        <input class="form-control" placeholder="Lieu de naissance" th:field="*{lieuNaissance}"
+                               type="text">
+                        <span class="text-danger" th:if="${#fields.hasErrors('lieuNaissance')}">Ce champs est obligatoire</span>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label">Genre</label>
+                        <select class="form-control" th:field="*{gender}">
+                            <option value="">Select sexe</option>
+                            <option value="M">Masculin</option>
+                            <option value="F">Feminin</option>
+                        </select>
+                        <span class="text-danger"
+                              th:if="${#fields.hasErrors('gender')}">Ce champs est obligatoire</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Adresse</label>
+                    <input class="form-control" placeholder="Adresse" th:field="*{adresse}" type="text">
+                    <span class="text-danger" th:if="${#fields.hasErrors('adresse')}">Ce champs est obligatoire</span>
+                </div>
+                <div class="row">
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label">Telephone 1</label>
+                        <input class="form-control" placeholder="Telephone 1" th:field="*{telephone1}" type="text">
+                        <span class="text-danger"
+                              th:if="${#fields.hasErrors('telephone1')}">Ce champs est obligatoire</span>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label">Telephone 2</label>
+                        <input class="form-control" placeholder="Telephone 2" th:field="*{telephone2}" type="text">
+                        <span class="text-danger"
+                              th:if="${#fields.hasErrors('telephone2')}">Saissez un numero valide</span>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label">Image</label>
+                        <input class="form-control" th:field="*{avatarFile}" type="file">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="mb-3 col-md-3">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" placeholder="Email" th:field="*{email}" type="email">
+                        <span class="text-danger" th:if="${#fields.hasErrors('email')}">Cet email est utilisé ou n'est pas valide</span>
+                    </div>
+                    <div class="mb-3 col-md-3">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" placeholder="Nom d'utilisateur" th:field="*{userName}" type="text">
+                        <span class="text-danger" th:if="${#fields.hasErrors('userName')}">Ce nom est reservé</span>
+                    </div>
+                    <div class="mb-3 col-md-3">
+                        <label class="form-label">Mot de passe</label>
+                        <input class="form-control" placeholder="Mot de passe" th:field="*{password}" type="password">
+                        <span class="text-danger"
+                              th:if="${#fields.hasErrors('password')}">Ce champs est obligatoire</span>
+                    </div>
+                    <div class="mb-3 col-md-3">
+                        <label class="form-label">Confirmation de mot passe</label>
+                        <input class="form-control" placeholder="Confirmation du mot de passe" th:field="*{confirmPassword}"
+                               type="password">
+                        <span class="text-danger" th:if="${#fields.hasErrors('confirmPassword')}">Vous devez confirmer le mot de passe</span>
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-primary" type="submit">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="profile">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Profile Details</h5>
+        </div>
+        <div class="card-body text-center">
+
+            <img alt="Photo" class="img-fluid rounded-circle mb-2"
+                 height="128" th:src="@{/upload/avatar/{data}(data=${#authentication.getPrincipal().getAvatar()})}" width="128">
+            <h5 class="card-title mb-0" th:text="${#authentication.getPrincipal().getNom()}"></h5>
+            <div class="text-muted mb-2" th:text="${#authentication.getPrincipal().getPrenom()}"></div>
+
+            <div>
+                <a class="btn btn-primary btn-sm" href="#">Follow</a>
+                <a class="btn btn-primary btn-sm" href="#">
+                    <svg class="feather feather-message-square" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Message</a>
+            </div>
+        </div>
+        <hr class="my-0">
+        <div class="card-body">
+            <h5 class="h6 card-title">Naissance</h5>
+            NE LE <a class="badge bg-primary me-1 my-1" href="#"
+                     th:text="${#authentication.getPrincipal().getDateNaissance()}"></a>
+            A <a class="badge bg-primary me-1 my-1" href="#"
+                 th:text="${#authentication.getPrincipal().getLieuNaissance()}"></a>
+            SEXE: <a class="badge bg-primary me-1 my-1" href="#"
+                     th:text="${#authentication.getPrincipal().getGender()}"></a>
+            NOM UTILISATEUR : <a class="badge bg-primary me-1 my-1" href="#"
+                                 th:text="${#authentication.getPrincipal().getUsername()}"></a>
+            ROLES:
+            <!--            <a href="#" class="badge bg-primary me-1 my-1" th:text="${#authentication.getPrincipal().getUserRoles()}"></a>-->
+            <!--            <a href="#" class="badge bg-primary me-1 my-1">React</a>-->
+            <!--            <a href="#" class="badge bg-primary me-1 my-1">Redux</a>-->
+            <!--            <a href="#" class="badge bg-primary me-1 my-1">UI</a>-->
+            <!--            <a href="#" class="badge bg-primary me-1 my-1">UX</a>-->
+        </div>
+        <hr class="my-0">
+        <div class="card-body">
+            <h5 class="h6 card-title">About</h5>
+            <ul class="list-unstyled mb-0">
+                <li class="mb-1">
+                    <svg class="feather feather-home feather-sm me-1" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Habite <a href="#" th:text="${#authentication.getPrincipal().getAdresse()}"></a>
+                </li>
+
+                <li class="mb-1">
+                    <svg class="feather feather-briefcase feather-sm me-1" fill="none" height="24"
+                         stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                         width="24" xmlns="http://www.w3.org/2000/svg">
+                        <rect height="14" rx="2" ry="2" width="20" x="2" y="7"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                    Adress mail <a href="#" th:text="${#authentication.getPrincipal().getEmail()}">GitHub</a></li>
+                <li class="mb-1">
+                    <svg class="feather feather-map-pin feather-sm me-1" fill="none" height="24" s stroke-linecap="round" stroke-linejoin="round"
+                         stroke-width="2" troke="currentColor" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z">
+
+                        </path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Telephone <a href="#" th:text="${#authentication.getPrincipal().getTelephone1()}">Boston</a></li>
+            </ul>
+        </div>
+        <hr class="my-0">
+        <div class="card-body">
+            <h5 class="h6 card-title">Reseaux </h5>
+            <ul class="list-unstyled mb-0">
+                <li class="mb-1"><span class="fas fa-globe fa-fw me-1"></span> <a href="#">staciehall.co</a></li>
+                <li class="mb-1"><span class="fab fa-twitter fa-fw me-1"></span> <a href="#">Twitter</a></li>
+                <li class="mb-1"><span class="fab fa-facebook fa-fw me-1"></span> <a href="#">Facebook</a></li>
+                <li class="mb-1"><span class="fab fa-instagram fa-fw me-1"></span> <a href="#">Instagram</a></li>
+                <li class="mb-1"><span class="fab fa-linkedin fa-fw me-1"></span> <a href="#">LinkedIn</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</html>

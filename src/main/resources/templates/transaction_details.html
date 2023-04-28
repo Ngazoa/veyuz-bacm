@@ -1,0 +1,146 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Transaction Manager</title>
+</head>
+<th:block id="others-static-ressource">
+    <style>
+        #details-transaction p b{
+            text-align: left;
+            color: rgb(0, 162, 232);
+            float: right;
+        }
+        #details-transaction {
+            border-right: solid 1px #ccc;
+            padding-right: 25px;
+        }
+    </style>
+</th:block>
+
+<div id="main-content">
+    <div class="card">
+        <div class="card-header">
+
+            <h5 class="card-title">Détails de la transaction</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6" id="details-transaction">
+                    <div th:replace="fragment/transaction-fragments::details"></div>
+                </div>
+                <div class="col-md-6">
+                    <div th:replace="fragment/transaction-fragments::transaction-files">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Historique transaction</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <table class="table table-bordered table-paginable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Effectué par</th>
+                            <th>Operation </th>
+                            <th>Commentaire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a, s : ${actions}">
+                            <td th:text="${s.count}"></td>
+                            <td th:text="${a.dateCreation}"></td>
+                            <td th:text="${a.appUser.nom}"></td>
+                            <td th:text="${a.action}"></td>
+                            <td th:utext="${a.commentaire}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<th:block id="others-js">
+
+    <script>
+
+        function showNotif(contenu, type='success'){
+            var rc = 'danger';
+            if(type == 'danger') {
+                rc = 'success';
+            }
+            $('#type').removeClass('bg-'+rc);
+            $('#notif').addClass('bg-'+type);
+            $('#notif p').html(contenu);
+            $("#notif").fadeIn(500);
+            setTimeout(function(){
+                $("#notif").fadeOut(500);
+			}, 5000);
+        }
+
+        $('.make-transaction-action').on("click", function(e){
+            e.preventDefault();
+            $.ajax({
+                url: $(this).prop("href"),
+                success: function(response) {
+                    var type = 'danger';
+                    if (response.isChange==false) {
+                       showNotif(response.message, type);
+                    }else{
+                        type = 'success';
+                        showNotif(response.message, type);
+                        setTimeout(window.location.href = '/transactions',90000);
+                    }
+                }
+            })
+        })
+
+        $('.send-back').on("click", function(e){
+            var uri = $(this).attr("href");
+            $("#modalRenvoyer form").attr("action", uri);
+        })
+
+        $("#modalRenvoyer form").on("submit", function(e){
+            e.preventDefault();
+            var form = $(this);
+            $.ajax({
+                url : $(form).prop("action"),
+                type: "POST",
+                data: $(form).serialize(),
+                dataType: "JSON",
+                success: function(response) {
+                    var type = 'danger';
+                    if(response.isChange) {
+                        type = 'success';
+                    }
+                    showNotif(response.message, type);
+                setTimeout(window.location.href = '/transactions',60000);
+
+                },
+                error: function() {
+                    window.location.href = '/transactions';
+                    alert("Une erreur est survenue !");
+                }
+            })
+        })
+
+    </script>
+
+</th:block>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/veyuz-layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Gestion des banques</title>
+
+    <th:block id="others-static-ressource"></th:block>
+
+    <div id="main-content">
+
+        <th:block th:if="${index != null}">
+
+        </th:block>
+
+        <th:block th:if="${showBanksList != null}">
+            <div>
+                <a th:href="@{/veyuz/banks/new}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouvelle banque</a>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Liste des banque</h5>
+                </div>
+                <div class="card-body">
+                    <th:block th:replace="fragment/banque-fragments::list-bank"></th:block>
+                </div>
+            </div>
+        </th:block>
+
+        <th:block th:if="${banqueForm != null}">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title" th:utext="${cardTitle}"></h5>
+                </div>
+                <div class="card-body">
+                    <th:block th:replace="fragment/banque-fragments::form"></th:block>
+                </div>
+            </div>
+        </th:block>
+
+        <th:block th:if="${usersList != null}">
+            <th:block th:replace="fragment/users-fragments::users-list"></th:block>
+        </th:block>
+
+        <th:block th:if="${showEditUserForm != null}">
+            <a th:href="@{${newUserFormUri}(id=${banque.id})}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouvel utilisateur</a>
+            <th:block th:replace="fragment/users-fragments::users-form"></th:block>
+        </th:block>
+
+        <th:block th:if="${TypeFichier != null}">
+            <div class="card">
+                <div class="card-header">
+                    <h5></h5>
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </th:block>
+
+        <th:block th:if="${typeTransaction != null}">
+            <div class="card">
+                <div class="card-header">
+                    <h5></h5>
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </th:block>
+
+        <th:block th:if="${pays != null}">
+            <div class="card">
+                <div class="card-header">
+                    <h5></h5>
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+
+    <th:block id="others-js"></th:block>
+</html>
+

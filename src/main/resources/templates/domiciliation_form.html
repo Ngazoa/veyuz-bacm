@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Domiciliation Manager</title>
+
+<th:block id="others-static-ressource"></th:block>
+
+    <div id="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Ajouter une nouvelle domiciliation</h5>
+            </div>
+            <div class="car-body">
+                <div class="row">
+                    <div class="col-md-7" style="border-right:1px solid #ccc;">
+<!--                        <div th:replace="fragment/domiciliation-fragments::list"></div>-->
+                    </div>
+                    <div class="col-md-5">
+                        <div style="padding: 10px;">
+                            <div  th:replace="fragment/domiciliation-fragments::form"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+
+            </div>
+        </div>
+    </div>
+
+
+    <th:block id="others-js">
+        <script>
+            $(document).ready(function(){
+                $("#domiciliation_clients #client").trigger("change");
+                $("#typeDomiciliation").trigger("change");
+            });
+
+            $("#domiciliation_clients #client").on("change", function(e){
+                var elt = $(this);
+                findDomiciliationInfo(elt);
+            })
+
+            $('form#domiciliatio').on("submit", function(e){
+                e.preventDefault();
+                var elt = $(this);
+                $.ajax({
+                    url: $(elt).attr("action"),
+                    type: $(elt).attr("method"),
+                    data: $(elt).serialize(),
+                    success: function(response) {
+                        alert(response);
+                    },
+                    error: function() {
+                        alert("Error");
+                    }
+                })
+            })
+
+            function findDomiciliationInfo(elt) {
+                var dm = $(elt).val();
+                if(dm != "") {
+                    $.ajax({
+                        url: "/get-client/" + dm,
+                        type: "GET",
+                        dataType: "JSON",
+                        beforeSend: function() {
+
+                        },
+                        success: function(beneficiaires) {
+                            var clients = "<option value=''>Selectionner le beneficiaire</option>";
+                            beneficiaires.forEach(function(b){
+                                clients += "<option value='"+ b.id +"'>" + b.name + "</option>"
+                            });
+                            $("#domiciliation_beneficiaires #beneficiaire").html(clients);
+                            $("#domiciliation_beneficiaires #beneficiaire").prop("disabled", false)
+                        },
+                        error: function() {
+                            $("#domiciliation_beneficiaires #beneficiaire").prop("disabled", true);
+                        }
+                    })
+                }else {
+                    $("#domiciliation_beneficiaires #beneficiaire").prop("disabled", true);
+                }
+            }
+
+        </script>
+
+    </th:block>
+
+
+</html>

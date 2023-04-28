@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta charset="UTF-8">
+    <title>Appercue Mail Notification</title>
+    <!--        <link rel="preconnect" href="https://fonts.gstatic.com">-->
+    <link rel="shortcut icon" th:href="@{/img/icons/veyuz.png}"/>
+    <link rel="stylesheet" th:href="@{/css/all.css}">
+    <link rel="stylesheet" th:href="@{/css/adminlte.min.css}">
+    <!-- summernote -->
+    <link rel="stylesheet" th:href="@{/css/summernote.css}">
+    <!--        <link rel="canonical" href="https://demo.adminkit.io/tables-datatables-responsive.html" />-->
+
+    <!--        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">-->
+
+    <!-- Choose your prefered color scheme -->
+    <link th:href="@{/css/light.css}" rel="stylesheet" href="../../static/css/light.css"/>
+    <link th:href="@{/css/benito.css}" rel="stylesheet" href="../../static/css/light.css"/>
+    <!--     <link href="/css/dark.css" rel="stylesheet">-->
+    <script th:src="@{/js/settings.js}" src="../../static/js/settings.js"></script>
+
+</head>
+
+
+<body style="background-color:grey">
+<input type="button" style="text-decoration: none;
+								color:black;
+								border: 2px solid #3b7ddd;
+								padding: 10px 30px;
+								font-weight: bold;" value="Cliquer pour telecharger" id="btnPrint" />
+<div >
+
+
+    <table align="center" border="0" cellpadding="0" cellspacing="0"
+       width="650" bgcolor="white" style="border:2px solid black"  id="dvContainer">
+    <tbody>
+    <tr>
+        <td align="center">
+            <table align="center" border="0" cellpadding="0"
+                   cellspacing="0" class="col-650" width="650">
+                <tbody>
+                <tr>
+                    <td align="center" style="background-color: #3b7ddd;
+										height: 50px;">
+
+                        <a href="#" style="text-decoration: none;">
+                            <p style="color:white;
+												font-weight:bold;">
+                                NOM BANQUE
+                            </p>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <tr style="height: 300px;">
+        <td align="center" style="border: none;
+						border-bottom: 2px solid #3b7ddd;
+						padding-right: 20px;padding-left:20px">
+            <img th:src="@{/img/avatars/vryuzblue.svg}" alt="Charles Hall" class="" width="132" height="132"/>
+
+            <p th:text="${LTitle}" style="font-weight: bolder;font-size: 42px;
+							letter-spacing: 0.025em;
+							color:black;">
+
+                <br>
+            </p>
+        </td>
+    </tr>
+
+    <tr style="display: inline-block;">
+        <td style="height: 150px;
+						padding: 20px;
+						border: none;
+						border-bottom: 2px solid #3b7ddd;
+						background-color: white;">
+
+            <h2 style="text-align: left;
+							align-items: center;">
+                Delais de rigueur
+            </h2>
+            <p class="data"
+               style="text-align: justify-all;
+							align-items: center;
+							font-size: 15px;
+							padding-bottom: 12px;">
+            <div  th:text="${mailTemplate}"></div>
+
+
+            <p>
+
+            </p>
+        </td>
+    </tr>
+    <tr style="border: none;
+			background-color: #3b7ddd;
+			height: 40px;
+			color:white;
+			padding-bottom: 20px;
+			text-align: center;">
+
+        <td height="40px" align="center">
+            <p style="color:white;
+	line-height: 1.5em;">
+                By veyuz.com
+            </p>
+            <a href="#"
+               style="border:none;
+		text-decoration: none;
+		padding: 5px;">
+
+                <img height="30"
+                     src=
+                             "https://extraaedgeresources.blob.core.windows.net/demo/salesdemo/EmailAttachments/icon-twitter_20190610074030.png"
+                     width="30"/>
+            </a>
+
+            <a href="#"
+               style="border:none;
+	text-decoration: none;
+	padding: 5px;">
+
+                <img height="30"
+                     src=
+                             "https://extraaedgeresources.blob.core.windows.net/demo/salesdemo/EmailAttachments/icon-linkedin_20190610074015.png"
+                     width="30"/>
+            </a>
+
+            <a href="#"
+               style="border:none;
+	text-decoration: none;
+	padding: 5px;">
+
+                <img height="20"
+                     src=
+                             "https://extraaedgeresources.blob.core.windows.net/demo/salesdemo/EmailAttachments/facebook-letter-logo_20190610100050.png"
+                     width="24"
+                     style="position: relative;
+			padding-bottom: 5px;"/>
+            </a>
+        </td>
+    </tr>
+    <tr>
+
+    </tr>
+    </tbody>
+</table>
+</div>
+<table>
+    <tbody>
+    <tr>
+        <td class="em_hide"
+            style="line-height:1px;
+				min-width:700px;
+				background-color:#ffffff;">
+            <img alt=""
+                 src="images/spacer.gif"
+                 style="max-height:1px;
+			min-height:1px;
+			display:block;
+			width:700px;
+			min-width:700px;"
+                 width="700"
+                 border="0"
+                 height="1">
+        </td>
+    </tr>
+    </tbody>
+    </br></br>
+</table>
+</body>
+<script th:src="@{/js/jquery.js}" src="../../static/js/jquery.js"></script>
+<script th:src="@{/js/app.js}" src="../../static/js/app.js"></script>
+<script th:src="@{/js/datatables.js}" src="../../static/js/datatables.js"></script>
+<script th:src="@{/js/benito.js}" src="../../static/js/datatables.js"></script>
+
+<script th:src="@{/js/jquery2.js}"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script th:src="@{/js/bootstrap.bundle.min.js}" src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<!-- AdminLTE for demo purposes -->
+<script th:src="@{js/demo.js}" src="../../dist/js/demo.js"></script>
+<!-- Summernote -->
+<script th:src="@{/js/summernote-bs4.min.js}" src="../../plugins/summernote/summernote-bs4.min.js"></script>
+
+
+<script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Datatables Responsive
+                $("#datatables-reponsive").DataTable({
+                    responsive: true
+                });
+            });
+
+</script>
+<script>
+  $(function () {
+    //Add text editor
+    $('#compose-textarea').summernote()
+  })
+
+</script>
+<script type="text/javascript">
+        $("#btnPrint").live("click", function () {
+            var divContents = $("#dvContainer").html();
+            var printWindow = window.open('', '', 'height=400,width=800');
+            printWindow.document.write('veyuz.com');
+            printWindow.document.write('</head><body >');
+            printWindow.document.write(divContents);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        });
+    </script>
+
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container d-flex flex-column" th:fragment="user_form">
+
+    <div class="m-sm-4">
+        <div th:if="${errorMessage != null}" th:utext="${errorMessage}" class="error">...</div>
+        <form th:action="@{${saveUserFormUri != null} ? saveUserFormUri : /admin-save-user}" method="post" enctype="multipart/form-data" th:object="${userForm}">
+            <div class="mb-3">
+                <label class="form-label">Nom </label>
+                <input class="form-control form-control-lg" type="text" th:field="*{nom}">
+                <span class="btn btn-warning" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Prenom </label>
+                <input class="form-control form-control-lg" type="text" th:field="*{prenom}">
+            </div>
+            <input type="hidden" th:value="${banque.id}" th:field="*{banque}">
+            <input type="hidden" th:value="${userId}" th:field="*{userId}">
+
+            <div class="mb-3">
+                <label class="form-label">Password </label>
+                <input class="form-control form-control-lg" type="password" th:field="*{password}"><span
+                    class="btn btn-warning" th:if="${#fields.hasErrors('password')}"
+                    th:errors="*{password}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Cofirmer Mot de passe </label>
+                <input class="form-control form-control-lg" type="password" th:field="*{confirmPassword}"><span
+                    class="btn btn-warning" th:if="${#fields.hasErrors('confirmPassword')}"
+                    th:errors="*{confirmPassword}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email </label>
+                <input class="form-control form-control-lg" type="email" th:field="*{email}"><span
+                    class="btn btn-warning" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Adresse </label>
+                <input class="form-control form-control-lg" t type="text" th:field="*{adresse}"><span
+                    class="btn btn-warning" th:if="${#fields.hasErrors('adresse')}" th:errors="*{adresse}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Nomutilisateur </label>
+                <input class="form-control form-control-lg" type="text" th:field="*{userName}"><span
+                    th:if="${#fields.hasErrors('userName')}"
+                    class="btn btn-warning" th:errors="*{userName}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Sexe </label>
+                <select class="form-control form-control-lg" th:field="*{gender}">
+                    <option value="">Select sexe</option>
+                    <option value="M">Masculin</option>
+                    <option value="F">Feminin</option>
+                </select>
+                <span th:if="${#fields.hasErrors('gender')}"
+                      class="btn btn-warning" th:errors="*{gender}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Telephone 1 </label>
+                <input class="form-control form-control-lg" type="text" th:field="*{telephone1}"><span
+                    th:if="${#fields.hasErrors('telephone1')}"
+                    class="btn btn-warning" th:errors="*{telephone1}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Telephone 2</label>
+                <input class="form-control form-control-lg" type="text" th:field="*{telephone2}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Date naissance </label>
+                <input class="form-control form-control-lg" type="date" th:field="*{dateNaissanceStr}"><span
+                    th:if="${#fields.hasErrors('dateNaissanceStr')}"
+                    class="btn btn-warning" th:errors="*{dateNaissanceStr}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Lieu Naissance </label>
+                <input class="form-control form-control-lg" type="text" th:field="*{lieuNaissance}"><span
+                    th:if="${#fields.hasErrors('lieuNaissance')}"
+                    class="btn btn-warning" th:errors="*{lieuNaissance}">..</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Avatar </label>
+                <input class="form-control form-control-lg" type="file" th:field="*{avatarFile}">
+            </div>
+            <button class="btn btn-primary" type="submit">Soumettre</button>
+        </form>
+    </div>
+</div>
+
+<div th:fragment="user_roles">
+    <form method="post" th:action="@{/admin/save-user-roles}" th:object="${rolesForm}">
+        <input type="hidden" th:field="*{appUser}">
+
+        <div th:each="role, s : ${roles}">
+            <input type="checkbox" th:field="*{appRoles}" th:value="${role.id}">
+            <label th:text="${role.roleName}"></label>
+            <hr>
+        </div>
+        <button class="btn btn-primary form-control form-control-lg" type="submit">Soumettre</button>
+    </form>
+</div>
+</body>
+</html>

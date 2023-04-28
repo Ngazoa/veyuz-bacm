@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="main-fragment (title, otherStaticResources, mainContent, otherJs)"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8">
+        <title th:replace="${title}">Title</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="AdminKit">
+        <meta name="keywords" content="">
+
+        <!--        <link rel="preconnect" href="https://fonts.gstatic.com">-->
+
+        <link rel="shortcut icon" th:href="@{/img/avatars/vryuzblue.svg}" />        <!-- Choose your prefered color scheme -->
+        <link th:href="@{/css/light.css}" rel="stylesheet" href="../../static/css/light.css"/>
+        <link th:href="@{/js/settings.js}" rel="stylesheet" href="../../static/js/settings.js"/>
+        <!-- SweetAlert2 -->
+        <link rel="stylesheet" th:href="@{/sweetalert2themebootstrap-4/bootstrap-4.css}"
+              href="../../static/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+
+        <style>
+            #datatables-reponsive_info, #datatables-reponsive_paginate {
+                display: none;
+                visibility: hidden;
+                opacity: 0;
+            }
+            .shortcup{
+                padding: 3px 5px;
+            }
+            .shortcup .nav-item{
+                border-right:1px solid #ccc;
+            }
+
+        </style>
+        <!-- END SETTINGS -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120946860-10"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-120946860-10', {'anonymize_ip': true});
+
+        </script>
+    <th:block th:replace="${otherStaticResources} ?: ~{}"></th:block>
+
+</head>
+<body data-theme="default" data-layout="fluid" data-sidebar-position="left" data-sidebar-layout="default">
+    <div class="wrapper">
+        <div th:replace="fragment/app-fragments::sidebar"></div>
+        <div class="main">
+            <div th:replace="fragment/app-fragments::navbar"></div>
+            <div th:replace="fragment/app-fragments::shortcup"></div>
+
+            <main class="content">
+                <div class="container-fluid p-0">
+
+                    <div class="mb-3">
+                        <h1 class="h3 d-inline align-middle">
+
+                        </h1>
+                    </div>
+
+                    <div th:if="${flashMessage != null}">
+                        <div class="alert alert-info alert-dismissible" role="alert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <div class="alert-message">
+                                <h4 class="alert-heading">Info</h4>
+                                <p th:utext="${flashMessage}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12" th:insert="${mainContent} ?: ~{}">
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row text-muted">
+                        <div class="col-6 text-start">
+                            <p class="mb-0">
+                                <a href="" target="_blank" class="text-muted"><strong>Veyuz</strong></a> &copy;
+                            </p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="#">Support</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="#">Help Center</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="#">Privacy</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="#">Terms</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            <div id="notif" style="position:fixed; top:5px;z-index:2000;width:100%;max-width:400px;right:3px;display:none;"
+                 class="bg-success">
+                <p style="min-height:30px;color:#fff;padding: 10px 15px;font-size:20px;">Une notification juste pour voir
+                    !</p>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/jquery/jquery.js}" src="../../static/js/jquery.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="../../static/sweetalert2/sweetalert2.js" th:src="@{/sweetalert2/sweetalert2.js}"></script>
+    <script th:src="@{/js/app.js}" src="../../static/js/app.js"></script>
+    <script th:src="@{/js/datatables.js}" src="../../static/js/datatables.js"></script>
+    <script th:src="@{/js/sensei237.js}" src="../../static/js/sensei237.js"></script>
+
+    <script>
+            $('#notif').hide();
+            document.addEventListener("DOMContentLoaded", function () {
+                var editor = new Quill("#quill-editor", {
+                    modules: {
+                        toolbar: "#quill-toolbar"
+                    },
+                    placeholder: "Type something",
+                    theme: "snow"
+                });
+                editor.on('text-change', function (delta, oldDelta, source) {
+                    document.getElementById("quill_html").value = editor.root.innerHTML;
+                });
+            });
+
+
+
+</script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Datatables Responsive
+            $("#datatables-reponsive").DataTable({
+                paginate: false,
+                responsive: true
+            });
+            $(".table-paginable").DataTable({
+                paginate: true,
+                responsive: true
+            });
+            // Choices.js
+            new Choices(document.querySelector(".choices-single"));
+            new Choices(document.querySelector(".choices-multiple"));
+        });
+
+
+</script>
+
+    <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+        <script>
+        var tmpDate;
+        $('.dateExpirationTransaction').each(function () {
+            var td = $(this);
+            var data = $(this).attr("data");
+            td.dblclick(function () {
+                var oldDate = td.text();
+                if (oldDate != "") {
+                    tmpDate = oldDate;
+                }
+                var inputDate = "<input min='" + tmpDate + "' type='date' value='" + tmpDate + "'>";
+                td.html(inputDate);
+                td.find('input').focus();
+                td.find('input').trigger("click");
+                td.find('input').blur(function () {
+                    var newDate = td.find('input').val();
+                    if (newDate == "" || newDate == oldDate) {
+                        newDate = oldDate;
+                        td.html(newDate);
+                    } else {
+                        changeTransactionExpirationDate(data, newDate, td);
+                    }
+                })
+            })
+
+        })
+
+        function changeTransactionExpirationDate(data, newDate, elt) {
+            $.ajax({
+                url: "/change-expiration-transaction-date/" + data + "/" + newDate,
+                success: function (response) {
+                    if (response.isChanged) {
+                        elt.html(newDate)
+                        elt.prev().prev().prev().text(response.nbJours)
+                    } else {
+                        alert("saisissez une date valide");
+                        elt.html(response.delay);
+                        elt.trigger("dblclick");
+                        console.log(tmpDate)
+                    }
+                },
+                error: function () {
+                    alert("Impossible de modifier la date ! erreur 500");
+                    elt.html(tmpDate);
+                    elt.trigger("dblclick");
+                }
+            })
+        }
+
+
+    </script>
+    </th:block>
+    <script>
+
+    $(window).on('load', function () {
+        $.ajax({
+            url: "/getNotificationNonLues",
+            success: function (response) {
+                document.querySelector("#nbreNotif").textContent = response.nbreNotif;
+                $("#lastNotif").html(response.lastNotif);
+            },
+            error: function () {
+                // alert("Impossible de modifier la date ! erreur 500");
+                console.log("-------------------------------------------------------------");
+            }
+        });
+    });
+
+
+</script>
+    <script>
+    $(window).on('load', function () {
+        $('.montant_format').each(function () {
+            var td = $(this);
+            var data = montant_format(td.text());
+            td.html(data);
+        });
+
+    });
+    function montant_format(number) {
+        var decimals = 2;
+        var dec_point = '.';
+        var thousands_sep = ',';
+        number = (number + '')
+                .replace(/[^0-9+\-Ee.]/g, '');
+        var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function (n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + (Math.round(n * k) / k)
+                            .toFixed(prec);
+                };
+        // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n))
+                .split('.');
+        if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+        }
+        if ((s[1] || '')
+                .length < prec) {
+            s[1] = s[1] || '';
+            s[1] += new Array(prec - s[1].length + 1)
+                    .join('0');
+        }
+        return s.join(dec);
+    }
+
+
+</script>
+    <script>
+    $(document).ready(function(){
+        setInterval(interval,30500);
+    });
+        function interval(){
+                       $.ajax({
+                url: "/get-transactions-en-attentes",
+                success: function (response) {
+                    if( response.nbre>0){
+                        window.notyf.open({
+                            type: "success",
+                            message: "Il existe actuellement - "+response.nbre+" - transaction(s) non traité(e)s. <u><a class=\"text-white\" href=\"/transactions/waiting\" target=\"_blank\">Plus de details ici</a></u> 🚀",
+                            duration: 5000,
+                            ripple: true,
+                            dismissible: false,
+                            position: {
+                                x: "rigth",
+                                y: "bottom"
+                            }
+                        });
+                        localStorage.setItem('popState', 'shown');
+                    }
+                },
+                error: function () {
+               }
+            });
+        }
+
+</script>
+    <th:block th:replace="${otherJs} ?: ~{}"></th:block>
+</body>
+</html>

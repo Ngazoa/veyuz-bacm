@@ -1,0 +1,196 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Transaction Manager</title>
+
+    <th:block id="others-static-ressource"></th:block>
+
+    <th:block id="others-js">
+        <script>
+            $(".delete-transaction").on("click", function(e){
+                e.preventDefault();
+                var elt = $(this);
+                $.ajax({
+                    url: $(elt).prop("href"),
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(response) {
+                        if (response.ok) {
+                            $(elt).parent().parent().parent().parent().remove();
+                        }
+                    }
+                })
+            })
+
+            document.addEventListener("DOMContentLoaded", function() {
+                var paginationContainer = $('#pagination');
+                var uri = paginationContainer.data("uri")
+                var nbPages = paginationContainer.data("pages")
+                var currentPage = paginationContainer.data("current");
+                console.log(uri + ', ' + nbPages + ' , ' + currentPage)
+
+            });
+        </script>
+    </th:block>
+
+    <div id="main-content">
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <h4 class="alert-heading">Astuce</h4>
+                <p>
+                    Les transactions effectuees s'afficherons ici sous la forme d'un tableau
+                </p>
+                <p th:if="${message != null}" th:text="${message}"></p>
+
+            </div>
+        </div>
+
+        <div th:if="${flashMessage != null}" class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <h4 class="alert-heading">Astuce</h4>
+                <a th:src="@{#flashMessage}" th:text="${flashMessage}"></a>
+
+            </div>
+        </div>
+
+            <fieldset class="mb-3">
+                <form method="post" th:action="@{${searchTransactionUri}}" th:object="${filter}" class="form-inline">
+
+                    <div class="row">
+                        <th:block sec:authorize="hasRole('ADMIN')">
+                            <div class="col-md-3">
+                                <label> Date de debut</label>
+                                <input type="date" th:field="*{date1}" class="form-control">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label> Date de fin</label>
+                                <input type="date" th:field="*{date2}" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <br>
+                                <input type="hidden" th:field="*{banque}">
+                                <input type="hidden" th:field="*{client}">
+                                <button type="submit" class="btn btn-primary">Appliquer</button>
+                            </div>
+                        </th:block>
+                        <th:block th:if="${newTransactionLink != null}" sec:authorize="hasRole('ADMIN')">
+                            <div class="col-md-2">
+                                <div class="btn-group btn-group-lg">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Nouvelle transaction
+                                    </button>
+                                    <div class="dropdown-menu" style="">
+                                        <a class="dropdown-item" th:href="@{${newTransactionLink}(client_id=${client.id}, type='normal')}">Transaction Financière</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" th:href="@{${newTransactionLink}(client_id=${client.id}, type='domiciliation')}">Utiliser une transaction commerciale</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                        <th:block sec:authorize="hasRole('CLIENT')">
+                            <div class="col-md-2">
+                                <div class="btn-group btn-group-lg">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Nouvelle transaction
+                                    </button>
+                                    <div class="dropdown-menu" style="">
+                                        <a class="dropdown-item" th:href="@{/transaction/new/{type}(type='normal')}">Transaction Financière</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" th:href="@{/transaction/new/{type}(type='domiciliation')}">Transaction commerciale</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </form>
+            </fieldset>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    Liste des transactions
+                </h5>
+                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+
+                    <a th:if="${withStatus == null}" th:href="@{/{id}-export/transaction(id=${banque.id}, type='excel')}">
+                        <i class="fas fa-excel"></i> exporter sur excel
+                    </a>
+                    <a th:unless="${withStatus == null}" th:href="@{/{id}-export/transaction(id=${banque.id}, type='excel', statut=${withStatus})}">
+                        <i class="fas fa-excel"></i> exporter sur excel
+                    </a>
+                </div>
+                <h6 class="card-subtitle text-muted"></h6>
+            </div>
+            <div class="card-body">
+                <table id="datatables-reponsive" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Type</th>
+                            <th>Client</th>
+                            <th>Beneficiaire</th>
+                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Agence</th>
+                            <th>Statut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="transaction, state : ${transactions}">
+
+                            <td th:utext="${transaction.reference}"></td>
+                            <td th:utext="${transaction.typeDeTransaction.name}"></td>
+                            <td th:utext="${transaction.client.denomination}"></td>
+                            <td th:utext="${transaction.beneficiaire.name}"></td>
+                            <td th:text="${transaction.dateCreation}"></td>
+                            <td class="montant_format" th:text="${transaction.montant}"></td>
+                            <td th:if="${transaction.appUser!=null}" th:text="${transaction.appUser.nom}"></td>
+                            <td th:if="${transaction.appUser==null}">/</td>
+                            <td>
+                                <span th:if="${transaction.statut == 0}" class="badge bg-primary">En attente</span>
+                                <span th:if="${transaction.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i>Traitement TDE</span>
+                                <span th:if="${transaction.statut == 2}" class="badge bg-primary">Validation TDE</span>
+                                <span th:if="${transaction.statut == 7}" class="badge bg-secondary">Traitement TOPs</span>
+                                <span th:if="${transaction.statut == 8}" class="badge bg-info">Validation TOPs</span>
+                                <span th:if="${transaction.statut == 3}" class="badge bg-success"><i class="fas fa-check"></i> Validée</span>
+                                <span th:if="${transaction.statut == -1}" class="badge bg-danger"><i class="fas fa-times"></i> Rejetée</span>
+                                <span th:if="${transaction.statut == 9}" class="badge bg-warning"><i class="fas fa-times"></i> Treasory</span>
+                                <span th:if="${transaction.statut == 4 or transaction.statut == 5}" class="badge bg-warning"><i class="fas fa-undo"></i> Renvoyée</span>
+
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Select
+                                    </button>
+                                    <div class="dropdown-menu" style="">
+                                        <a  class="dropdown-item" th:href="@{/transaction-{id}/details(id=${transaction.id})}">Afficher les details</a>
+                                        <div class="dropdown-divider"></div>
+                                        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CLIENT'')')}">
+                                        <a th:if="${transaction.statut <1}" class="dropdown-item delete-transaction" th:href="@{/delete-transaction-{id}(id=${transaction.id})}">Supprimer la transaction</a>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <nav id="pagination" th:if="${nbPages != null and nbPages > 1 }" th:data-pages="${nbPages}" th:data-uri="${uri}" th:data-current="${currentPage}" aria-label="Page navigation example">
+                    <div th:replace="pagination::pagination"></div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+</html>

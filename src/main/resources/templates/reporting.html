@@ -1,0 +1,36 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Transaction Manager</title>
+<th:block id="others-static-ressource"></th:block>
+<th:block id="others-js"></th:block>
+<div id="main-content">
+
+    <div class="card">
+        <div class="card-body">
+            <div th:replace="fragment/reporting-fragments::filtre"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+                Reporting
+            </h5>
+            <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') and date1Str != null and date2Str != null}" style="float-right" th:href="@{/{id}-export/apurements(id=${banque.id}, date1Str=${date1Str}, date2Str=${date2Str}, devise=${devise}, typeDeTransaction=${typeDeTransaction}, statut=${statut})}">
+                Exporter sur excel
+            </a>
+            <h6 class="card-subtitle text-muted"></h6>
+        </div>
+        <div class="card-body">
+            <div th:replace="fragment/reporting-fragments::table"></div>
+        </div>
+    </div>
+</div>
+</html>

@@ -1,0 +1,255 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+    <title>Transaction Manager</title>
+    <th:block id="others-static-ressource"></th:block>
+
+    <div id="main-content">
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <h4 class="alert-heading">Astuce</h4>
+                <p>
+                    Les transactions effectuées s'afficherons ici sous la forme d'un tableau
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" id="transactionForm" action="/save-transaction" th:object="${transactionForm}">
+                            <span th:text="${typeDomiciliation}"></span>
+                            <input type="hidden" th:field="*{banque}">
+                            <input type="hidden" th:field="*{client}">
+                            <input type="hidden" th:field="*{transaction}">
+                            <input type="hidden" th:field="*{type}">
+                            <div th:if="${type}==${normal}">
+                                <h3>
+                                    Transaction Finanière
+
+                                    <small><a th:href="@{/transaction/new/{type}(type=${domiciliation})}">Passer en commerciale (domicialiation)</a></small>
+                                </h3>
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                    <label class="form-label">Nature transaction</label>
+                                    <select class="form-control form-select" th:field="*{typeDeTransaction}" required>
+                                        <option value="">Selectionner un element le type de transaction</option>
+                                        <option th:each="t, state : ${typeTransactions}" th:value="${t.id}" th:utext="${t.name}"></option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                    <label class="form-label">Devise transaction</label>
+                                    <select class="form-control form-select" th:field="*{devise}" required>
+                                        <option value="">Selectionner la devise</option>
+                                        <option th:each="d, state : ${listDevises}" th:value="${d.id}" th:utext="${d.name}"></option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                    <label class="form-label">Bénéficiaire transaction</label>
+                                    <select class="form-control" th:field="*{beneficiaire}" required>
+                                        <option value="">Selectionner le beneficiaires</option>
+                                        <option th:each="b, state : ${listbeneficiaires}" th:value="${b.id}" th:utext="${b.name}"></option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Motif / Objet de la transaction</label>
+                                    <input type="text" required th:field="*{motif}" class="form-control">
+                                </div></div>
+                                <div class="input-group mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Montant (En fonction de la devise)</label>
+                                    <small class="text-info" th:text="*{montantMax}"></small>
+                                    <div class="input-group mb-3">
+                                        <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
+                                             'groupSeparator': ',', 'digits': 2,
+                                            'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
+                                               placeholder="0.00">
+                                        <br>
+                                        <span th:if="${#fields.hasErrors('montantTexte')}" style="float:right;margin-top:-24px" class="text-danger">Vous devez saisir un montant valide</span>
+
+    <!--                                    <input class="form-control" type="number" th:field="*{montant}" required>-->
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${type}==${domiciliation}">
+                                <h3>
+                                    Transaction Commerciale
+
+                                    <small><a th:href="@{/transaction/new/{client_id}/client/{type}(client_id=${client.id}, type=${normal})}"> Passer en mode Transaction Financiere
+                                        (non domiciliée)</a></small>
+                                </h3>
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Domiciliation</label>
+                                    <select class="form-control form-select" th:field="*{domiciliation}" required>
+                                        <option value="">Selectionner la domiciliation</option>
+                                        <option th:each="d, state : ${client.domiciliations}" th:value="${d.id}" th:utext="${d}"></option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nature de la transaction</label>
+                                    <input type="hidden" th:field="*{typeDeTransaction}" class="form-control" required>
+                                    <input type="text" th:value="*{typeDeTransactionName}" id="typeDeTransactionV" disabled class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Bénéficiaire transaction</label>
+                                    <input type="hidden" th:field="*{beneficiaire}" class="form-control" required>
+                                    <input type="text" th:value="*{beneficiaireName}" disabled id="beneficiaireV" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="mb-3">
+                                    <label class="form-label">Devise transaction</label>
+                                    <input type="hidden" th:field="*{devise}" class="form-control" required>
+                                    <input type="text" th:value="*{deviseName}" disabled id="deviseV" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Motif / Objet de la transaction</label>
+                                    <input type="text" required th:field="*{motif}" class="form-control">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Montant (En devise de la transaction)</label>
+                                    <small class="text-info" th:text="*{montantMax}"></small>
+                                    <div class="mb-3">
+                                        <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
+                                         'groupSeparator': ',', 'digits': 2,
+                                        'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
+                                               placeholder="0.00">
+                                        <br>
+                                        <span th:if="${#fields.hasErrors('montantTexte')}" style="float:right;margin-top:-24px" class="text-danger">Vous devez saisir un montant valide</span>
+                                        <!-- <input type="number" min="0" disabled max="" th:field="*{montant}" class="form-control" required>-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN2'')')}">
+                                <div class="input-group mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Reference</label>
+                                    <input required type="text" class="form-control" th:field="*{reference}">
+                                    <span th:if="${#fields.hasErrors('reference')}" style="float:right;margin-top:-24px" class="text-danger">Verifier la valeur saisie</span>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="hidden" th:field="*{type}">
+                                    <label class="form-label">Date</label>
+                                    <input required type="date" class="form-control" th:field="*{dateTransactionStr}">
+                                    <span th:if="${#fields.hasErrors('dateTransactionStr')}" style="float:right;margin-top:-24px" class="text-danger">Ce champ est obligatoire</span>
+                                </div>
+                                </div>
+                            </th:block>
+
+                            <button class="btn btn-primary" id="submitButton" type="submit">Créer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block id="others-js">
+        <script>
+            $(document).ready(function(){
+
+            })
+            $("#domiciliation").on("change", function(e){
+                var elt = $(this);
+                findDomiciliationInfo(elt);
+            })
+
+            function findDomiciliationInfo(elt) {
+                var dm = $(elt).val();
+                if(dm != "") {
+                    $.ajax({
+                        url: "/domiciliation-infos/" + dm,
+                        type: "GET",
+                        dataType: "JSON",
+                        beforeSend: function() {
+
+                        },
+                        success: function(response) {
+                            if (response.isFinish) {
+                                showNotif("Vous ne pouvez plus effectuer de transaction avec cette domiciliaation.", "danger", 10000);
+                            }
+                            else {
+                                showNotif("Saisissez le montant de votre transaction", "success", 10000);
+                                $("#typeDeTransactionV").val(response.domiciliation.typeDeTransaction.name);
+                                $("#deviseV").val(response.devise.name);
+                                $("#beneficiaireV").val(response.domiciliation.beneficiaire.name);
+
+                                $("#typeDeTransaction").val(response.domiciliation.typeDeTransaction.id);
+                                $("#devise").val(response.devise.id);
+                                $("#beneficiaire").val(response.domiciliation.beneficiaire.id);
+                                $("#montant").prop("max", response.domiciliation.montantRestant).prop("disabled", false);
+                                $("#submitButton").prop("disabled", false);
+                            }
+                        },
+                        error: function() {
+                            $("#submitButton").prop("disabled", false);
+                        }
+                    })
+                }else {
+                    $("#typeDeTransactionV").val("");
+                    $("#deviseV").val('');
+                    $("#beneficiaireV").val('');
+
+                    $("#typeDeTransaction").val('');
+                    $("#devise").val('');
+                    $("#beneficiaire").val('');
+                    $("#montant").prop("max", '').prop("disabled", true);
+                    $("#submitButton").prop("disabled", true);
+                }
+            }
+
+            $("#transactionFor").on("submit", function(e){
+                e.preventDefault();
+                ajaxSubmitFormTransaction();
+            })
+
+            function ajaxSubmitFormTransaction() {
+                var form = $("#transactionForm")[0];
+                var data = new FormData(form);
+                $("#submitButton").prop("disabled", true);
+                $.ajax({
+                    type: $("#transactionForm").attr("method"),
+                    url: $("#transactionForm").attr("action"),
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    timeout: 1000000,
+                    dataType: "JSON",
+                    success: function(response) {
+                        $("#submitButton").prop("disabled", false);
+                        if(response.isSaved) {
+                            window.location.href = response.redirectUrl;
+                        }
+                    },
+                    error: function(jqXHR) {
+                        alert("Erreur : "+jqXHR.responseText)
+                    }
+                })
+            }
+        </script>
+    </th:block>
+</html>
+

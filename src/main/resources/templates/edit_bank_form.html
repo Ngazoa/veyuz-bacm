@@ -1,0 +1,29 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/veyuz-layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Gestion des banques</title>
+
+<th:block id="others-static-ressource"></th:block>
+
+<div id="main-content">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Gestion des banques</h5>
+        </div>
+
+        <div class="card-body">
+                <div class="col-md-7 mb-4 mt-3">
+                    <div th:replace="fragment/banque-fragments::form"></div>
+                </div>
+
+        </div>
+    </div>
+</div>
+
+<th:block id="others-js"></th:block>
+</html>

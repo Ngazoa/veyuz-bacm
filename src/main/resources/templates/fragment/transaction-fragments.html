@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="fileUploadForms" th:fragment="form-transaction-files">
+    <div>
+
+        <div id="foms-transaction-container" style="max-height: 500px;overflow:auto;">
+            <form action="/rest-upload-transaction-files" enctype="multipart/form-data"
+                  method="POST" th:action="@{/rest-upload-transaction-files}"
+                  th:each="ff : ${filesTransactionUploadForm.fichierForms}" th:object="${fichierForm}">
+                <div class="mb-3">
+                    <label class="form-label" th:if="${ff.fichier.typeDeFichier != null}"
+                           th:utext="${ff.fichier.typeDeFichier.name}"></label>
+                    <label class="form-label" th:unless="${ff.fichier.typeDeFichier != null}"
+                           th:utext="${ff.fichier.fileTitle}"></label>
+                    <div class="input-group">
+                        <input class="form-control" th:field="*{file}" type="file">
+                        <span class="input-group-text bg-success text-white" th:if="${ff.fichier.fileName != null}">
+                            <i class="fas fa-fw fa-check-double"></i>
+                            </span>
+                        <span class="input-group-text bg-danger text-white" th:unless="${ff.fichier.fileName != null}">
+                                <i class="fas fa-fw fa-times"></i>
+                            </span>
+                    </div>
+                    <input name="fichier" th:value="${ff.fichier.id}" type="hidden">
+                    <span class="msg"></span>
+                    <i class="loader float-right"></i>
+                </div>
+            </form>
+
+        </div>
+
+        <button class="btn btn-primary" id="submitAllButton" type="submit">Enregistrer</button>
+        <a class="btn btn-info" id="addFileButton"
+           th:href="@{/build-other-file-form-{id}-transaction(id=${transaction.id})}"
+           title="Ajouter un autre document justificatif" type="button"><i class="fas fa-plus"></i></a>
+    </div>
+</div>
+
+<div th:fragment="details">
+    <p>
+        <span>Reference</span>
+        <b th:utext="${transaction.reference}"></b>
+    </p>
+    <p>
+        <span>Motif</span>
+        <b th:utext="${transaction.motif}"></b>
+    </p>
+    <p>
+        <span>Type de transaction</span>
+        <b th:utext="${transaction.typeDeTransaction.name}"></b>
+    </p>
+    <p>
+        <span>Client</span>
+        <b th:utext="${transaction.client.denomination}"></b>
+    </p>
+    <p>
+        <span>Beneficiaire</span>
+        <b th:utext="${transaction.beneficiaire.name}"></b>
+    </p>
+    <p>
+        <span>Date</span>
+        <b th:utext="${transaction.dateCreation}"></b>
+    </p>
+    <p>
+        <span>Devise</span>
+        <b th:utext="${transaction.devise.name}"></b>
+    </p>
+    <p>
+        <span>Montant</span>
+        <b class="montant_format" th:utext="${transaction.montant}"></b>
+    </p>
+
+    <p>
+        <span>Type de financement</span>
+        <b th:if="${transaction.typeFinancement!=null}" th:utext="${transaction.typeFinancement.typeName}"></b>
+        <b th:if="${transaction.typeFinancement==null}"> En attente</b>
+
+    </p>
+
+    <p>
+        <span>Taux</span>
+        <b th:if="${transaction.taux!=null}" th:utext="${transaction.taux}"></b>
+        <b th:if="${transaction.taux==null}"> **/**</b>
+
+    </p>
+
+    <p>
+        <span>Date de valeur</span>
+        <b th:if="${transaction.dateValeur!=null}" th:utext="${transaction.dateValeur}"></b>
+        <b th:if="${transaction.dateValeur==null}"> **/**</b>
+
+    </p>
+    <p>
+        <span>Statut</span>
+        <b class="chat-message-right mb-4">
+            <button class="btn btn-primary" th:if="${transaction.statut == 0}">En attente de traitement</button>
+            <button class="btn btn-info" th:if="${transaction.statut == 1}">
+                <span th:text="${#authorization.expression('!hasRole(''ROLE_MACKER'')')? 'Transmis pour traitement au Trade I' :
+                  'En attente de traitement'}"></span>
+            </button>
+            <button class="btn btn-secondary" th:if="${transaction.statut == 2}">
+                <span th:text="${#authorization.expression('!hasRole(''ROLE_CHECKER'')')? 'Transmis pour validation au Trade II' :
+                  'En attente de traitement'}"></span>
+            </button>
+            <button class="btn btn-success" th:if="${transaction.statut == 3 and transaction.apured == true}"><i
+                    class="fas fa-check"></i> Apurée
+            </button>
+            <button class="btn btn-primary" th:if="${transaction.statut == 7}">
+                <span th:text="${#authorization.expression('!hasRole(''ROLE_MAKER_TO'')')? 'Transmis pour traitement Treasory Ops' :
+                  'En attente de traitement'}"></span>
+            </button>
+            <button class="btn btn-info" th:if="${transaction.statut == 8}">
+                <span th:text="${#authorization.expression('!hasRole(''ROLE_CHECKER_TO'')')? 'Transmis pour Validation Treasory ' :
+                  'En attente de traitement'}"></span>
+            </button>
+
+            <button class="btn btn-warning" th:if="${transaction.statut == 9}">
+                <span th:text="${#authorization.expression('!hasRole(''ROLE_TREASURY'')')? 'Transmis pour Trésorerie' :
+                  'En attente de traitement'}"></span>
+            </button>
+
+            <button class="btn btn-success" th:if="${transaction.statut == 3 and transaction.apured == false}"><i
+                    class="fas fa-check"></i> Validée et transmise pour apurement
+            </button>
+            <button class="btn btn-danger" th:if="${transaction.statut == -1}"><i class="fas fa-times"></i> Rejetée
+            </button>
+            <button class="btn btn-danger" th:if="${transaction.statut == 5 or transaction.statut == 6}"><i
+                    class="fas fa-times"></i> Renvoyée pour vérification
+            </button>
+            <button class="btn btn-danger" th:if="${transaction.statut == 4}"><i class="fas fa-times"></i> Transaction
+                renvoyée pour complement
+            </button>
+        </b>
+    </p>
+
+
+    <blockquote class="mt-5" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER'')')
+            or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_TRADE_DOMICILIATION'')')
+             or #authorization.expression('hasRole(''ROLE_MAKER'')')}">
+
+        <form method="get" th:action="@{/add-others-{id}-files(id=${transaction.id})}">
+            <h5 class="modal-title">Ajouter autres fichiers pour apurement</h5>
+            <hr>
+            <div id="autres-fichiers">
+                <label class="form-label" for="autresFichiers">Saisissez les intitulés des fichiers ici en les
+                    séparant par des points-virgules (;)</label>
+                <textarea class="form-control" id="autresFichiers" name="autresFichiers"
+                          placeholder="Intitulés des documents" required
+                          rows="5"></textarea>
+            </div>
+            <div class="mb-3 mt-3">
+                <button class="btn btn-primary" type="submit">Ajouter les documents</button>
+            </div>
+        </form>
+    </blockquote>
+
+    </th:block>
+    <form method="get"
+          th:action="@{/set-transaction-{id}-reference-and-date(id=${transaction.id})}" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')}">
+        <br>
+        <div class="modal-body m-3">
+            <hr>
+            <label class="form-label">Type de Financement:</label>
+            <select class="form-control form-select" name="typefinancement" required>
+                <option value="">Selectionner le financement</option>
+                <option th:each="d, state : ${typefinancement}" th:text="${d.typeName}"
+                        th:value="${d.id}"></option>
+            </select>
+
+        </div>
+        <button class="btn btn-success" th:if="transaction.statut!=3" type="submit">Ajouter le préfinancement</button>
+        <hr>
+    </form>
+
+    <br>
+    <br>
+
+</div>
+
+<div th:fragment="transaction-files">
+    <h4>Documents justificatifs</h4>
+    <div>
+        <div th:each="f, state : ${transaction.fichiers}">
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-control">
+
+                            <a class="text-success"
+                               th:href="@{/downloadFile/fichiers_transactions/{file}(file=${f.fileName})}"
+                               th:if="${f.fileName != null}">
+                                <span th:if="${f.typeDeFichier != null}" th:text="${f.typeDeFichier.name}"></span>
+                                <span th:text="${f.fileTitle}" th:unless="${f.typeDeFichier != null}"></span>
+                            </a>
+                            <a class="text-secondary" th:unless="${f.fileName != null}">
+                                   <span th:if="${f.typeDeFichier != null}">
+                                       <span th:text="${f.typeDeFichier.name}"></span>
+                                       <i class="badge text-danger chat-message-right mb-10"><small>fichier manquant</small></i>
+                                   </span>
+                                <span th:unless="${f.typeDeFichier != null}">
+                                       <span th:text="${f.fileTitle}"></span>
+                                       <i class="badge text-danger chat-message-right mb-10"><small>fichier manquant</small></i>
+                                   </span>
+
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <hr>
+
+
+        <th:block sec:authorize="hasRole('ROLE_MACKER')">
+            <button class="btn btn-danger" data-bs-target="#defaultModalPrimary" data-bs-toggle="modal"
+                    th:if="${transaction.statut == W or transaction == SM}" type="button">
+                Rejeter
+            </button>
+        </th:block>
+
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')
+            or #authorization.expression('hasRole(''ROLE_CHECKER'')')
+             or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
+            <button class="btn btn-warning send-back" data-bs-target="#modalRenvoyer"
+                    data-bs-toggle="modal"
+                    th:href="@{/send-back-to-customer/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SCSTR})}"
+                    th:if="${transaction.statut == W or transaction.statut == SM}" type="button">
+                Renvoyer
+            </button>
+        </th:block>
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_MACKER'')') or
+             #authorization.expression('hasRole(''ROLE_CHECKER'')')} ">
+            <button class="btn btn-warning send-back" data-bs-target="#modalRenvoyer"
+                    data-bs-toggle="modal"
+                    th:href="@{/send-back-to-macker/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SMSTR})}"
+                    th:if="${transaction.statut == M or transaction.statut == SC}" type="button">
+                Renvoyer
+            </button>
+        </th:block>
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or
+              #authorization.expression('hasRole(''ROLE_MACKER'')')} ">
+            <a class="btn btn-success make-transaction-action"
+               th:href="@{/macked-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${MSTR})}"
+               th:if="${transaction.statut == W }">Approuver</a>
+        </th:block>
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+             or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
+            <a class="btn btn-success make-transaction-action"
+               th:href="@{/check-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${CSTR})}"
+               th:if="${transaction.statut >=1 and transaction.statut != 9 and transaction.statut!=3}">Approuver >></a>
+        </th:block>
+
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+             or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
+            <a class="btn btn-success make-transaction-action"
+               th:href="@{/valider-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${VSTR})}"
+               th:if="${transaction.statut == C and transaction.statut == 8}">Valider</a>
+        </th:block>
+
+        <th:block
+                th:if="${#authorization.expression('hasRole(''ROLE_TREASURY'')') and transaction.statut == 9}">
+            <br>
+            <button class="btn btn-primary" data-bs-target="#defaultModalPrimary1" data-bs-toggle="modal" type="button">
+                Valider pour débit
+            </button>
+
+        </th:block>
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
+            <a style="float:right;" th:href="@{/import-files/{id}/transaction(id=${transaction.id})}"
+               th:if="${transaction.statut != V or transaction.statut != R}">Ajouter les documents</a>
+        </th:block>
+
+        <div aria-hidden="true" class="modal fade" id="defaultModalPrimary1" role="dialog" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Informations de validation pour débit</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <form method="get" th:action="@{/set-transaction-{id}-reference-and-date(id=${transaction.id})}">
+
+                        <div class="modal-body m-3">
+
+                            <label class="form-label">Date de Debit de la transaction</label>
+                            <input class="form-control" name="date"
+                                   required th:value="${#dates.format(transaction.dateTransaction, 'yyyy-MM-dd')}"
+                                   type="date">
+                            <hr>
+                            <label class="form-label">Date de Valeur</label>
+                            <input class="form-control" name="dateValeur"
+                                   required
+                                   type="date">
+                            <hr>
+                            <div class="mb-3">
+                                <label class="form-label w-100">Deal Ticket</label>
+                                <input type="file">
+                            </div>
+
+                            <hr>
+                            <label class="form-label">Taux:</label>
+                            <input class="form-control form-select" name="taux" required type="number">
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Fermer</button>
+                            <button class="btn btn-success" type="submit">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <div aria-hidden="true" class="modal fade" id="defaultModalPrimary" style="display: none;" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <form action="/rejeter-transaction" class="modal-content" method="post"
+                      th:action="@{/rejeter-transaction}" th:object="${rejetForm}">
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">Veuillez saisir le motif du rejet</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body m-3">
+                        <textarea class="form-control" placeholder="Saissiez le motif du rejet ici" rows="3"
+                                  th:field="*{motif}"></textarea>
+                    </div>
+                    <input name="transaction" th:value="${transaction.id}" type="hidden">
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Annuler</button>
+                        <button class="btn btn-primary" type="submit">Valider le rejet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div aria-hidden="true" class="modal fade" id="modalRenvoyer" style="display: none;" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <form class="modal-content" method="post" th:action="@{/rejeter-transaction}" th:object="${rejetForm}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Saisissez un commentaire pour renvoie</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body m-3">
+                        <textarea class="form-control" placeholder="Saisissez un commentaire pour le renvoie"
+                                  rows="3" th:field="*{motif}"></textarea>
+                    </div>
+                    <input name="transaction" th:value="${transaction.id}" type="hidden">
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Annuler</button>
+                        <button class="btn btn-primary" type="submit">Renvoyer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="import-transaction-form">
+    <form enctype="multipart/form-data" method="post" th:action="${postUri}" th:object="${importFileForm}">
+        <div class="form-group mb-3 mt-2">
+            <label class="form-label">Importer votre fichier</label>
+            <i class="text-info">(Excel avec extension .xls)</i>
+            <input class="form-control" name="file" required type="file">
+            <input name="banque" th:value="${banque.id}" type="hidden"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Importer</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <div th:fragment="table">
+        <table id="datatables-reponsive" class="table table-striped" style="width:100%">
+            <thead>
+            <tr>
+                <th>Reference</th>
+                <th>Nbre jours</th>
+                <th>Type</th>
+                <th>Client</th>
+                <th>Beneficiaire</th>
+                <th>Date expiration</th>
+                <th>Devise</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th th:if="${show != null}">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ap, state : ${appurements.appurements}">
+                <td th:utext="${ap.transaction.reference}"></td>
+                <td th:text="${ap.nbJrsRestant}"></td>
+                <td th:utext="${ap.transaction.typeDeTransaction.name}"></td>
+                <td th:utext="${ap.transaction.client.denomination}"></td>
+                <td th:utext="${ap.transaction.beneficiaire.name}"></td>
+                <td title="Double clic pour modifier" th:data="${ap.transaction.id}" class="dateExpirationTransaction" th:text="${#dates.format(ap.transaction.delay, 'yyyy-MM-dd')}"></td>
+                <td th:text="${ap.transaction.devise.name}"></td>
+                <td class="montant_format" th:text="${ap.transaction.montant}"></td>
+                <td>
+                    <span th:if="${ap.etat == 1}" class="badge bg-success" th:text="${ap.state}"></span>
+                    <span th:if="${ap.etat == 0}" class="badge bg-warning" th:text="${ap.state}"></span>
+                    <span th:if="${ap.etat == -1}" class="badge bg-danger" th:text="${ap.state}"></span>
+                </td>
+                <td th:if="${show != null}">
+                    <div th:if="${ap.transaction.statut != ValidateCode}" class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Select
+                        </button>
+                        <div class="dropdown-menu" style="">
+                            <th:block th:if="${#authorization.expression('hasRole(''ROLE_CLIENT'')')}" >
+                            <a class="dropdown-item" th:href="@{/import-files/{id}/transaction(id=${ap.transaction.id})}">Ajouter les fichiers manquants</a>
+                            </th:block>
+                            <div class="dropdown-divider"></div>
+                            <a th:data-ref="${ap.transaction.id}" data-bs-toggle="modal" data-bs-target="#fichiers-manquants" th:if="${ap.transaction.statut != ValidateCode}" class="dropdown-item fichiers-manquants" href="#fichiers-manquants">Afficher les documents manquants</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav id="pagination" th:if="${nbPages != null and nbPages > 1 }" th:data-pages="${nbPages}" th:data-uri="${uri}" th:data-current="${currentPage}" aria-label="Page navigation example">
+            <div th:replace="pagination::pagination"></div>
+        </nav>
+
+
+        <div class="modal fade" id="fichiers-manquants" tabindex="-1" aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Liste de fichiers manquants</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body m-3">
+                        <p class="mb-0">Liste des fichiers</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <form th:action="@{/reporting}" method="get" th:fragment="filtre" th:object="${reportingSearchForm}">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label">DEVISE</label>
+                    <select class="form-select" th:field="*{devise}">
+                        <option value="">ALL</option>
+                        <option th:each="d, s : ${devises}" th:text="${d.name}" th:value="${d.code}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label">TYPE</label>
+                    <select class="form-select" th:field="*{typeDeTransaction}">
+                        <option value="">ALL</option>
+                        <option th:each="t, s : ${typesDeTransaction}" th:text="${t.name}" th:value="${t.code}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label">STATUT</label>
+                    <select class="form-select" th:field="*{statut}">
+                        <option value="">ALL</option>
+                        <option th:each="st, s : ${statuts}" th:text="${st}" th:value="${st}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label">DU</label>
+                    <input required class="form-control" type="date" th:field="*{date1Str}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label">AU</label>
+                    <input required class="form-control" type="date" th:field="*{date2Str}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label"></label>
+                    <button type="submit" class="btn btn-primary">search</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</body>
+</html>

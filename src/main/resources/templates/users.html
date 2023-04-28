@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout/layout::main-fragment(
+        ~{::title},
+        ~{:: #others-static-ressource},
+        ~{:: #main-content},
+        ~{:: #others-js}
+      )}">
+
+<title>Users Manager</title>
+
+<th:block id="others-static-ressource"></th:block>
+
+<th:block id="others-js"></th:block>
+
+<div id="main-content">
+
+    <th:block th:if="${showList != null}">
+        <div th:replace="fragment/users-fragments::users-list"></div>
+    </th:block>
+
+    <th:block th:if="${showEditForm != null}">
+        <div th:replace="fragment/users-fragments::users-form"></div>
+    </th:block>
+
+</div>
+
+</html>
+
+</html>

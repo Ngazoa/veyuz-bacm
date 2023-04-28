@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <table th:fragment="list-bank" id="datatables-reponsive" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Sigle</th>
+                <th>Numero Contribuable</th>
+                <th>Telephone</th>
+                <th>Email</th>
+                <th>Pays</th>
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="b, s : ${banques}" class="" th:classappend="${b.enable} ? '' : 'bg-warning text-danger'">
+                <td>
+                    <img src="" alt="">
+                </td>
+                <td th:utext="${b.name}"></td>
+                <td th:utext="${b.sigle}"></td>
+                <td th:text="${b.numeroContribuable}"></td>
+                <td th:text="${b.telephone}"></td>
+                <td th:text="${b.email}"></td>
+                <td th:text="${b.pays.name}"></td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Actions
+                        </button>
+                        <div class="dropdown-menu" style="">
+                            <a class="dropdown-item" th:href="@{${editBank}(id=${b.id})}">Modifier les informations</a>
+                            <a class="dropdown-item" th:href="@{${editBank}(id=${b.id})}">Liste des clients</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" th:href="@{${editBank}(id=${b.id})}">Liste des transactions</a>
+                            <a class="dropdown-item" th:href="@{${editBank}(id=${b.id})}">Liste des clients</a>
+                            <a class="dropdown-item" th:href="@{${usersUri}(id=${b.id})}">Liste des utilisateurs</a>
+                            <div class="dropdown-divider"></div>
+                            <a th:unless="${b.enable}" class="dropdown-item delete-transaction" th:href="@{${activeBank}(id=${b.id})}">Activer</a>
+                            <a th:if="${b.enable}" class="dropdown-item delete-transaction" th:href="@{${activeBank}(id=${b.id})}">Bloquer</a>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form th:fragment="form" th:action="@{/veyuz/banks/save}"  method="post" enctype="multipart/form-data" th:object="${banqueForm}">
+        <div class="mb-3">
+            <label class="form-label">Pays *</label>
+            <input type="hidden" th:field="*{banque}">
+            <select class="form-select" th:field="*{pays}" required>
+                <option th:each="p : ${countries}" th:value="${p.id}" th:text="${p.name}"></option>
+            </select>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <label class="form-label">Nom</label>
+                    <input placeholder="Nom de la banque" type="text" class="form-control" th:field="*{name}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Sigle</label>
+                    <input placeholder="Exemple : SCB" type="text" class="form-control" th:field="*{sigle}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Numero du contribuable</label>
+                    <input placeholder="Numero du contribuable" type="text" class="form-control" th:field="*{numeroContribuable}">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">Logo</label>
+                            <input placeholder="logo" type="file" class="form-control" th:field="*{logoFile}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input placeholder="email" data-inputmask="'alias': 'email'" inputmode="email" type="text" class="form-control" th:field="*{email}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Contact</label>
+                            <input placeholder="Numero de telephone" type="text" class="form-control" th:field="*{telephone}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label  class="form-label">Description</label>
+                            <textarea rows="5" class="form-control" th:field="*{description}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><input type="checkbox" class="" th:field="*{enable}"> Activer la banque</label>
+        </div>
+
+        <div class="mb-3 mt-5 text-right">
+            <button type="submit" class="btn btn-primary">Soumettre le formulaire</button>
+        </div>
+
+    </form>
+
+    <table th:fragment="list-users" id="datatables-reponsive" class="table table-striped" style="width:100%">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Nom & prenom</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Genre</th>
+            <th>Status</th>
+            <th>#</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u, s : ${users}">
+            <td>
+                <img th:if="${u.avatar == null}" th:src="@{/img/avatars/avatar.png}" class="rounded-circle my-n1" alt="Avatar" width="32" height="32">
+
+            </td>
+            <td>
+                <span th:text="${u.nom}"></span>
+                <span th:text="${u.prenom}"></span>
+            </td>
+            <td th:text="${u.email}"></td>
+            <td>
+                <span th:utext="${u.telephone1}"></span>
+                <span th:utext="${u.telephone2}"></span>
+            </td>
+            <td th:utext="${u.gender}"></td>
+            <td>
+                <span th:if="${u.enable == true}" class="badge bg-success">Actif</span>
+                <span th:unless="${u.enable == true}" class="badge bg-warning">Inactif</span>
+            </td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Action
+                    </button>
+                    <div class="dropdown-menu" style="">
+                        <a th:href="@{${configAccessUri}(id=${u.id})}" th:data-config="@{${postUserAccessForm}}" class="dropdown-item config-user-access">Configurer les access</a>
+                        <a class="dropdown-item" th:href="@{/admin/block-active-bank-user-{id}/{etat}(id=${u.id}, etat='0')}">Bloquer</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" th:href="@{/admin/block-active-bank-user-{id}/{etat}(id=${u.id}, etat='1')}">Activer</a>
+                        <a class="dropdown-item" th:href="@{/#}">Details</a>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

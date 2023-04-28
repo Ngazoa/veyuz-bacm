@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<div th:fragment="setting-sidebar" class="col-md-3 col-xl-2">
+    <div class="card">
+        <div class="list-group list-group-flush" role="tablist">
+
+            <a class="list-group-item list-group-item-action" th:classappend="${#strings.equals(setItem, 'profile')} ? active : ''" th:href="@{/getUserProfile}" role="tab">
+                Profile
+            </a>
+
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'clients')} ? active : ''" class="list-group-item list-group-item-action"  th:href="@{/clients}" role="tab">
+                    Clients
+                </a>
+            </th:block>
+
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'trans')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/import-transactions}" role="tab">
+                    Transactions
+                </a>
+                <a th:classappend="${#strings.equals(setItem, 'tdt')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/type-transactions}" role="tab">
+                    Types de transactions
+                </a>
+                <a th:classappend="${#strings.equals(setItem, 'tdf')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/type-fichiers}" role="tab">
+                    Types de fichiers
+                </a>
+            </th:block>
+
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'domi')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/admin/domiciliations/import}" role="tab">
+                    Domiciliations
+                </a>
+            </th:block>
+
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_CLIENT'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'benef')} ? active : ''" th:if="${#authentication.getPrincipal().getClient() != null}" class="list-group-item list-group-item-action"
+                   th:href="@{/client/{client_id}/mes-beneficiaires(client_id=${#authentication.getPrincipal().getClient().getId()})}" role="tab">
+                    KYC Beneficiaires
+                </a>
+            </th:block>
+
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'le')} ? active : ''" class="list-group-item list-group-item-action"  href=""  role="tab">
+                    Lettre d'engagement
+                </a>
+                <a th:classappend="${#strings.equals(setItem, 'md')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/send-mise-en-demeure}" role="tab">
+                    Mise en demeure
+                </a>
+            </th:block>
+            <a th:classappend="${#strings.equals(setItem, 'pass')} ? active : ''" class="list-group-item list-group-item-action"  th:href="@{/get-password-form}" role="tab">
+                Mot de passe
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="setting-profile-form" class="col-md-9 col-xl-10">
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="account" role="tabpanel">
+
+            <div class="card">
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">Public info</h5>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label" for="inputUsername">Username</label>
+                                    <input type="text" class="form-control" id="inputUsername" placeholder="Username">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="inputUsername">Biography</label>
+                                    <textarea rows="2" class="form-control" id="inputBio" placeholder="Tell something about yourself"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <img th:alt="${user.userName}" th:src="@{img/avatars/avatar.png}" class="rounded-circle img-responsive mt-2" width="128" height="128">
+                                    <div class="mt-2">
+                                        <span class="btn btn-primary"><i class="fas fa-upload"></i> Upload</span>
+                                    </div>
+                                    <small>For best results, use an image at least 128px by 128px in .jpg format</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">Private info</h5>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label" for="inputFirstName">First name</label>
+                                <input type="text" class="form-control" id="inputFirstName" placeholder="First name">
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label" for="inputLastName">Last name</label>
+                                <input type="text" class="form-control" id="inputLastName" placeholder="Last name">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="inputEmail4">Email</label>
+                            <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="inputAddress">Address</label>
+                            <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="inputAddress2">Address 2</label>
+                            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                        </div>
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label" for="inputCity">City</label>
+                                <input type="text" class="form-control" id="inputCity">
+                            </div>
+                            <div class="mb-3 col-md-4">
+                                <label class="form-label" for="inputState">State</label>
+                                <select id="inputState" class="form-control">
+                                    <option selected="">Choose...</option>
+                                    <option>...</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 col-md-2">
+                                <label class="form-label" for="inputZip">Zip</label>
+                                <input type="text" class="form-control" id="inputZip">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:fragment="password">
+
+    <form method="post" th:action="@{/Editpassword}">
+        <div class="mb-3">
+            <label class="form-label" for="inputPasswordNew">Mot de passe actuel</label>
+            <input type="password" name="inputPasswordCurrent" class="form-control" id="inputPasswordCurrent">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="inputPasswordNew">Nouveau Mot de passe</label>
+            <input type="password" name="inputPasswordNew" minlength="7" class="form-control" id="inputPasswordNew">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="inputPasswordNew2">Confirmer mot de passe</label>
+            <input type="password" name="inputPasswordNew2" class="form-control" id="inputPasswordNew2">
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+</div>
+
+
+</html>
