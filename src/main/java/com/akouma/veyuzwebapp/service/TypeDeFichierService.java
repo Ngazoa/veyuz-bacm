@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class TypeDeFichierService {
 
+    @Autowired
+    private TypeDeFichierRepository typeDeFichierRepository;
+
     public TypeDeFichierRepository getTypeDeFichierRepository() {
         return typeDeFichierRepository;
     }
@@ -18,14 +21,17 @@ public class TypeDeFichierService {
         this.typeDeFichierRepository = typeDeFichierRepository;
     }
 
-    @Autowired
-    private TypeDeFichierRepository typeDeFichierRepository;
-
     public Iterable<TypeDeFichier> getAll() {
         return typeDeFichierRepository.findAll();
     }
 
     public TypeDeFichier save(TypeDeFichier typeDeFichier) {
+        return typeDeFichierRepository.save(typeDeFichier);
+    }
+
+    public TypeDeFichier updateStatus(Long id, boolean status) {
+        TypeDeFichier typeDeFichier = typeDeFichierRepository.findById(id).get();
+        typeDeFichier.setObligatoire(status);
         return typeDeFichierRepository.save(typeDeFichier);
     }
 }

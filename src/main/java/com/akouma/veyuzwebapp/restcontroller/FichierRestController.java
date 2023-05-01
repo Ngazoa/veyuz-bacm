@@ -1,47 +1,37 @@
 package com.akouma.veyuzwebapp.restcontroller;
 
 import com.akouma.veyuzwebapp.form.FichierForm;
-import com.akouma.veyuzwebapp.form.FilesTransactionUploadForm;
 import com.akouma.veyuzwebapp.model.Fichier;
 import com.akouma.veyuzwebapp.model.Transaction;
 import com.akouma.veyuzwebapp.service.FichierService;
 import com.akouma.veyuzwebapp.service.FileStorageService;
 import com.akouma.veyuzwebapp.service.TransactionService;
+import com.akouma.veyuzwebapp.service.TypeDeFichierService;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import com.akouma.veyuzwebapp.utils.Upload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.function.EntityResponse;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.util.HashMap;
 
 @RestController
 public class FichierRestController {
 
     @Autowired
+    TemplateEngine templateEngine;
+    @Autowired
     private FichierService fichierService;
     @Autowired
     private TransactionService transactionService;
-
     @Autowired
-    TemplateEngine templateEngine;
+    private TypeDeFichierService typeDeFichierService;
     @Autowired
     private FileStorageService fileStorageService;
+
     @PostMapping("/rest-upload-transaction-files")
     public ResponseEntity<?> multiUploadFileMode(@ModelAttribute FichierForm fichierForm, HttpServletRequest request) {
         try {
@@ -50,7 +40,7 @@ public class FichierRestController {
             if (fichierForm.getFichier() != null) {
                 if (fichierForm.getFichier().getTransaction().getStatut() != StatusTransaction.VALIDATED && fichierForm.getFichier().getTransaction().getStatut() != StatusTransaction.REJECTED) {
                     Fichier fichier = fichierForm.getFichier();
-                    String fileName = upload.uploadFile(fichierForm.getFile(),fileStorageService, "fichiers_transactions",request);
+                    String fileName = upload.uploadFile(fichierForm.getFile(), fileStorageService, "fichiers_transactions", request);
                     if (fileName != null && fichierForm.getFichier() != null) {
                         fichierForm.getFichier().setFileName(fileName);
                         fichierService.saveFichier(fichierForm.getFichier());
@@ -67,12 +57,11 @@ public class FichierRestController {
                 } else {
                     return new ResponseEntity<>("Impossible d'ajouter le fichier ou de le modifier car la transaction est deja approuvée et validée</br>", HttpStatus.OK);
                 }
-            }
-            else {
+            } else {
                 if (fichierForm.getTransaction() != null && fichierForm.getTransaction().getStatut() != StatusTransaction.VALIDATED) {
                     Fichier fichier = new Fichier();
                     System.out.println(fichierForm.getFile());
-                    String fileName = upload.uploadFile(fichierForm.getFile(), fileStorageService, "fichiers_transactions",request);
+                    String fileName = upload.uploadFile(fichierForm.getFile(), fileStorageService, "fichiers_transactions", request);
                     if (fileName != null) {
                         fichier.setFileName(fileName);
                         fichier.setFileTitle(fichierForm.getFileTitle());
@@ -153,6 +142,14 @@ public class FichierRestController {
         }
         response.put("response", filesList);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/update-typefichier-status")
+    @ResponseBody
+    public ResponseEntity<String> updateItemStatus(@RequestParam("itemId") Long itemId, @RequestParam("isChecked") boolean isChecked) {
+        // Update the item's status in the database based on the ID and checkbox status.
+        typeDeFichierService.updateStatus(itemId, isChecked);
+        return ResponseEntity.ok("Item status updated successfully.");
     }
 
 }

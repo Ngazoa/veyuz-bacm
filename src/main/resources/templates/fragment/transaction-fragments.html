@@ -10,16 +10,34 @@
     <div>
 
         <div id="foms-transaction-container" style="max-height: 500px;overflow:auto;">
-            <form action="/rest-upload-transaction-files" enctype="multipart/form-data"
+            <form id="fileUploadForm" action="/rest-upload-transaction-files" enctype="multipart/form-data"
                   method="POST" th:action="@{/rest-upload-transaction-files}"
                   th:each="ff : ${filesTransactionUploadForm.fichierForms}" th:object="${fichierForm}">
                 <div class="mb-3">
-                    <label class="form-label" th:if="${ff.fichier.typeDeFichier != null}"
-                           th:utext="${ff.fichier.typeDeFichier.name}"></label>
+                    <div th:if="${ff.fichier.typeDeFichier != null}">
+                        <div th:if="${ff.fichier.typeDeFichier.isObligatoire}">
+                            <span class="input-group-text bg-danger text-white">
+                            <i class="fas fa-fw fa-check-double">*</i>
+                            </span>
+                            <label class="form-label"
+                                   th:utext="${ff.fichier.typeDeFichier.name}"
+                            >
+                            </label>
+                        </div>
+                        <label class="form-label" th:unless="${ff.fichier.typeDeFichier.isObligatoire}"
+                               th:utext="${ff.fichier.typeDeFichier.name}"
+                        >
+                        <span class="input-group-text bg-secondary text-white">
+                            <i class="fas fa-fw fa-check-double"></i>
+                            </span>
+
+                        </label>
+                    </div>
                     <label class="form-label" th:unless="${ff.fichier.typeDeFichier != null}"
                            th:utext="${ff.fichier.fileTitle}"></label>
                     <div class="input-group">
-                        <input class="form-control" th:field="*{file}" type="file">
+                        <input class="form-control" id="" th:field="*{file}" th:required="${ff.fichier.typeDeFichier.isObligatoire}"
+                               type="file">
                         <span class="input-group-text bg-success text-white" th:if="${ff.fichier.fileName != null}">
                             <i class="fas fa-fw fa-check-double"></i>
                             </span>
@@ -39,6 +57,8 @@
         <a class="btn btn-info" id="addFileButton"
            th:href="@{/build-other-file-form-{id}-transaction(id=${transaction.id})}"
            title="Ajouter un autre document justificatif" type="button"><i class="fas fa-plus"></i></a>
+        <div id="loader" class="loader"></div>
+
     </div>
 </div>
 
@@ -100,40 +120,40 @@
         <span>Statut</span>
         <b class="chat-message-right mb-4">
             <button class="btn btn-primary" th:if="${transaction.statut == 0}">En attente de traitement</button>
-            <button class="btn btn-info" th:if="${transaction.statut == 1}">
+            <button class="btn btn-info" th:if="${transaction.statut == 1 and !transaction.renvoye}">
                 <span th:text="${#authorization.expression('!hasRole(''ROLE_MACKER'')')? 'Transmis pour traitement au Trade I' :
                   'En attente de traitement'}"></span>
             </button>
-            <button class="btn btn-secondary" th:if="${transaction.statut == 2}">
+            <button class="btn btn-secondary" th:if="${transaction.statut == 2 and !transaction.renvoye}">
                 <span th:text="${#authorization.expression('!hasRole(''ROLE_CHECKER'')')? 'Transmis pour validation au Trade II' :
                   'En attente de traitement'}"></span>
             </button>
             <button class="btn btn-success" th:if="${transaction.statut == 3 and transaction.apured == true}"><i
                     class="fas fa-check"></i> Apurée
             </button>
-            <button class="btn btn-primary" th:if="${transaction.statut == 7}">
+            <button class="btn btn-primary" th:if="${transaction.statut == 7 and !transaction.renvoye}">
                 <span th:text="${#authorization.expression('!hasRole(''ROLE_MAKER_TO'')')? 'Transmis pour traitement Treasory Ops' :
                   'En attente de traitement'}"></span>
             </button>
-            <button class="btn btn-info" th:if="${transaction.statut == 8}">
+            <button class="btn btn-info" th:if="${transaction.statut == 8 and !transaction.renvoye}">
                 <span th:text="${#authorization.expression('!hasRole(''ROLE_CHECKER_TO'')')? 'Transmis pour Validation Treasory ' :
                   'En attente de traitement'}"></span>
             </button>
 
-            <button class="btn btn-warning" th:if="${transaction.statut == 9}">
+            <button class="btn btn-warning" th:if="${transaction.statut == 9 and !transaction.renvoye}">
                 <span th:text="${#authorization.expression('!hasRole(''ROLE_TREASURY'')')? 'Transmis pour Trésorerie' :
                   'En attente de traitement'}"></span>
             </button>
 
             <button class="btn btn-success" th:if="${transaction.statut == 3 and transaction.apured == false}"><i
-                    class="fas fa-check"></i> Validée et transmise pour apurement
+                    class="fas fa-check"></i> Transmise pour apurement
             </button>
             <button class="btn btn-danger" th:if="${transaction.statut == -1}"><i class="fas fa-times"></i> Rejetée
             </button>
-            <button class="btn btn-danger" th:if="${transaction.statut == 5 or transaction.statut == 6}"><i
+            <button class="btn btn-danger" th:if="${transaction.renvoye}"><i
                     class="fas fa-times"></i> Renvoyée pour vérification
             </button>
-            <button class="btn btn-danger" th:if="${transaction.statut == 4}"><i class="fas fa-times"></i> Transaction
+            <button class="btn btn-danger" th:if="${transaction.statut == 4 and transaction.renvoye}"><i class="fas fa-times"></i> Transaction
                 renvoyée pour complement
             </button>
         </b>
@@ -175,7 +195,7 @@
             </select>
 
         </div>
-        <button class="btn btn-success" th:if="transaction.statut!=3" type="submit">Ajouter le préfinancement</button>
+        <button class="btn btn-success" th:if="transaction.statut!=3" type="submit">Valider</button>
         <hr>
     </form>
 
@@ -242,8 +262,8 @@
             <button class="btn btn-warning send-back" data-bs-target="#modalRenvoyer"
                     data-bs-toggle="modal"
                     th:href="@{/send-back-to-macker/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SMSTR})}"
-                    th:if="${transaction.statut == M or transaction.statut == SC}" type="button">
-                Renvoyer
+                    th:if="${transaction.statut == M or transaction.statut >1}" type="button">
+                << Renvoyer
             </button>
         </th:block>
         <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
@@ -262,7 +282,7 @@
                th:if="${transaction.statut >=1 and transaction.statut != 9 and transaction.statut!=3}">Approuver >></a>
         </th:block>
 
-        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_TREASURY'')')
             or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
              or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
             <a class="btn btn-success make-transaction-action"
@@ -278,10 +298,10 @@
             </button>
 
         </th:block>
-        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_AGENCE'')')
             or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
              or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
-            <a style="float:right;" th:href="@{/import-files/{id}/transaction(id=${transaction.id})}"
+            <a style="float:right;" th:href="@{${uri}}"
                th:if="${transaction.statut != V or transaction.statut != R}">Ajouter les documents</a>
         </th:block>
 
@@ -292,26 +312,49 @@
                         <h5 class="modal-title">Informations de validation pour débit</h5>
                         <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
                     </div>
+
                     <form method="get" th:action="@{/set-transaction-{id}-reference-and-date(id=${transaction.id})}">
 
                         <div class="modal-body m-3">
 
-                            <label class="form-label">Date de Debit de la transaction</label>
+                            <p>
+                                <span>Type de financement</span>
+                                <b th:if="${transaction.typeFinancement!=null}" th:utext="${transaction.typeFinancement.typeName}"></b>
+                                <b th:if="${transaction.typeFinancement==null}"> En attente</b>
+                            </p>
+                            <p>
+                                <span>Type de transaction</span>
+                                <b th:utext="${transaction.typeDeTransaction.name}"></b>
+                            </p>
+                            <p>
+                                <span>Client</span>
+                                <b th:utext="${transaction.client.denomination}"></b>
+                            </p>
+                            <p>
+                                <span>Beneficiaire</span>
+                                <b th:utext="${transaction.beneficiaire.name}"></b>
+                            </p>
+                            <p>
+                                <span>Devise</span>
+                                <b th:utext="${transaction.devise.name}"></b>
+                            </p>
+                            <p>
+                                <span>Montant</span>
+                                <b class="montant_format" th:utext="${transaction.montant}"></b>
+                            </p>
+                            <hr>
+                            <label class="form-label">Date de l'opération</label>
                             <input class="form-control" name="date"
                                    required th:value="${#dates.format(transaction.dateTransaction, 'yyyy-MM-dd')}"
                                    type="date">
-                            <hr>
                             <label class="form-label">Date de Valeur</label>
                             <input class="form-control" name="dateValeur"
                                    required
                                    type="date">
-                            <hr>
                             <div class="mb-3">
                                 <label class="form-label w-100">Deal Ticket</label>
                                 <input type="file">
                             </div>
-
-                            <hr>
                             <label class="form-label">Taux:</label>
                             <input class="form-control form-select" name="taux" required type="number">
                         </div>

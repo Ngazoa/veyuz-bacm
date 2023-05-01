@@ -22,6 +22,10 @@ public class StatusTransaction {
     public static final String SENDBACK_CUSTOMER_STR = "send-back-to-customer";
     public static final int SENDBACK_CUSTOMER = 4;
     public static final int SENDBACK_MACKER = 5;
+    public static final int SENDBACK_TOPC = 51;
+    public static final int SENDBACK_TOPM = 52;
+    public static final int SENDBACK_TDEM = 53;
+    public static final int SENDBACK_TDC = 54;
     public static final String SENDBACK_MACKER_STR = "send-back-to-macker";
     public static final String SENDBACK_CHECKER_STR = "send-back-to-checker";
     public static final int SENDBACK_CHECKER = 6;

@@ -47,17 +47,6 @@
                 <p>
                     Les transactions effectuees s'afficherons ici sous la forme d'un tableau
                 </p>
-                <p th:if="${message != null}" th:text="${message}"></p>
-
-            </div>
-        </div>
-
-        <div th:if="${flashMessage != null}" class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <div class="alert-message">
-                <h4 class="alert-heading">Astuce</h4>
-                <a th:src="@{#flashMessage}" th:text="${flashMessage}"></a>
-
             </div>
         </div>
 
@@ -159,10 +148,10 @@
                             <td th:if="${transaction.appUser==null}">/</td>
                             <td>
                                 <span th:if="${transaction.statut == 0}" class="badge bg-primary">En attente</span>
-                                <span th:if="${transaction.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i>Traitement TDE</span>
-                                <span th:if="${transaction.statut == 2}" class="badge bg-primary">Validation TDE</span>
-                                <span th:if="${transaction.statut == 7}" class="badge bg-secondary">Traitement TOPs</span>
-                                <span th:if="${transaction.statut == 8}" class="badge bg-info">Validation TOPs</span>
+                                <span th:if="${transaction.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i>Traitement TDM</span>
+                                <span th:if="${transaction.statut == 2}" class="badge bg-primary">Validation TDC</span>
+                                <span th:if="${transaction.statut == 7}" class="badge bg-secondary">Traitement TOPsM</span>
+                                <span th:if="${transaction.statut == 8}" class="badge bg-info">Validation TOPsC</span>
                                 <span th:if="${transaction.statut == 3}" class="badge bg-success"><i class="fas fa-check"></i> Validée</span>
                                 <span th:if="${transaction.statut == -1}" class="badge bg-danger"><i class="fas fa-times"></i> Rejetée</span>
                                 <span th:if="${transaction.statut == 9}" class="badge bg-warning"><i class="fas fa-times"></i> Treasory</span>

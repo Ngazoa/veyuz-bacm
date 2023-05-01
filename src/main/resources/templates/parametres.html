@@ -28,6 +28,10 @@
             })
 
 
+
+
+
+
         </script>
 
     </th:block>
@@ -83,7 +87,8 @@
                                    required
                                    type="number">
                             <button class="btn" type="submit">
-                                <svg class="feather feather-search align-middle" fill="none" height="24" stroke="currentColor"
+                                <svg class="feather feather-search align-middle" fill="none" height="24"
+                                     stroke="currentColor"
                                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                      width="24" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="11" cy="11" r="8"></circle>
@@ -99,7 +104,8 @@
                                    name="telephone" placeholder="Rechercher par le nom du client...."
                                    required type="text">
                             <button class="btn" type="submit">
-                                <svg class="feather feather-search align-middle" fill="none" height="24" stroke="currentColor"
+                                <svg class="feather feather-search align-middle" fill="none" height="24"
+                                     stroke="currentColor"
                                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                      width="24" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="11" cy="11" r="8"></circle>
@@ -267,7 +273,8 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Apperçu des mails envoyés</h5>
-                                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" id="closeModal"
+                                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                                id="closeModal"
                                                 type="button"></button>
                                     </div>
                                     <div class="modal-body">
@@ -300,7 +307,7 @@
                                             <th>Code</th>
                                             <th>Type</th>
                                             <th>Nature</th>
-                                            <th>Liste des fichiers</th>
+                                            <th>Documents exigés</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -311,9 +318,16 @@
                                             <td th:text="${tdt.import ? 'importation' : ''}"></td>
                                             <td th:text="${tdt.type}"></td>
                                             <td>
+                                                <ul class="item-list">
                                         <span th:each="tdf : ${tdt.typeDeFichiers}">
-                                            <i class="badge bg-info" th:text="${tdf.name}"></i>
+                                           <li><input class="typeDeFichiers" th:value="${tdf.id}"
+                                                      title="Marquer comme obligatoire ou non"
+                                                      type="checkbox" th:checked="${tdf.isObligatoire}">
+                                               <i class="badge bg-info" th:text="${tdf.name}"></i>
+                                           </li>
+                                            <br>
                                         </span>
+                                                </ul>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -344,6 +358,37 @@
                                 </div>
                             </div>
                         </div>
+                        <script>
+const checkboxes = document.querySelectorAll('.item-list input[type=checkbox]');
+
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', (event) => {
+    const itemValue = event.target.value;
+    const isChecked = event.target.checked;
+     query(isChecked,itemValue)
+  });
+});
+
+function query( is,id)
+{
+$.ajax({
+    type: 'POST',
+    url: '/update-typefichier-status',
+    data: {
+        itemId: id,
+        isChecked: is
+    },
+    success: function(data) {
+        console.log('Ajax request succeeded');
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        console.error('Ajax request failed', textStatus, errorThrown);
+    }
+});
+}
+
+
+                        </script>
                     </div>
                     <div class="col-md-4">
                         <div class="card">

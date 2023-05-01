@@ -382,7 +382,7 @@ public class ClientService {
                     client1.setTelephone(client.getTelephone());
                     try {
                         client1.setId(cryptoUtils.encrypt(client.getId()));
-                        System.out.println("======"+cryptoUtils.encrypt(client.getId()));
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

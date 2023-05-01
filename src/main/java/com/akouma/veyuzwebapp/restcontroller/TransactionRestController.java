@@ -6,6 +6,7 @@ import com.akouma.veyuzwebapp.form.ReportingSearchForm;
 import com.akouma.veyuzwebapp.form.TransactionForm;
 import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.service.*;
+import com.akouma.veyuzwebapp.utils.CryptoUtils;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,8 @@ public class TransactionRestController {
 
     @Autowired
     private UserRoleService userRoleService;
+    @Autowired
+    private CryptoUtils cryptoUtils;
 
     @Transactional
     @GetMapping("/rest-transaction-change-status/{id}/{user_id}/{status}")
@@ -140,7 +143,7 @@ public class TransactionRestController {
     public ResponseEntity<?> approuverTransactionLikeMacker(
             @PathVariable("id") Transaction transaction,
             @PathVariable("user_id") AppUser appUser,
-            @PathVariable("status") String status, Authentication authentication) {
+            @PathVariable("status") String status, Authentication authentication) throws Exception {
 
         HashMap<String, Object> response = new HashMap<>();
         String message = "Vous ne pouvez pas effectuer cette operation";
@@ -165,7 +168,7 @@ public class TransactionRestController {
                     notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
                     notification.setRead(false);
                     notification.setUtilisateur(transaction.getClient().getUser());
-                    notification.setHref("/transaction-" + transaction.getId() + "/details");
+                    notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId()) + "/details");
                     notificationService.save(notification);
                     isChange = true;
                     message = "L'operation a ete prise en compte ! la transaction a ete transmise pour le Trade desk Maker .";
@@ -184,7 +187,7 @@ public class TransactionRestController {
     public ResponseEntity<?> approuverTransactionLikeChecker(
             @PathVariable("id") Transaction transaction,
             @PathVariable("user_id") AppUser appUser,
-            @PathVariable("status") String status, Authentication authentication) {
+            @PathVariable("status") String status, Authentication authentication) throws Exception {
 
         HashMap<String, Object> response = new HashMap<>();
         String message = "Vous ne pouvez pas effectuer cette operation Car il se peut que vous ne disposez pas des autorisations necessaires";
@@ -197,6 +200,7 @@ public class TransactionRestController {
             if (authentication.getAuthorities().stream().
                     anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER"))
                     && transaction.getStatut() == StatusTransaction.MACKED) {
+                transaction.setRenvoye(false);
 
                 transaction.setStatut(StatusTransaction.CHECKED);
                 transactionService.saveTransaction(transaction);
@@ -209,12 +213,13 @@ public class TransactionRestController {
                 notification.setMessage("La transaction  du client " + transaction.getClient() + " a été validée et transmise au Treasory Ops Maker ");
                 notification.setRead(false);
                 notification.setUtilisateur(transaction.getClient().getUser());
-                notification.setHref("/transaction-" + transaction.getId() + "/details");
+                notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId()) + "/details");
                 notificationService.save(notification);
 
             } else if (authentication.getAuthorities().stream().
                     anyMatch(a -> a.getAuthority().equals("ROLE_MAKER_TO"))
                     && transaction.getStatut() == StatusTransaction.CHECKED) {
+                transaction.setRenvoye(false);
 
                 transaction.setStatut(StatusTransaction.TRANSMIS_MAKER_2);
                 transactionService.saveTransaction(transaction);
@@ -227,15 +232,16 @@ public class TransactionRestController {
                 notification.setMessage("La transaction  du client " + transaction.getClient() + " a été validée et transmise au Treasory Ops Cherker ");
                 notification.setRead(false);
                 notification.setUtilisateur(transaction.getClient().getUser());
-                notification.setHref("/transaction-" + transaction.getId() + "/details");
+                notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId()) + "/details");
                 notificationService.save(notification);
 
 
             } else if (authentication.getAuthorities().stream().
                     anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO"))
                     && transaction.getStatut() == StatusTransaction.TRANSMIS_MAKER_2) {
+                transaction.setRenvoye(false);
 
-                if(transaction.getTypeFinancement()!=null) {
+                if (transaction.getTypeFinancement() != null) {
                     transaction.setStatut(StatusTransaction.TRANSMIS_TRESORERIE);
                     transactionService.saveTransaction(transaction);
                     this.saveTransactionAndAction(transaction, appUser, status,
@@ -247,9 +253,9 @@ public class TransactionRestController {
                     notification.setMessage("La transaction  du client " + transaction.getClient() + " a été validée et pour validation de la tresorerie ");
                     notification.setRead(false);
                     notification.setUtilisateur(transaction.getClient().getUser());
-                    notification.setHref("/transaction-" + transaction.getId() + "/details");
+                    notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId()) + "/details");
                     notificationService.save(notification);
-                }else{
+                } else {
                     message = "Veuillez saisir le type de Préfinancement";
                 }
             }
@@ -314,7 +320,7 @@ public class TransactionRestController {
             @PathVariable("id") Transaction transaction,
             @PathVariable("user_id") AppUser appUser,
             @PathVariable("status") String status,
-            @ModelAttribute RejeterTransactionForm rejeterTransactionForm) {
+            @ModelAttribute RejeterTransactionForm rejeterTransactionForm) throws Exception {
 
         HashMap<String, Object> response = new HashMap<>();
         String message = "Vous ne pouvez pas effectuer cette operation";
@@ -335,7 +341,7 @@ public class TransactionRestController {
                         Notification notification = new Notification();
                         notification.setMessage("Une de vos transactions  vous a été renvoyée pour complément ! Voir l'historique en cliquant sur le lien precedent pour connaitre les motifs de ce renvoie.");
                         notification.setRead(false);
-                        notification.setHref("/transaction-" + transaction.getId() + "/details");
+                        notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId()) + "/details");
                         notification.setUtilisateur(transaction.getClient().getUser());
                         notificationService.save(notification);
                     }
@@ -353,7 +359,7 @@ public class TransactionRestController {
             @PathVariable("id") Transaction transaction,
             @PathVariable("user_id") AppUser appUser,
             @PathVariable("status") String status,
-            @ModelAttribute RejeterTransactionForm rejeterTransactionForm) {
+            @ModelAttribute RejeterTransactionForm rejeterTransactionForm, Authentication authentication) throws Exception {
 
         HashMap<String, Object> response = new HashMap<>();
         String message = "Vous ne pouvez pas effectuer cette operation";
@@ -361,21 +367,60 @@ public class TransactionRestController {
         String commentaire = rejeterTransactionForm.getMotif();
 
         // Le user doit avoir le role ROLE_MACKER et la transaction doit etre a WAITING
-        if (status.equals(StatusTransaction.SENDBACK_MACKER_STR)) {
-            if ((transaction.getStatut() == StatusTransaction.MACKED || transaction.getStatut() == StatusTransaction.SENDBACK_CHECKER) && transaction.getBanque().equals(appUser.getBanque())) {
-                AppRole roleChecker = roleService.getRoleByName("ROLE_CHECKER");
-                if (roleChecker != null) {
-                    UserRole userRole = userRoleService.getUserRole(appUser, roleChecker);
-                    if (userRole != null) {
-                        transaction.setStatut(StatusTransaction.SENDBACK_MACKER);
-                        this.saveTransactionAndAction(transaction, appUser, status, commentaire);
-                        isChange = true;
-                        message = "L'operation a ete prise en compte ! la transaction a été renvoyée au client pour complement.";
-                    }
-                }
+        if (transaction.getBanque().equals(appUser.getBanque())) {
+
+            if (authentication.getAuthorities().stream().
+                    anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER"))
+                    && transaction.getStatut() == StatusTransaction.MACKED) {
+                transaction.setRenvoye(true);
+                transaction.setStatut(StatusTransaction.SENDBACK_MACKER);
+                this.saveTransactionAndAction(transaction, appUser, status, commentaire);
+                isChange = true;
+                message = "L'operation a ete prise en compte ! la transaction a été renvoyée au client pour complement.";
+
+
+            } else if (authentication.getAuthorities().stream().
+                    anyMatch(a -> a.getAuthority().equals("ROLE_MAKER_TO"))
+                    && transaction.getStatut() == StatusTransaction.CHECKED) {
+
+                transaction.setStatut(StatusTransaction.MACKED);
+                transaction.setRenvoye(true);
+                transactionService.saveTransaction(transaction);
+                this.saveTransactionAndAction(transaction, appUser, status,
+                        "Transaction a été renvoyée par le treasury Ops Maker");
+                isChange = true;
+                //message = "L'operation a ete prise en compte ! la transaction a été approuvée et validée définitivement. Puis transmise pour apurement !";
+                message = "La Transaction  a été renvoyée par le treasury Ops Maker";
+                Notification notification = new Notification();
+                notification.setMessage("La transaction  du client " + transaction.getClient() + " a été renvoye au trade pour validation");
+                notification.setRead(false);
+                notification.setUtilisateur(transaction.getClient().getUser());
+                notification.setHref("/transaction-" +cryptoUtils.encrypt(transaction.getId()) + "/details");
+                notificationService.save(notification);
+
+
+            } else if (authentication.getAuthorities().stream().
+                    anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO"))
+                    && transaction.getStatut() == StatusTransaction.TRANSMIS_MAKER_2) {
+                transaction.setRenvoye(true);
+
+                transaction.setStatut(StatusTransaction.CHECKED);
+                transactionService.saveTransaction(transaction);
+                this.saveTransactionAndAction(transaction, appUser, status,
+                        "Transaction renvoyee par le treasury Ops Checker");
+                isChange = true;
+                //message = "L'operation a ete prise en compte ! la transaction a été approuvée et validée définitivement. Puis transmise pour apurement !";
+                message = "La Transaction  a ete renvoyee par le treasury Ops Checker";
+                Notification notification = new Notification();
+                notification.setMessage("La transaction  du client " + transaction.getClient() + " a été renvoyee au trade pour validation");
+                notification.setRead(false);
+                notification.setUtilisateur(transaction.getClient().getUser());
+                notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId()) + "/details");
+                notificationService.save(notification);
+
+
             }
         }
-
         response.put("message", message);
         response.put("isChange", isChange);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -385,7 +430,7 @@ public class TransactionRestController {
     public ResponseEntity<?> validerTransaction(
             @PathVariable("id") Transaction transaction,
             @PathVariable("user_id") AppUser appUser,
-            @PathVariable("status") String status) {
+            @PathVariable("status") String status) throws Exception {
 
         HashMap<String, Object> response = new HashMap<>();
         String message = "Vous ne pouvez pas effectuer cette operation";
@@ -411,7 +456,7 @@ public class TransactionRestController {
                         Notification notification = new Notification();
                         notification.setMessage("la transaction a été validée ! Maintenant encours d'apurement");
                         notification.setRead(false);
-                        notification.setHref("/transaction-" + transaction.getId() + "/details");
+                        notification.setHref("/transaction-" + cryptoUtils.encrypt(transaction.getId() )+ "/details");
                         notification.setUtilisateur(transaction.getClient().getUser());
                         notificationService.save(notification);
                         if (transaction.getTypeDeTransaction().isImport()) {

@@ -332,7 +332,7 @@ function uploadFiles() {
 
 $('#filesSend').on("click", function (e) {
     // var ref = $("#modal").data("ref");
-    $("#modal .tab-title").html("Fichiers déposés pour apurements");
+    $("#modal .tab-title").html("Fichers transmis pour apurement");
     $.ajax({
         url: "/rest-apurements/" + ref + "/files",
         type: "GET",

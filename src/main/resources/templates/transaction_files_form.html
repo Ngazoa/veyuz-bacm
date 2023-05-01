@@ -89,6 +89,8 @@
             })
             $("#submitAllButton").on("click", function(e) {
                 e.preventDefault();
+                if(validateForm()===false){
+                showLoader();
                 $("#result").html("");
                 $("#fileUploadForms form").each(function() {
                     var elt = $(this);
@@ -119,7 +121,34 @@
                         }
                     })
                 })
+              hideLoader();  }
             });
+
+            function validateForm() {
+
+  // get all the required input elements
+  const requiredFields = document.querySelectorAll('input[required]');
+
+    const error=false;
+  for (let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (field.value=== "") {
+      showNotif("Veuillez remplir tous les champs Obligatoires ", "danger", 5000);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function showLoader() {
+  document.getElementById("loader").style.display = "block";
+}
+
+function hideLoader() {
+  document.getElementById("loader").style.display = "none";
+}
+
         </script>
     </th:block>
 

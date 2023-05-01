@@ -202,6 +202,8 @@ public class Transaction {
     private String taux;
     private Date dateValeur;
 
+    private boolean renvoye;
+
 
     @ManyToOne
     @JoinColumn(name = "app_user_id")

@@ -13,7 +13,7 @@ public class ReferenceGenerator {
     public  String generateReference() {
         String prefix = generateRandomPrefix();
         String number = generateRandomNumber();
-        return "BAC" + "-" + number;
+        return "TT" + "-" + number;
     }
 
     private static String generateRandomPrefix() {

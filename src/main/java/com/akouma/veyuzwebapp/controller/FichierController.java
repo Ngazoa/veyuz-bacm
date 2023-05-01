@@ -50,7 +50,6 @@ public class FichierController {
         this.session = session;
     }
 
-    @Secured({"ROLE_MAKER_TO","ROLE_ADMIN", "ROLE_MACKER","ROLE_SUPERADMIN", "ROLE_SUPERUSER","ROLE_TRADE_DESK","ROLE_CHECKER","ROLE_AGENCE"})
     @GetMapping("/import-files/{id}/transaction")
     public String getFormAddFilesToTransaction(@PathVariable("id") String transact, Model model) throws Exception {
         Transaction transaction =transactionRepository.findById(cryptoUtils.decrypt(String.valueOf(transact))).orElse(null);
@@ -59,9 +58,7 @@ public class FichierController {
                if (!CheckSession.checkSessionData(session)) {
                    return "redirect:/";
                }
-               if (transaction.getStatut() != StatusTransaction.WAITING && transaction.getStatut() != StatusTransaction.SENDBACK_CUSTOMER) {
-                   return "error/403";
-               }
+
                FilesTransactionUploadForm filesTransactionUploadForm = new FilesTransactionUploadForm();
                Collection<FichierForm> fichierForms = new ArrayList<>();
                for (Fichier f : transaction.getFichiers()) {
