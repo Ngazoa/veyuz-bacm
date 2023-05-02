@@ -34,14 +34,13 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     Page<Transaction> findByBanqueAndStatutOrderByDateCreationAsc(Banque banque, int status, Pageable pageable);
 
     Page<Transaction> findByBanqueAndClientAndStatutOrderByDateCreationDesc(Banque banque, Client client, int status, Pageable pageable);
+    Page<Transaction> findByBanqueAndStatutOrderByDateCreationDesc(Banque banque,  int status, Pageable pageable);
 
     Iterable<Transaction> findByBanqueOrderByDateCreationDesc(Banque banque);
 
     Iterable<Transaction> findByBanqueAndClientOrderByDateCreationDesc(Banque banque, Client client);
 
-
-    List<Transaction> findByClientAndTypeDeTransaction_IsImportAndIsApured(Client client, boolean isImport, boolean isApured);
-
+    List<Transaction> findByBanqueAndClientAndTypeDeTransaction_IsImportAndHasSaction(Banque banque, Client client, boolean isImport, boolean hasSaction);
 
     Page<Transaction> findByBanqueOrderByDateCreationAsc(Banque banque, Pageable pageable);
 
@@ -147,5 +146,5 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     @Override
     boolean existsById(Long aLong);
 
-    Page<Transaction> findByBanqueAndAppUserAndClientAndStatutOrderByDateCreationDesc(Banque banque, AppUser appuser, Client client, int statut, PageRequest of);
+    Page<Transaction> findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(Banque banque, AppUser appuser, int statut, Pageable pageable);
 }

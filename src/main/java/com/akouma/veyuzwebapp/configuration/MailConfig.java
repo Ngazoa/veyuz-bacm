@@ -1,6 +1,5 @@
 package com.akouma.veyuzwebapp.configuration;
 
-import com.akouma.veyuzwebapp.utils.MailConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,16 +13,17 @@ public class MailConfig {
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("email-smtp.us-east-1.amazonaws.com");
+        mailSender.setHost("localhost");
         mailSender.setPort(587);
-        mailSender.setUsername(MailConstant.MY_GMAIL_EMAIL);
-        mailSender.setPassword(MailConstant.MY_GMAIL_PASSWORD);
 
-        Properties properties = mailSender.getJavaMailProperties();
-        properties.put("mail.transport.protocol", "smtp");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls", "true");
-        properties.put("mail.debug", "true");
+        mailSender.setUsername("ignored");
+        mailSender.setPassword("ignored");
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "false");
+        props.put("mail.smtp.starttls.enable", "false"); // enable TLS
+        props.put("mail.debug", "true");
 
         return mailSender;
     }
