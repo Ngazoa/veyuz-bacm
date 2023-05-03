@@ -37,6 +37,7 @@ public class ApurementService {
         return apurementRepositoy.findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(banque, client, isApured);
     }
 
+
     public Apurement getApurementByReferenceTransaction(String referenceTransaction) {
         return apurementRepositoy.findFistByReferenceTransaction(referenceTransaction);
     }

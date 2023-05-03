@@ -5,7 +5,6 @@ import com.akouma.veyuzwebapp.model.Apurement;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -28,8 +27,6 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
 
     Iterable<Apurement> findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(Banque banque, Client client, boolean isApured);
 
-    Page<Apurement> findByBanqueAndIsApuredAndDateExpirationIsNotNullOrderByIsApuredAsc(Banque banque, boolean isApured, Pageable pageable);
-
     Iterable<Apurement> findByIsApuredAndIsExpired(boolean b, boolean b1);
 
     Iterable<Apurement> findByIsApuredAndIsExpiredAndDateExpirationNot(boolean isApured, boolean isExpired, Date o);
@@ -51,6 +48,7 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Iterable<Apurement> findByBanqueAndIsApuredFalseAndIsExpiredFalse(Banque banque);
 
     Page<Apurement> findByBanqueAndIsApuredOrderByIsApuredAsc(Banque banque, boolean isApured, Pageable pageable);
+
     Iterable<Apurement> findByBanqueAndIsApuredOrderByIsApuredAsc(Banque banque, boolean isApured);
 
     Iterable<? extends Apurement> findByBanqueAndClientAndIsApuredFalseAndIsExpiredFalse(Banque banque, Client client);

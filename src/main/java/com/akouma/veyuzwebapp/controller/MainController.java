@@ -3,6 +3,7 @@ package com.akouma.veyuzwebapp.controller;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.service.BanqueService;
+import com.akouma.veyuzwebapp.service.MailService;
 import com.akouma.veyuzwebapp.service.UserService;
 import com.akouma.veyuzwebapp.utils.CheckSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class MainController {
     private UserService userService;
     @Autowired
     private BanqueService banqueService;
+    @Autowired
+    private MailService mailService;
 
     public MainController(HttpSession session) {
 
@@ -51,15 +54,12 @@ public class MainController {
             session.setAttribute("userConnecte", appUser);
             if (appUser.getClient() != null) {
                 banquesList = (List<Banque>) appUser.getClient().getBanques();
-                System.out.println("Je suis un client !");
+
             } else {
                 if (appUser.getBanque() != null) {
                     banquesList = new ArrayList<>();
                     banquesList.add(appUser.getBanque());
-                    System.out.println("Je suis administrateur d'une banque");
-
                 } else {
-                    System.out.println("Je suis le super utilisateur");
                     return "redirect:/veyuz";
                 }
             }
@@ -104,7 +104,7 @@ public class MainController {
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String loginPage(Model model) {
-
+       // mailService.sendSimpleMessage("akouma.net@gmail.com","Belka TobBY","Jesus m'aime");
         return "loginPage";
     }
 
@@ -164,14 +164,13 @@ public class MainController {
                                       @RequestParam("inputPasswordNew") String newPaasowrd,
                                       @RequestParam("inputPasswordNew2") String confirmPassword) {
         AppUser useConnecte = userService.getLoggedUser(principal);
-        System.out.println(newPaasowrd + "---------------------- 1" + confirmPassword);
+
         model.addAttribute("dash", "params");
 
         if (!newPaasowrd.equals(confirmPassword)) {
             String msg = "Mot de passe mal confirmé ";
             model.addAttribute("passwordForm", "password");
             model.addAttribute("errorMessage", msg);
-            System.out.println("---------------------- 11");
 
             return "parametres";
         }
@@ -180,15 +179,12 @@ public class MainController {
             String msg = "Ancien mot de passe incorrecte ";
             model.addAttribute("passwordForm", "password");
             model.addAttribute("errorMessage", msg);
-            System.out.println("---------------------- 111 -- " + useConnecte.getPassword());
-
             return "parametres";
         }
 
         String msg = "Mot de passe modifié avec succès";
         model.addAttribute("passwordForm", "password");
         model.addAttribute("flashMessage", msg);
-        System.out.println("---------------------- 1111");
 
         return "parametres";
     }

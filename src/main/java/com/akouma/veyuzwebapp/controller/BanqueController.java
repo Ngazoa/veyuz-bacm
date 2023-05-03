@@ -6,6 +6,7 @@ import com.akouma.veyuzwebapp.form.UserRoleForm;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
+import com.akouma.veyuzwebapp.repository.ApurementRepositoy;
 import com.akouma.veyuzwebapp.service.*;
 import com.akouma.veyuzwebapp.utils.CheckSession;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
@@ -47,6 +48,8 @@ public class BanqueController {
     private PaysService paysService;
     @Autowired
     private AppUserValidator userValidator;
+    @Autowired
+    private ApurementRepositoy apurementRepositoy;
 
     @Autowired
     private UserService userService;
@@ -257,8 +260,6 @@ public class BanqueController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model, Principal principal, Authentication authentication) {
 
-        System.out.println(this.session.getAttribute("loggedUser"));
-
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
@@ -273,7 +274,7 @@ public class BanqueController {
             getCustomerHomeData(banque, loggedUser, model);
         } else {
             // C'est le dashboard admin qu'on va afficher
-            getAdminHomeData(banque, model, authentication, principal);
+            getAdminHomeDatas(banque, model, authentication, principal);
         }
 
         AppUser appUser = (AppUser) session.getAttribute("userConnecte");
@@ -285,7 +286,7 @@ public class BanqueController {
         return "dashboard";
     }
 
-    private void getAdminHomeData(Banque banque, Model model, Authentication authentication, Principal principal) {
+    private void getAdminHomeDatas(Banque banque, Model model, Authentication authentication, Principal principal) {
         Long waiting;
         AppUser loggedUser = userService.getLoggedUser(principal);
         Long checked;
@@ -299,21 +300,15 @@ public class BanqueController {
         }
         Long nbClient = clientService.count(banque);
         Long waitingAp;
-//        for (Apurement ap : apurementService.getNonApuredAndExpiredApurements(banque)) {
-//            waitingAp++;
-//        }
 
         waitingAp = apurementService.getApurementscount(banque, null, false).spliterator().estimateSize();
         if (authentication.getAuthorities().stream().
                 anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
             checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null, loggedUser).getTotalElements();
-
         } else {
             checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null, null).getTotalElements();
 
         }
-
-        // checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null).getTotalElements();
 
         model.addAttribute("lastTransactions", transactionService.getAllTransactionsForBanque(banque, 10, 0).getContent());
         model.addAttribute("waiting", waiting);
@@ -340,7 +335,6 @@ public class BanqueController {
             waitingAp = apurementService.getApurementscount(banque, null, isApured).spliterator().estimateSize();
 
         }
-
 
         Long checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, loggedUser.getClient(), null).getTotalElements();
         Long sendBack = transactionService.getTransactionsByStatus(banque, StatusTransaction.SENDBACK_CUSTOMER_STR, 10000, 0, loggedUser.getClient(), null).getTotalElements();

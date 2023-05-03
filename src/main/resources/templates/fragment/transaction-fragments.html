@@ -117,6 +117,12 @@
 
     </p>
     <p>
+        <span>Date de valeur Beac</span>
+        <b th:if="${transaction.dateValeurBeac!=null}" th:utext="${transaction.dateValeurBeac}"></b>
+        <b th:if="${transaction.dateValeurBeac==null}"> **/**</b>
+
+    </p>
+    <p>
         <span>Statut</span>
         <b class="chat-message-right mb-4">
             <button class="btn btn-primary" th:if="${transaction.statut == 0}">En attente de traitement</button>
@@ -184,18 +190,31 @@
     <form method="get"
           th:action="@{/set-transaction-{id}-reference-and-date(id=${transaction.id})}" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
             or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')}">
-        <br>
         <div class="modal-body m-3">
             <hr>
-            <label class="form-label">Type de Financement:</label>
-            <select class="form-control form-select" name="typefinancement" required>
+            <label class="form-label" for="financement">Type de Financement:</label>
+            <div class="d-flex justify-content-center">
+            <select class="form-control form-select" id="financement" name="typefinancement" required>
                 <option value="">Selectionner le financement</option>
                 <option th:each="d, state : ${typefinancement}" th:text="${d.typeName}"
                         th:value="${d.id}"></option>
             </select>
-
+            <button class="btn btn-primary" th:if="transaction.statut!=3" type="submit">Valider</button>
+            </div>
         </div>
-        <button class="btn btn-success" th:if="transaction.statut!=3" type="submit">Valider</button>
+        <hr>
+    </form>
+
+    <form method="get"
+          th:action="@{/set-transaction-{id}-reference-and-date(id=${transaction.id})}" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_CHECKER_TO'')')}">
+        <div class="modal-body m-3">
+            <label class="form-label" for="batebeac">Date validation Beac:</label>
+            <div class="d-flex justify-content-center">
+                <input type="date" class="form-control" id="batebeac" name="batebeac" required>
+                <button class="btn btn-primary" th:if="transaction.statut!=3" type="submit">Valider</button>
+            </div>
+        </div>
         <hr>
     </form>
 
@@ -241,7 +260,7 @@
 
 
         <th:block sec:authorize="hasRole('ROLE_MACKER')">
-            <button class="btn btn-danger" data-bs-target="#defaultModalPrimary" data-bs-toggle="modal"
+            <button class="btn btn-secondary" data-bs-target="#defaultModalPrimary" data-bs-toggle="modal"
                     th:if="${transaction.statut == W or transaction == SM}" type="button">
                 Rejeter
             </button>
@@ -259,10 +278,10 @@
         </th:block>
         <th:block th:if="${#authorization.expression('hasRole(''ROLE_MACKER'')') or
              #authorization.expression('hasRole(''ROLE_CHECKER'')')} ">
-            <button class="btn btn-warning send-back" data-bs-target="#modalRenvoyer"
+            <button class="btn btn-danger send-back" data-bs-target="#modalRenvoyer"
                     data-bs-toggle="modal"
                     th:href="@{/send-back-to-macker/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SMSTR})}"
-                    th:if="${transaction.statut == M or transaction.statut >1}" type="button">
+                    th:if="${transaction.statut == M or transaction.statut >1 and transaction.statut<9}" type="button">
                 << Renvoyer
             </button>
         </th:block>
@@ -300,7 +319,7 @@
         </th:block>
         <th:block th:if="${#authorization.expression('hasRole(''ROLE_AGENCE'')')
             or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
+             or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
             <a style="float:right;" th:href="@{${uri}}"
                th:if="${transaction.statut != V or transaction.statut != R}">Ajouter les documents</a>
         </th:block>

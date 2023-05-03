@@ -357,7 +357,7 @@ public class TransactionController {
         Banque banque = (Banque) session.getAttribute("banque");
         Client client = loggedUser.getClient();
         if (client == null) {
-            if (loggedUser == null || loggedUser.getClient() == null) {
+            if (loggedUser.getClient() == null) {
                 return "error/403";
             }
         }
@@ -387,12 +387,12 @@ public class TransactionController {
             return "error/500";
         }
         if (type.equals("domiciliation")) {
-            if (transactionService.checkIfHasNotTransactionPendingTransaction(client).size() > 0) {
+            if (transactionService.checkIfHasNotTransactionPendingTransaction(banque, client).size() > 0) {
                 // Means that custumer has some pending transactions
                 String msg = "Attention, Il se peut que ce client  ait une transaction en cours" +
                         " non apurée . Priere de verifier ";
                 redirectAttributes.addFlashAttribute("flashMessage", msg);
-                return "redirect:/transactions";
+                return "redirect:/clients";
             }
         }
         setFormTransactionData(banque, client, type, transaction, model);
@@ -563,7 +563,7 @@ public class TransactionController {
     public String showTransactionDetails(@PathVariable("id") String transactionId, Model model, Authentication authentication, Principal principal) throws Exception {
 
 
-        Transaction transaction=transactionService.getTransaction(cryptoUtils.decrypt(transactionId)).get();
+        Transaction transaction = transactionService.getTransaction(CryptoUtils.decrypt(transactionId)).get();
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -986,13 +986,14 @@ public class TransactionController {
             @RequestParam(value = "typefinancement", required = false, defaultValue = "0") long financement,
             @RequestParam(value = "taux", required = false) String taux,
             @RequestParam(value = "dateValeur", required = false) String dateValeur,
+            @RequestParam(value = "batebeac", required = false) String batebeac,
             RedirectAttributes redirectAttributes, Principal principal, Authentication authentication) throws Exception {
 
         if (authentication.getAuthorities().stream().
                 anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO")) || authentication.getAuthorities().stream().
                 anyMatch(a -> a.getAuthority().equals("ROLE_MAKER_TO")) || authentication.getAuthorities().stream().
                 anyMatch(a -> a.getAuthority().equals("ROLE_TREASURY"))) {
-            if (date == null || taux == null || dateValeur == null) {
+            if (financement != 0) {
                 transaction.setTypeFinancement(typeFinancementRepository.getById(financement));
                 transactionService.saveTransaction(transaction);
 
@@ -1008,10 +1009,29 @@ public class TransactionController {
 
             }
         }
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        if (authentication.getAuthorities().stream().
+                anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO"))) {
+            if (batebeac != null) {
+                transaction.setDateValeurBeac(sdf.parse(batebeac));
+                transactionService.saveTransaction(transaction);
+
+                String id = CryptoUtils.encrypt(transaction.getId());
+                ActionTransaction actionTransaction = new ActionTransaction();
+                actionTransaction.setTransaction(transaction);
+                actionTransaction.setAction("Ajout date de validation Beac ");
+                AppUser loggedUser = userService.getLoggedUser(principal);
+                actionTransaction.setAppUser(loggedUser);
+                actionTransaction.setCommentaire("Ajout du type de préfinancement  effectué avec succès");
+                actionTransactionService.saveActionTransaction(actionTransaction);
+                return "redirect:/transaction-" + id + "/details";
+
+            }
+        }
+
         try {
-            if (date == null || dateValeur == null) {
+            if (date == null || taux == null || dateValeur == null) {
                 redirectAttributes.addFlashAttribute("flashMessage",
                         "Oops Une erreur est survenue , veuillez verifier que vous y etes autorise ou que vous avez bien renseignez les differentes dates");
             }

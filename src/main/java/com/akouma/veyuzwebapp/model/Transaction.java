@@ -222,6 +222,8 @@ public class Transaction {
         this.typeFinancement = typeFinancement;
     }
 
+    private Date dateValeurBeac;
+
     public AppUser getAppUser() {
         return appUser;
     }
