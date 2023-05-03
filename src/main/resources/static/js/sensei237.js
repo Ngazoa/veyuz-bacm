@@ -256,9 +256,11 @@ $('#modal-transmettre-pour-apurement form').on('submit', function(event) {
 $(".edit-date-effective-apurement").each(function () {
     var elt = $(this);
     elt.on("click", function (e) {
-        ref = elt.data("ref");
+        e.preventDefault();
+        var ref = elt.data("ref");
         $('#modal-transmettre-pour-apurement form').attr('data-ref', ref)
         $('#modal-transmettre-pour-apurement form .loader').html("");
+        $('#modal-transmettre-pour-apurement').modal('show')
     });
 })
 
