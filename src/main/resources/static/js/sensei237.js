@@ -230,6 +230,38 @@ $(".apurement-btn-action").each(function () {
     });
 })
 
+$('#modal-transmettre-pour-apurement form').on('submit', function(event) {
+    event.preventDefault();
+    var elt = $(this);
+    var data = elt.data("ref")
+    var date = elt.find('input').val()
+    $.ajax({
+        url: "/add-apurement-effective-date/" + data + "/" + date,
+        type: "GET",
+        dataType: "JSON",
+        beforeSend: function() {
+            elt.find(".loader").html(loader)
+        },
+        success: function(response) {
+            elt.find(".loader").html("")
+            if (response.isChanged) {
+                window.location.reload();
+            }else {
+                alert(response.errorMessage)
+            }
+        }
+    })
+})
+
+$(".edit-date-effective-apurement").each(function () {
+    var elt = $(this);
+    elt.on("click", function (e) {
+        ref = elt.data("ref");
+        $('#modal-transmettre-pour-apurement form').attr('data-ref', ref)
+        $('#modal-transmettre-pour-apurement form .loader').html("");
+    });
+})
+
 $('#fichiersManquant').on("click", function (e) {
     // var ref = $("#modal").data("ref");
     $("#modal .tab-title").html("Liste des fichiers manquants");
@@ -473,6 +505,7 @@ var multipleUploadForm = document.querySelector('#multipleUploadForm');
 var multipleFileUploadInput = document.querySelector('#multipleFileUploadInput');
 var multipleFileUploadError = document.querySelector('#multipleFileUploadError');
 var multipleFileUploadSuccess = document.querySelector('#multipleFileUploadSuccess');
+var enterDateEffectiveForm = document.querySelector('#modal-transmettre-pour-apurement form');
 
 function uploadSingleFile(file) {
     var formData = new FormData();

@@ -235,6 +235,9 @@
                 </a>
                 <ul id="apurments" class="sidebar-dropdown list-unstyled collapse "
                     th:classappend="${#strings.equals(dash, 'apurments')} ? show : ''" data-bs-parent="#sidebar">
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apwd')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/apurments-treasury-approved}">Validées par la trésorerie</a>
+                    </li>
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apw')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments}">En attente d'apurement</a>
                     </li>

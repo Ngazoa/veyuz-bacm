@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.service;
 
+import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Apurement;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
@@ -23,6 +24,12 @@ public class ApurementService {
         }
         return apurementRepositoy.findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(banque, client, isApured, PageRequest.of(page, max));
     }
+
+    public Page<Apurement> getApurementsTreasurySend(Banque banque, int max, Integer page, boolean isApured, int status) {
+
+        return apurementRepositoy.findByBanqueAndIsApuredAndStatusOrderByDateOuvertureDesc(banque, isApured, status, PageRequest.of(page, max));
+    }
+
     public Iterable<Apurement> getApurementscount(Banque banque, Client client, boolean isApured) {
         if (client == null) {
             return apurementRepositoy.findByBanqueAndIsApuredOrderByIsApuredAsc(banque, isApured);
@@ -66,5 +73,17 @@ public class ApurementService {
 
     public Iterable<? extends Apurement> getNonApuredAndExpiredApurements(Banque banque, Client client) {
         return apurementRepositoy.findByBanqueAndClientAndIsApuredFalseAndIsExpiredFalse(banque, client);
+    }
+
+    public Page<Apurement> getApurementsHasFiles(Banque banque, Client client, int max, Integer page, boolean isApured, int status) {
+        if (client == null) {
+            return apurementRepositoy.findByBanqueAndIsApuredAndStatusOrderByDateOuvertureDesc(banque, isApured, status, PageRequest.of(page, max));
+        }
+
+        return apurementRepositoy.findByBanqueAndClientAndIsApuredAndStatusOrderByDateOuvertureDesc(banque, client, isApured, status, PageRequest.of(page, max));
+    }
+
+    public Page<Apurement> getApurementsHasFilesAgence(Banque banque, AppUser appUser, int max, Integer page, boolean isApured, int status) {
+        return apurementRepositoy.findByBanqueAndIsApuredAndStatusAndAppUserOrderByDateOuvertureDesc(banque, isApured, status, appUser, PageRequest.of(page, max));
     }
 }

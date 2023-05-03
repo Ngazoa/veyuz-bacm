@@ -488,6 +488,9 @@ public class TransactionRestController {
         apurement.setDevise(transaction.getDevise().getCode());
         apurement.setMotif(transaction.getMotif());
         apurement.setDateExpiration(transaction.getDelay());
+        apurement.setStatus(StatusTransaction.APUREMENT_WAITING_DATE);
+        apurement.setTransaction(transaction);
+        apurement.setAppUser(transaction.getAppUser());
         Apurement savedApurement = apurementService.saveApurement(apurement);
         // on ajoute les fichiers de l'apurement
         for (Fichier f : transaction.getFichiers()) {

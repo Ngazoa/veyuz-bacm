@@ -37,6 +37,18 @@ public class StatusTransaction {
 
     public static final int INVALID_STATUS = -2;
 
+//    ===========================================================================================
+//    LES STATUTS DE L'APUREMENT
+
+    public static final int APUREMENT_WAITING_DATE = 0;
+
+    public static final int  APUREMENT_WAITING_FILES = 1;
+
+    public static final int APUREMENT_HAS_FILES = 2;
+
+    public static final int APUREMENT_IS_VALIDATED = 3;
+
+
     // ========================================================================
     // LES TYPES DE TRANSACTIONS
     public static final String TYPE_NORMAL = "normal";
@@ -47,6 +59,8 @@ public class StatusTransaction {
 
     public static final int DELAY_TRANSACTION_IMPORTATION_BIENS = 30;
     public static final int DELAY_TRANSACTION_IMPORTATION_SERVICES = 90;
+
+    public static final int DEFAULT_DELAY_TRANSACTION = 20;
 
     public static final String IMP_BIENS = "biens";
     public static final String IMP_SERVICES = "services";

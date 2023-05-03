@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.model;
 
+import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
@@ -44,8 +45,20 @@ public class Apurement {
     private Boolean isApured = false;
     private Boolean isExpired = false;
     private int countEditExpirationDate;
-
     private Date dateMiseEnDemmeure;
+    private Date dateEffective;
+    private int status = StatusTransaction.APUREMENT_WAITING_DATE;
+
+//    CETTE VARIABLE REPRESENTE LE USER AVEC LE ROLE AGENC QUI A INITIE LA TRANSACTION
+    @ManyToOne
+    @JoinColumn(name = "app_user_id", referencedColumnName = "id")
+    @JsonManagedReference
+    private AppUser appUser;
+
+    @OneToOne
+    @JoinColumn(name = "transaction_id", referencedColumnName = "id")
+    @JsonManagedReference
+    private Transaction transaction;
 
     @CreationTimestamp
     private Date dateCreation;

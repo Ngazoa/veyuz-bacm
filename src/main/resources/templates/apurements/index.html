@@ -34,24 +34,25 @@
     <div class="mb-3" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or
                             #authorization.expression('hasRole(''ROLE_TREASURY_OPS'')')
                     or #authorization.expression('hasRole(''ROLE_TRADE_DESK'')')}">
-        <div style="text-align: right;">
-            <button class="btn btn-primary" data-bs-target="#miseDemeure" data-bs-toggle="modal">
-                Envoyer les mises en demeure
-            </button>
-            <a th:if="${exportUri != null}" th:href="@{${exportUri}}" class="btn btn-success">
-                <i class="fas fa-file-excel"></i> Exporter sur excel
-            </a>
-        </div>
-        <br>
-        <form th:if="${searchUri != null}" th:action="@{${searchUri}}" method="get" class="form-inline">
-            <div class="input-group">
-                <input type="text" name="reference" class="form-control" placeholder="Entrer la reference pour recherher..." required>
-                <button type="submit" class="btn btn-primary">Rechercher</button>
+        <div class="d-flex">
+            <div style="text-align: right; margin-right: 10px;" class="mr-3">
+                <button class="btn btn-primary" data-bs-target="#miseDemeure" data-bs-toggle="modal">
+                    Envoyer les mises en demeure
+                </button>
+                <a th:if="${exportUri != null}" th:href="@{${exportUri}}" class="btn btn-success mr-3">
+                    <i class="fas fa-file-excel"></i> Exporter sur excel
+                </a>
             </div>
-        </form>
+            <form th:if="${searchUri != null}" th:action="@{${searchUri}}" method="get" class="form-inline ml-5">
+                <div class="input-group">
+                    <input type="text" name="reference" class="form-control" placeholder="Entrer la reference pour recherher..." required>
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </form>
+        </div>
 
         <div class="modal fade" id="miseDemeure" role="dialog" aria-modal="true" tabindex="-1">
-            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-dialog modal-md" role="document">
                 <form th:if="${importFile != null}" class="modal-content" id="apurementForm" th:action="@{/rest-apurements/mise-demeure}" enctype="multipart/form-data" th:object="${importFile}" method="post">
                     <div class="modal-header">
                         <h5 class="modal-title">Envoie des mises en demeure</h5>
@@ -101,7 +102,7 @@
         </div>
         <div class="card-body">
             <div>
-                <table id="datatables-reponsive" class="table table-striped" style="width:100%">
+                <table id="datatables-reponsive" class="table table-striped table-responsive" style="width:100%">
                     <thead>
                         <tr>
                             <th th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
@@ -113,6 +114,7 @@
                             <th>Dévise</th>
                             <th>Montant</th>
                             <th>Date Ouv</th>
+                            <th>Date Effective debit</th>
                             <th>Delai</th>
                             <th>Statut</th>
                             <th>Action</th>
@@ -129,18 +131,24 @@
                             <td class="montant_format" th:text="${ap.montant}"></td>
                             <td th:text="${#dates.format(ap.dateOuverture, 'dd-MM-yyyy')}"></td>
                             <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
-                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:data="${ap.id}" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}" th:data-value="${#dates.format(ap.dateExpiration, 'yyyy-MM-dd')}" class="dateExpirationApurement"></td>
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${#dates.format(ap.dateEffective, 'dd-MM-yyyy')}"></td>
+
                             <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
-                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}"></td>
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:data="${ap.id}" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}" th:data-value="${#dates.format(ap.dateExpiration, 'yyyy-MM-dd')}" class="dateExpirationApurement"></td>
+
                             <td>
-                                <span th:if="${ap.isApured == false and (ap.isExpired == false or ap.isExpired == null)}" class="badge bg-info">En cours</span>
+                                <span th:if="${ap.status == 0}" class="badge bg-warning">Pas Transmis</span>
+                                <span th:if="${ap.status == 1}" class="badge bg-info">En attente des fichiers</span>
                                 <span th:if="${ap.isApured}" class="badge bg-success">Acceptée</span>
-                                <span th:if="${ap.isApured == false and ap.isExpired == true}" class="badge bg-danger">Non apurée</span>
+                                <span th:if="${ap.status == 2}" class="badge bg-info">En cours</span>
                             </td>
+
                             <td>
-                                <a th:unless="${ap.isApured}" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm apurement-btn-action" data-bs-toggle="modal" data-bs-target="#modal">
+                                <a th:if="${!ap.isApured and ap.status != 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm apurement-btn-action" data-bs-toggle="modal" data-bs-target="#modal">
                                     <i data-feather="eye"></i>
-                                    details
+                                </a>
+                                <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm edit-date-effective-apurement" data-bs-toggle="modal" data-bs-target="#modal-transmettre-pour-apurement">
+                                    <i class="fas fa-paper-plane"></i>
                                 </a>
                             </td>
                         </tr>
@@ -171,7 +179,8 @@
                                                 <i class="align-middle" data-feather="file-plus"></i>
                                             </a>
                                         </li>
-                                        <li class="nav-item" title="Fichiers envoyés">
+                                        <li th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_TRADE_DESK'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" class="nav-item" title="Fichiers envoyés">
                                             <a class="nav-link" id="filesSend" href="#vertical-icon-tab-2" data-bs-toggle="tab" role="tab">
                                                 <i class="align-middle" data-feather="file-text"></i>
                                             </a>
@@ -191,12 +200,35 @@
 
                             </div>
                             <div class="modal-footer">
-                                <a th:if="${#authorization.expression('hasRole(''ROLE_MACKER'')')
-                    or #authorization.expression('hasRole(''ROLE_CHECKER'')')
-                    or #authorization.expression('hasRole(''ROLE_AGENCE'')')}" href="" class="btn btn-success" id="validerApurement">Valider l'apurement</a>
+                                <a th:if="${#authorization.expression('hasRole(''ROLE_TRADE_DESK'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') or #authorization.expression('hasRole(''ROLE_CHECKER'')')
+                    or #authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}" href="" class="btn btn-success" id="validerApurement">Valider l'apurement</a>
                                 <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div data-ref="" class="modal fade" id="modal-transmettre-pour-apurement" role="dialog" aria-modal="true" tabindex="-1">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <form class="modal-content"  data-ref="" id="modal-transmettre-pour-apurement-form">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Transmettre à l'agence</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info">
+                                    <p>Cette transaction a été validée par le trésorier ! Entrer la date effective de débit et trasmettez à l'agence afin qui'il procède à l'upload des fichiers d'apurement</p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="date" required class="form-control" name="dateeffctive" id="dateeffective">
+                                </div>
+                                <div class="loader"></div>
+                            </div>
+                            <div class="modal-footer">
+                               <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success btn-sm">Enregistrer la date et Transmettre</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 

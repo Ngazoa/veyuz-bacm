@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.repository;
 
+import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Apurement;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
@@ -22,6 +23,9 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Page<Apurement> findByBanqueAndIsApured(Banque banque, boolean isApured, Pageable pageable);
 
     Page<Apurement> findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(Banque banque, Client client, boolean isApured, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndIsApuredAndStatusOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, Pageable pageable);
+
     Iterable<Apurement> findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(Banque banque, Client client, boolean isApured);
 
     Page<Apurement> findByBanqueAndIsApuredAndDateExpirationIsNotNullOrderByIsApuredAsc(Banque banque, boolean isApured, Pageable pageable);
@@ -58,4 +62,8 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Iterable<Apurement> findByBanqueAndAndClientAndReferenceTransactionContainingOrderByDateOuvertureDesc(Banque banque, Client client, String reference);
 
     Iterable<Apurement> findByBanqueAndReferenceTransactionContainingOrderByDateOuvertureDesc(Banque banque, String reference);
+
+    Page<Apurement> findByBanqueAndClientAndIsApuredAndStatusOrderByDateOuvertureDesc(Banque banque, Client client, boolean isApured, int status, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndIsApuredAndStatusAndAppUserOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, AppUser appUser, Pageable pageable);
 }

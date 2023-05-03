@@ -13,6 +13,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -174,7 +176,12 @@ public class ApurementRestController {
 //                    System.out.println("I -"+fileName+" II- "+fileForm.getFichierManquant());
                     fileForm.getFichierManquant().setFile(fileName);
                     fileForm.getFichierManquant().setIsValidated(false);
-                    fichierManquantService.saveFichierManquant(fileForm.getFichierManquant());
+                    ApurementFichierManquant apurementFichierManquant = fichierManquantService.saveFichierManquant(fileForm.getFichierManquant());
+                    if (apurementFichierManquant != null) {
+                        Apurement apurement = apurementFichierManquant.getApurement();
+                        apurement.setStatus(StatusTransaction.APUREMENT_HAS_FILES);
+                        apurementService.saveApurement(apurement);
+                    }
                     message = fileForm.getFichierManquant().getFileName() + " a été déplacé et transmis";
                     isUpload = true;
                 }else {
@@ -200,7 +207,16 @@ public class ApurementRestController {
      * @return
      */
     @GetMapping("/rest-apurements/file/{id}/{validate}")
-    public ResponseEntity<?> validerFichier(@PathVariable("id") ApurementFichierManquant fichier, @PathVariable("validate") boolean validated) {
+    public ResponseEntity<?> validerFichier(@PathVariable("id") ApurementFichierManquant fichier, @PathVariable("validate") boolean validated, Authentication authentication) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
+            authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))) {
+            response.put("isOk", false);
+            response.put("message", "Vous n'avez pas les authorisations nécessaires pour effectuer cette opération");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         fichier.setIsValidated(validated);
         fichier.getApurement().setIsApured(false);
         fichierManquantService.saveFichierManquant(fichier);
@@ -226,7 +242,7 @@ public class ApurementRestController {
             title = "Valider le fichier";
         }
 
-        HashMap<String, Object> response = new HashMap<>();
+
         response.put("message", message);
         response.put("isOk", true);
         response.put("href", v);
@@ -242,7 +258,16 @@ public class ApurementRestController {
      * @return
      */
     @GetMapping("/rest-apurements/{id}/apurer")
-    public ResponseEntity<?> apurer(@PathVariable("id")Apurement apurement) {
+    public ResponseEntity<?> apurer(@PathVariable("id")Apurement apurement, Authentication authentication) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
+                authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))) {
+            response.put("isOk", false);
+            response.put("message", "Vous n'avez pas les authorisations nécessaires pour effectuer cette opération");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         String msg = "Dossier apuré !";
         String list = "<ul>";
         boolean isCompleted = true;
@@ -259,6 +284,7 @@ public class ApurementRestController {
 
         if (isCompleted) {
             apurement.setIsApured(true);
+            apurement.setStatus(StatusTransaction.APUREMENT_IS_VALIDATED);
             for (ApurementFichierManquant fm : apurement.getFichiersManquants()) {
                 fm.setIsValidated(true);
                 Transaction transaction = transactionService.getTransactionByReference(apurement.getReferenceTransaction());
@@ -274,8 +300,6 @@ public class ApurementRestController {
             apurementService.saveApurement(apurement);
         }
 
-
-        HashMap<String, Object> response = new HashMap<>();
         response.put("message", msg);
         response.put("isOk", isCompleted);
 
@@ -301,7 +325,7 @@ public class ApurementRestController {
         }
         boolean isChanged = false;
         Long nbJoursRestant = null;
-        int maxExpirationDays = 20;
+        int maxExpirationDays = StatusTransaction.DEFAULT_DELAY_TRANSACTION;
         Transaction transaction = transactionService.getTransactionByReference(apurement.getReferenceTransaction());
         if (apurement.getCountEditExpirationDate() < 3) {
             if (transaction != null) {
@@ -339,6 +363,51 @@ public class ApurementRestController {
         hashMap.put("delay", new SimpleDateFormat("yyyy-MM-dd").format(transaction.getDelay()));
         return new ResponseEntity<>(hashMap, HttpStatus.OK);
     }
+
+    @GetMapping("/add-apurement-effective-date/{id}/{date}")
+    public ResponseEntity<?> setApurementEffectiveDate(@PathVariable("id") Apurement apurement, @PathVariable("date") String dateStr) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        String errorMessage = null;
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            errorMessage = "Vous devez saisir une date valide !";
+        }
+        boolean isChanged = false;
+
+        if (date != null) {
+            // on determine la date d'expiration
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            Transaction transaction = apurement.getTransaction();
+            if (transaction != null && transaction.getTypeDeTransaction().getType() != null) {
+                if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
+                    calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
+                } else if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
+                    calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_SERVICES);
+                } else {
+                    calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
+                }
+            } else {
+                calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
+            }
+
+            apurement.setDateExpiration(calendar.getTime());
+            apurement.setStatus(StatusTransaction.APUREMENT_WAITING_FILES);
+            apurement.setDateEffective(date);
+            apurementService.saveApurement(apurement);
+            isChanged = true;
+            hashMap.put("dateText", new SimpleDateFormat("dd-MM-yyyy").format(date));
+            hashMap.put("dataValue", new SimpleDateFormat("yyyy-MM-dd").format(date));
+        }
+
+        hashMap.put("errorMessage", errorMessage);
+        hashMap.put("isChanged", isChanged);
+        return new ResponseEntity<>(hashMap, HttpStatus.OK);
+    }
+
 
     /**
      * Cette fonction permet d'afficher la liste des fichiers manquant pour un dossier d'apurement

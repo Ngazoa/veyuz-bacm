@@ -206,7 +206,7 @@ public class Transaction {
 
 
     @ManyToOne
-    @JoinColumn(name = "app_user_id")
+    @JoinColumn(name = "app_user_id", referencedColumnName = "id")
     private AppUser appUser;
 
     @ManyToOne
