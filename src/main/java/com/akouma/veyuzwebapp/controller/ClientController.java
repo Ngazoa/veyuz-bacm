@@ -299,8 +299,6 @@ public class ClientController {
 
         boolean isEnable = !client.getUser().isEnable();
         clientService.setEnable(isEnable, client);
-        System.out.println(banque.getName());
-
         String msg = "Vous venez de bloquer le client " + client.getDenomination() + " !!!";
         if (isEnable) {
             msg = "Vous venez d'activer le compte du client " + client.getDenomination() + " !!!";

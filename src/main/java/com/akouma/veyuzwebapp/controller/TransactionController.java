@@ -137,10 +137,10 @@ public class TransactionController {
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/transactions/{client_id}-client", "/transactions/{client_id}-client/page={page}"})
     public String getTransactionsClient(
-            @PathVariable("client_id") Client client,
+            @PathVariable("client_id") String clt,
             @PathVariable(value = "page", required = false) Integer page,
             Model model, Principal principal) throws Exception {
-
+           Client client=clientService.findById(cryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
