@@ -27,7 +27,36 @@
 
 </th:block>
 
-<th:block id="others-js"></th:block>
+<th:block id="others-js">
+    <script>
+        $('.add-date-effective-form').each(function() {
+            var form = $(this);
+            form.on("submit", function(event){
+                event.preventDefault();
+                alert("Nouveau Submit")
+                var elt = $(this);
+                var data = elt.data("ref")
+                var date = elt.find('input').val()
+                $.ajax({
+                    url: "/add-apurement-effective-date/" + data + "/" + date,
+                    type: "GET",
+                    dataType: "JSON",
+                    beforeSend: function() {
+                        elt.find(".loader").html(loader)
+                    },
+                    success: function(response) {
+                        elt.find(".loader").html("")
+                        if (response.isChanged) {
+                            window.location.reload();
+                        }else {
+                            alert(response.errorMessage)
+                        }
+                    }
+                })
+            })
+        })
+    </script>
+</th:block>
 
 <div id="main-content">
 
@@ -147,7 +176,7 @@
                                 <a th:if="${!ap.isApured and ap.status != 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm apurement-btn-action" data-bs-toggle="modal" data-bs-target="#modal">
                                     <i data-feather="eye"></i>
                                 </a>
-                                <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm edit-date-effective-apurement">
+                                <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-transmettre-pour-apurement-' + ${ap.id}">
                                     <i class="fas fa-paper-plane"></i>
                                 </a>
                             </td>
@@ -226,6 +255,30 @@
                             </div>
                             <div class="modal-footer">
                                <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success btn-sm">Enregistrer la date et Transmettre</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:each="ap, s : ${apurements}" data-ref="" class="modal fade" th:id="'modal-transmettre-pour-apurement-' + ${ap.id}" role="dialog" aria-modal="true" tabindex="-1">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <form class="modal-content add-date-effective-form" th:data-ref="${ap.id}">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Transmettre à l'agence</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info">
+                                    <p>Cette transaction a été validée par le trésorier ! Entrer la date effective de débit et trasmettez à l'agence afin qui'il procède à l'upload des fichiers d'apurement</p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="date" required class="form-control dateeffective" name="dateeffctive">
+                                </div>
+                                <div class="loader"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
                                 <button type="submit" class="btn btn-success btn-sm">Enregistrer la date et Transmettre</button>
                             </div>
                         </form>
