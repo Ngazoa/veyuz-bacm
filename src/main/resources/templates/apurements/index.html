@@ -33,7 +33,6 @@
             var form = $(this);
             form.on("submit", function(event){
                 event.preventDefault();
-                alert("Nouveau Submit")
                 var elt = $(this);
                 var data = elt.data("ref")
                 var date = elt.find('input').val()
@@ -42,15 +41,17 @@
                     type: "GET",
                     dataType: "JSON",
                     beforeSend: function() {
-                        elt.find(".loader").html(loader)
+                        showNotif("Traitement en cours !", "info");
                     },
                     success: function(response) {
                         elt.find(".loader").html("")
                         if (response.isChanged) {
-                            window.location.reload();
+                            showNotif("Dossier transmis à l'agence pour ajouter les fichiers d'apurements !", "success", 4000);
+                            $("#ligne" + data).fadeOut(400).remove();
                         }else {
                             alert(response.errorMessage)
                         }
+                        $("#modal-transmettre-pour-apurement-" + data).modal('hide')
                     }
                 })
             })
@@ -150,7 +151,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="ap, s : ${apurements}" class="" th:classappend="${ap.isApured == false and ap.isExpired == true ? 'bg-danger' : ''}">
+                        <tr th:each="ap, s : ${apurements}" th:id="'ligne' + ${ap.id}" class="" th:classappend="${ap.isApured == false and ap.isExpired == true ? 'bg-danger' : ''}">
                             <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${ap.referenceTransaction}"></td>
                             <td th:text="${ap.motif}"></td>
