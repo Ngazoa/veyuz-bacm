@@ -170,14 +170,12 @@ public class ClientService {
         if (client.getReference() == null) {
             client.setReference("C-" + new Date().getTime() + "-VEYUZ");
         }
-
+System.out.println("====>1");
         String codeVeyuz = client.getCodeVeyuz();
-        System.out.println("Code veyuz = " + codeVeyuz);
+
         if (client.getCodeVeyuz() == null || client.getCodeVeyuz().trim() == "") {
             boolean existe = true;
-            System.out.println("Generation de code veyuz");
             while (existe) {
-                System.out.println("Code veyuz");
                 codeVeyuz = Upload.generateVeyuzCode();
                 if (clientRepository.findFirstByCodeVeyuz(codeVeyuz) == null) {
                     existe = false;
@@ -203,32 +201,16 @@ public class ClientService {
 
         Client savedClient = saveClient(client);
 
-        String encrytedPassword = null;
         AppUser appUser = clientForm.getAppUser();
-        if (appUser.getPassword() != null) {
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            encrytedPassword = passwordEncoder.encode(appUser.getPassword());
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(sdf.parse(clientForm.getDateNaissanceStr()).getTime());
 
         String avatar = u.uploadFile(clientForm.getAvatar(),fileStorageService, "/avatar",request);
 
 //        AppUser appUser = new AppUser();
         appUser.setAvatar(avatar);
         appUser.setEnable(false);
-        appUser.setDateNaissance(date);
-        appUser.setPassword(encrytedPassword);
         appUser.setClient(savedClient);
-        System.out.println("Avant les roles");
-        userRepository.save(appUser);
 
-        AppRole appRoleClient = appRoleRepository.findFirstByRoleName("ROLE_CLIENT");
-        UserRole role = new UserRole();
-        role.setAppUser(appUser);
-        role.setAppRole(appRoleClient);
-        UserRole userRole = userRoleRepository.save(role);
+        userRepository.save(appUser);
 
 //        appUser.getUserRoles().add(userRole);
 

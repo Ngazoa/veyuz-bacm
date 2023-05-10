@@ -134,54 +134,54 @@
             <div>
                 <table id="datatables-reponsive" class="table table-striped table-responsive" style="width:100%">
                     <thead>
-                        <tr>
-                            <th th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                    <tr>
+                        <th th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')')
                  or #authorization.expression('hasRole(''ROLE_MACKER'')') }">Reference Transaction</th>
-                            <th>Motif de la transaction</th>
-                            <th>Client</th>
-                            <th>Beneficiaire</th>
-                            <th>Dévise</th>
-                            <th>Montant</th>
-                            <th>Date Ouv</th>
-                            <th>Date Effective debit</th>
-                            <th>Delai</th>
-                            <th>Statut</th>
-                            <th>Action</th>
-                        </tr>
+                        <th>Motif de la transaction</th>
+                        <th>Client</th>
+                        <th>Beneficiaire</th>
+                        <th>Dévise</th>
+                        <th>Montant</th>
+                        <th>Date Ouv</th>
+                        <th>Date Effective debit</th>
+                        <th>Delai</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="ap, s : ${apurements}" th:id="'ligne' + ${ap.id}" class="" th:classappend="${ap.isApured == false and ap.isExpired == true ? 'bg-danger' : ''}">
-                            <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                    <tr th:each="ap, s : ${apurements}" th:id="'ligne' + ${ap.id}" class="" th:classappend="${ap.isApured == false and ap.isExpired == true ? 'bg-danger' : ''}">
+                        <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${ap.referenceTransaction}"></td>
-                            <td th:text="${ap.motif}"></td>
-                            <td th:text="${ap.client.denomination}"></td>
-                            <td th:text="${ap.beneficiaire}"></td>
-                            <td th:text="${ap.devise}"></td>
-                            <td class="montant_format" th:text="${ap.montant}"></td>
-                            <td th:text="${#dates.format(ap.dateOuverture, 'dd-MM-yyyy')}"></td>
-                            <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                        <td th:text="${ap.motif}"></td>
+                        <td th:text="${ap.client.denomination}"></td>
+                        <td th:text="${ap.beneficiaire}"></td>
+                        <td th:text="${ap.devise}"></td>
+                        <td class="montant_format" th:text="${ap.montant}"></td>
+                        <td th:text="${#dates.format(ap.dateOuverture, 'dd-MM-yyyy')}"></td>
+                        <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${#dates.format(ap.dateEffective, 'dd-MM-yyyy')}"></td>
 
-                            <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                        <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:data="${ap.id}" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}" th:data-value="${#dates.format(ap.dateExpiration, 'yyyy-MM-dd')}" class="dateExpirationApurement"></td>
 
-                            <td>
-                                <span th:if="${ap.status == 0}" class="badge bg-warning">Pas Transmis</span>
-                                <span th:if="${ap.status == 1}" class="badge bg-info">En attente des fichiers</span>
-                                <span th:if="${ap.isApured}" class="badge bg-success">Acceptée</span>
-                                <span th:if="${ap.status == 2}" class="badge bg-info">En cours</span>
-                            </td>
+                        <td>
+                            <span th:if="${ap.status == 0}" class="badge bg-warning">Pas Transmis</span>
+                            <span th:if="${ap.status == 1}" class="badge bg-info">En attente des fichiers</span>
+                            <span th:if="${ap.isApured}" class="badge bg-success">Acceptée</span>
+                            <span th:if="${ap.status == 2}" class="badge bg-info">En cours</span>
+                        </td>
 
-                            <td>
-                                <a th:if="${!ap.isApured and ap.status != 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
-                                    <i data-feather="eye"></i>
-                                </a>
-                                <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-transmettre-pour-apurement-' + ${ap.id}">
-                                    <i class="fas fa-paper-plane"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        <td>
+                            <a th:if="${!ap.isApured and ap.status != 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
+                                <i data-feather="eye"></i>
+                            </a>
+                            <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-transmettre-pour-apurement-' + ${ap.id}">
+                                <i class="fas fa-paper-plane"></i>
+                            </a>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
 
@@ -255,7 +255,7 @@
                                 <div class="loader"></div>
                             </div>
                             <div class="modal-footer">
-                               <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
+                                <button class="btn btn-danger btn-sm" data-bs-dismiss="modal">Annuler</button>
                                 <button type="submit" class="btn btn-success btn-sm">Enregistrer la date et Transmettre</button>
                             </div>
                         </form>

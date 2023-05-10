@@ -128,7 +128,7 @@
                             <th>Type</th>
                             <th>Client</th>
                             <th>Beneficiaire</th>
-                            <th>Date</th>
+                            <th>Date Creat</th>
                             <th>Montant</th>
                             <th>Agence</th>
                             <th>Statut</th>
@@ -142,19 +142,19 @@
                             <td th:utext="${transaction.typeDeTransaction.name}"></td>
                             <td th:utext="${transaction.client.denomination}"></td>
                             <td th:utext="${transaction.beneficiaire.name}"></td>
-                            <td th:text="${transaction.dateCreation}"></td>
+                            <td th:text="${transaction.dateCreation}" />
                             <td class="montant_format" th:text="${transaction.montant}"></td>
                             <td th:if="${transaction.appUser!=null}" th:text="${transaction.appUser.nom}"></td>
                             <td th:if="${transaction.appUser==null}">/</td>
                             <td>
                                 <span th:if="${transaction.statut == 0}" class="badge bg-primary">En attente</span>
-                                <span th:if="${transaction.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i>Traitement TDM</span>
-                                <span th:if="${transaction.statut == 2}" class="badge bg-primary">Validation TDC</span>
-                                <span th:if="${transaction.statut == 7}" class="badge bg-secondary">Traitement TOPsM</span>
-                                <span th:if="${transaction.statut == 8}" class="badge bg-info">Validation TOPsC</span>
+                                <span th:if="${transaction.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i>Traitee TDM</span>
+                                <span th:if="${transaction.statut == 2}" class="badge bg-primary">Validée TDC</span>
+                                <span th:if="${transaction.statut == 7}" class="badge bg-secondary">Traitée TOPsM</span>
+                                <span th:if="${transaction.statut == 8}" class="badge bg-info">Validé TOPsC</span>
                                 <span th:if="${transaction.statut == 3}" class="badge bg-success"><i class="fas fa-check"></i> Validée</span>
                                 <span th:if="${transaction.statut == -1}" class="badge bg-danger"><i class="fas fa-times"></i> Rejetée</span>
-                                <span th:if="${transaction.statut == 9}" class="badge bg-warning"><i class="fas fa-times"></i> Treasory</span>
+                                <span th:if="${transaction.statut == 9}" class="badge bg-warning"><i class="fas fa-times"></i> Treasury</span>
                                 <span th:if="${transaction.statut == 4 or transaction.statut == 5}" class="badge bg-warning"><i class="fas fa-undo"></i> Renvoyée</span>
 
                             </td>

@@ -72,6 +72,7 @@ public class ApurementController {
         if (loggedUser.getClient() != null) {
             apurements = apurementService.getApurementsHasFiles(banque, loggedUser.getClient(), max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
         } else {
+
             if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
                 apurements = apurementService.getNotApuredTransactions(banque, null, max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
             } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
