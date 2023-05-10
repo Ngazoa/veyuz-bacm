@@ -188,8 +188,6 @@ public class ClientController {
         model.addAttribute("profile", null);
         model.addAttribute("uri", "/clients/page={page}");
         model.addAttribute("dash", "params");
-        System.out.println("--------861");
-
 
         return "parametres";
     }
@@ -197,9 +195,12 @@ public class ClientController {
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/clients/new", "/clients-{client_id}/edit"})
     public String newClient(
-            @PathVariable(value = "client_id", required = false) Client client,
-            Model model, Principal principal) {
-
+            @PathVariable(value = "client_id", required = false) String clt,
+            Model model, Principal principal) throws Exception {
+        Client client = null;
+        if(clt!=null) {
+            client = clientService.findById(cryptoUtils.decrypt(clt));
+        }
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
@@ -233,11 +234,14 @@ public class ClientController {
             BindingResult result,
             Model model, Principal principal,
             RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        System.out.println("====><<<<13");
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
         }
+        System.out.println("<<<<<====>13");
+
         model.addAttribute("dash", "params");
 
         Banque banque = (Banque) session.getAttribute("banque");
@@ -246,13 +250,14 @@ public class ClientController {
         if (!loggedUser.getBanque().equals(banque) || !banque.equals(clientForm.getBanque())) {
             return "error/403";
         }
+        System.out.println("==>>>>>==>13");
+
         clientForm.setBanque(banque);
         model.addAttribute("banque", clientForm.getBanque());
         model.addAttribute("dash", "client");
         model.addAttribute("setItem", "clients");
         if (result.hasErrors()) {
             setModelData(model, clientForm.getClient(), clientForm.getBanque(), principal);
-            System.out.println("Nous sommes ici");
             return "parametres";
         }
         Client newClient = null;
@@ -282,9 +287,10 @@ public class ClientController {
 
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/clients-{id}/manage")
-    public String blockClient(@PathVariable("id") Client client, Principal principal, RedirectAttributes redirectAttributes
-            , Model model) {
+    public String blockClient(@PathVariable("id") String clt, Principal principal, RedirectAttributes redirectAttributes
+            , Model model) throws Exception {
 
+        Client client =clientService.findById(cryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
@@ -299,6 +305,8 @@ public class ClientController {
 
         boolean isEnable = !client.getUser().isEnable();
         clientService.setEnable(isEnable, client);
+        System.out.println(banque.getName());
+
         String msg = "Vous venez de bloquer le client " + client.getDenomination() + " !!!";
         if (isEnable) {
             msg = "Vous venez d'activer le compte du client " + client.getDenomination() + " !!!";

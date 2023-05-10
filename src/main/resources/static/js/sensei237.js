@@ -219,16 +219,7 @@ $("form#apurementForm").on("submit", function (e) {
     });
 })
 
-$(".apurement-btn-action").each(function () {
-    var elt = $(this);
-    elt.on("click", function (e) {
-        ref = elt.data("ref");
-        $("#modal").attr("data-ref", ref);
-        $("#modal ul li a").removeClass("active");
-        $('#fichiersManquant').addClass("active")
-        $('#fichiersManquant').trigger("click");
-    });
-})
+
 
 $('#modal-transmettre-pour-apurement form').on('submit', function(event) {
     event.preventDefault();

@@ -111,7 +111,7 @@
                             $("#result").append(data);
                             $("#submitAllButton").prop("disabled", false);
                             $(elt)[0].reset();
-                                  showNotif("Ficihier de la transaction enregistre avec succes . Vous allez etre redirige vers vos transactions ", "success", 5000);
+                                  showNotif("Fichier de la transaction enregistre avec succes . Vous allez etre redirige vers vos transactions ", "success", 5000);
                               // setTimeout(window.location.href = '/transactions', 200000);
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
@@ -121,19 +121,20 @@
                         }
                     })
                 })
-              hideLoader();  }
+              hideLoader();
+               }
             });
 
             function validateForm() {
 
   // get all the required input elements
-  const requiredFields = document.querySelectorAll('input[required]');
+  const requiredFields = document.querySelectorAll('input[type="file"][required]');
 
-    const error=false;
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
-    if (field.value=== "") {
-      showNotif("Veuillez remplir tous les champs Obligatoires ", "danger", 5000);
+
+    if (field.value==='') {
+      showNotif("Veuillez remplir tous les champs d'importation de documents obligatoires ", "danger", 5000);
       return true;
     }
   }
@@ -149,8 +150,48 @@ function hideLoader() {
   document.getElementById("loader").style.display = "none";
 }
 
-        </script>
-    </th:block>
+
+    </script>
+    <script>
+    function toggleInputDisplay(checkbox) {
+        var inputId = 'input-' + checkbox.id.substring(checkbox.id.indexOf('-') + 1);
+        let input = document.getElementById(inputId);
+        if (!checkbox.checked) {
+            input.style.display = 'block';
+            input.setAttribute("required", true);
+            input.required = true;
+        } else {
+             input.removeAttribute("required");
+             input.required = false;
+             input.value = "";
+            input.style.display = 'none';
+        }
+    }
+
+    </script>
+    <!-- JavaScript code to select all checkboxes on click of "select all" checkbox -->
+    <script>
+  // Get the "select all" checkbox element
+  let selectAllCheckbox = document.getElementById("select-all");
+
+  // Add a click event listener to the "select all" checkbox
+  selectAllCheckbox.addEventListener("click", function() {
+    // Get all other checkboxes on the page
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#select-all)');
+
+    // Set the "checked" property of all other checkboxes to the same value as the "select all" checkbox
+    checkboxes.forEach(function(checkbox) {
+      checkbox.checked = selectAllCheckbox.checked;
+      toggleInputDisplay(checkbox);
+    });
+  });
+</script>
+
+
+
+
+
+</th:block>
 
 
 </html>

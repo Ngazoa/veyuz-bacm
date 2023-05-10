@@ -140,7 +140,7 @@ public class TransactionController {
             @PathVariable("client_id") String clt,
             @PathVariable(value = "page", required = false) Integer page,
             Model model, Principal principal) throws Exception {
-           Client client=clientService.findById(cryptoUtils.decrypt(clt));
+        Client client = clientService.findById(CryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -319,6 +319,7 @@ public class TransactionController {
                         tdo.setReference(transaction.getReference());
                         tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                         tdo.setStatut(transaction.getStatut());
+                        tdo.setDateCreation(transaction.getDateCreation());
                         return tdo;
                     }
             ).collect(Collectors.toList());
@@ -443,7 +444,6 @@ public class TransactionController {
      * @param principal
      * @return
      */
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_MACKER", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @PostMapping("/save-transaction")
     public ModelAndView saveTransaction(
             @ModelAttribute @Validated TransactionForm transactionForm,
@@ -558,7 +558,6 @@ public class TransactionController {
      * @param principal
      * @return
      */
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_SUPERUSER", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @GetMapping("/transaction-{id}/details")
     public String showTransactionDetails(@PathVariable("id") String transactionId, Model model, Authentication authentication, Principal principal) throws Exception {
 
@@ -978,7 +977,6 @@ public class TransactionController {
         return file.getAbsolutePath();
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/set-transaction-{id}-reference-and-date")
     public String setReferenceAndDate(
             @PathVariable("id") Transaction transaction,

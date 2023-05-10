@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 
-@Transactional
 public class AppUserDetails  implements UserDetails {
     public Long getId() {
         return id;
