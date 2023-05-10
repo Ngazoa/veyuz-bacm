@@ -222,11 +222,15 @@ $("form#apurementForm").on("submit", function (e) {
 $(".apurement-btn-action").each(function () {
     var elt = $(this);
     elt.on("click", function (e) {
+        e.preventDefault();
         ref = elt.data("ref");
         $("#modal").attr("data-ref", ref);
         $("#modal ul li a").removeClass("active");
         $('#fichiersManquant').addClass("active")
-        $('#fichiersManquant').trigger("click");
+        setTimeout(function(){
+            $('#fichiersManquant').trigger("click");
+        }, 1000)
+        $("#modal").modal("show");
     });
 })
 
