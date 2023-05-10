@@ -222,11 +222,13 @@ $("form#apurementForm").on("submit", function (e) {
 $(".apurement-btn-action").each(function () {
     var elt = $(this);
     elt.on("click", function (e) {
+        e.preventDefault()
         ref = elt.data("ref");
         $("#modal").attr("data-ref", ref);
         $("#modal ul li a").removeClass("active");
         $('#fichiersManquant').addClass("active")
         $('#fichiersManquant').trigger("click");
+        $("#modal").modal("show");
     });
 })
 
@@ -285,7 +287,7 @@ $('#fichiersManquant').on("click", function (e) {
 })
 
 $('#showFileForms').on("click", function (e) {
-    // var ref = $("#modal").data("ref");
+//    var ref = $("#modal").data("ref");
     $("#modal .tab-title").html("Formulaire pour déposer les fichiers manquants");
     $.ajax({
         url: "/rest-apurements/" + ref + "/files-forms",

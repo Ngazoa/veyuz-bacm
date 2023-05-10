@@ -174,7 +174,7 @@
                             </td>
 
                             <td>
-                                <a th:if="${!ap.isApured and ap.status != 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm apurement-btn-action" data-bs-toggle="modal" data-bs-target="#modal">
+                                <a th:if="${!ap.isApured and ap.status != 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
                                     <i data-feather="eye"></i>
                                 </a>
                                 <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-transmettre-pour-apurement-' + ${ap.id}">
