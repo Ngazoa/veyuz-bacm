@@ -422,7 +422,6 @@ function montant_format(number) {
     return s.join(dec);
 }
 
-
 function validerFichier(elt) {
     $.ajax({
         url: elt.prop("href"),
@@ -572,7 +571,6 @@ singleUploadForm.addEventListener('submit', function(event){
     uploadSingleFile(files[0]);
     event.preventDefault();
 }, true);
-
 
 multipleUploadForm.addEventListener('submit', function(event){
     var files = multipleFileUploadInput.files;
