@@ -87,4 +87,11 @@ public class ApurementService {
     public Page<Apurement> getApurementsHasFilesAgence(Banque banque, AppUser appUser, int max, Integer page, boolean isApured, int status) {
         return apurementRepositoy.findByBanqueAndIsApuredAndStatusAndAppUserOrderByDateOuvertureDesc(banque, isApured, status, appUser, PageRequest.of(page, max));
     }
+
+    public Page<Apurement> getNotApuredTransactions(Banque banque, AppUser appUser, int max, Integer page, boolean isApured, int status) {
+        if (appUser != null)
+            return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualAndAppUserOrderByDateOuvertureDesc(banque, isApured, status, appUser, PageRequest.of(page, max));
+
+        return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualOrderByDateOuvertureDesc(banque, isApured, status, PageRequest.of(page, max));
+    }
 }
