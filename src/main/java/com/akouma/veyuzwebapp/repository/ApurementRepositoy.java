@@ -73,4 +73,5 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Page<Apurement> findByBanqueAndStatusAndAppUser(Banque banque, int apurementRejeter, AppUser loggedUser, Pageable pageable);
 
     Page<Apurement> findByBanqueAndStatus(Banque banque, int apurementRejeter, Pageable pageable);
+
 }

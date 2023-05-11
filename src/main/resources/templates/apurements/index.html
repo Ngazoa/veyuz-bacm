@@ -29,6 +29,7 @@
 
 <th:block id="others-js">
     <script>
+<<<<<<< HEAD
 
         $(document).ready(function() {
             $('.annuler-definitivement-transaction').click(function(e) {
@@ -108,6 +109,35 @@
         });
 
 
+=======
+        $('.add-date-effective-form').each(function() {
+            var form = $(this);
+            form.on("submit", function(event){
+                event.preventDefault();
+                var elt = $(this);
+                var data = elt.data("ref")
+                var date = elt.find('input').val()
+                $.ajax({
+                    url: "/add-apurement-effective-date/" + data + "/" + date,
+                    type: "GET",
+                    dataType: "JSON",
+                    beforeSend: function() {
+                        showNotif("Traitement en cours !", "info");
+                    },
+                    success: function(response) {
+                        elt.find(".loader").html("")
+                        if (response.isChanged) {
+                            showNotif("Dossier transmis à l'agence pour ajouter les fichiers d'apurements !", "success", 4000);
+                            $("#ligne" + data).fadeOut(400).remove();
+                        }else {
+                            alert(response.errorMessage)
+                        }
+                        $("#modal-transmettre-pour-apurement-" + data).modal('hide')
+                    }
+                })
+            })
+        })
+>>>>>>> 97ea108ff94d61205c1a25b55bafa042205d8617
     </script>
 </th:block>
 
@@ -218,9 +248,7 @@
 
                         <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:data="${ap.id}" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}" th:data-value="${#dates.format(ap.dateExpiration, 'yyyy-MM-dd')}" class="dateExpirationApurement"></td>
-
                         <td th:text="${ap.joursRestant}"></td>
-
                         <td>
                             <span th:if="${ap.status == 0}" class="badge bg-warning">Pas Transmis</span>
                             <span th:if="${ap.status == 1}" class="badge bg-info">En attente des fichiers</span>
@@ -242,7 +270,7 @@
                                 <a th:if="${ap.status != -1000}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="toggle" title="Annuler">
                                     <i class="fas fa-trash"></i>
                                 </a>
-                            </th:bock>o
+                            </th:bock>
                         </td>
                     </tr>
                     </tbody>
@@ -319,12 +347,12 @@
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-default btn-sm" data-bs-dismiss="modal">Fermer</button>
+
                                 <button type="submit" class="btn btn-success btn-sm">Enregistrer la date et Transmettre</button>
                             </div>
                         </form>
                     </div>
                 </div>
-
 
                 <div th:each="ap, s : ${apurements}" data-ref="" class="modal fade" th:id="'modal-transmettre-pour-apurement-' + ${ap.id}" role="dialog" aria-modal="true" tabindex="-1">
                     <div class="modal-dialog modal-sm" role="document">
@@ -374,7 +402,6 @@
                         </form>
                     </div>
                 </div>
-
             </div>
         </div>
 
