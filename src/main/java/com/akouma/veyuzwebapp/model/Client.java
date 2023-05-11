@@ -171,7 +171,9 @@ public class Client {
 
     @Override
     public String toString() {
-        return "com.example.demo.model.Client[ id=" + id + " ]";
+        return "" +
+                " " + user.getNom() +" "+user.getPrenom()+
+                " denomination: '" + denomination + '\'' +
+                " reference: '" + reference + '\'';
     }
-    
 }

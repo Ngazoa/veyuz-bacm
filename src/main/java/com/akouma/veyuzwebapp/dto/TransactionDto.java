@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Data
 public class TransactionDto {
-    private Long id;
+    private String id;
     private Collection<Fichier> fichiers;
     private Client client;
     private Beneficiaire beneficiaire;

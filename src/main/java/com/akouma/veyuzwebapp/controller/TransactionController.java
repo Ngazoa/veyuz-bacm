@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.controller;
 
+import com.akouma.veyuzwebapp.dto.TransactionDto;
 import com.akouma.veyuzwebapp.form.*;
 import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.TypeFinancementRepository;
@@ -34,6 +35,7 @@ import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class TransactionController {
@@ -69,7 +71,7 @@ public class TransactionController {
     @Autowired
     private CryptoUtils cryptoUtils;
     @Autowired
-    private  ClientService clientService;
+    private ClientService clientService;
 
     public TransactionController(HttpSession session) {
         this.session = session;
@@ -135,10 +137,10 @@ public class TransactionController {
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/transactions/{client_id}-client", "/transactions/{client_id}-client/page={page}"})
     public String getTransactionsClient(
-            @PathVariable("client_id") Client client,
+            @PathVariable("client_id") String clt,
             @PathVariable(value = "page", required = false) Integer page,
             Model model, Principal principal) throws Exception {
-
+        Client client = clientService.findById(CryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -152,7 +154,7 @@ public class TransactionController {
         page--;
 
         Page<Transaction> transactions = transactionService.getPageableTransactionsHasFilesForClient(banque, client, true, max, page);
-        String id=cryptoUtils.encrypt(client.getId());
+        String id = CryptoUtils.encrypt(client.getId());
 
         SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
         searchTransactionForm.setBanque(banque);
@@ -160,7 +162,7 @@ public class TransactionController {
         String uri = "/transactions/" + id + "-client/page={page}";
         model.addAttribute("uri", uri);
         model.addAttribute("showClientTransactionBtn", true);
-        model.addAttribute("newTransactionLink", "/transaction/new/"+id+"/client/{type}");
+        model.addAttribute("newTransactionLink", "/transaction/new/" + id + "/client/{type}");
 
         addTransactionViewData(client, model, banque, transactions, searchTransactionForm, uri);
         model.addAttribute("dash", "transaction");
@@ -300,7 +302,28 @@ public class TransactionController {
                 }
                 model.addAttribute("pages", pages);
             }
-            model.addAttribute("transactions", transactions.getContent());
+            List<TransactionDto> transactionDtoList = transactions.getContent().stream().map(
+                    transaction -> {
+                        TransactionDto tdo = new TransactionDto();
+                        tdo.setBeneficiaire(transaction.getBeneficiaire());
+                        try {
+                            tdo.setId(CryptoUtils.encrypt(transaction.getId()));
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        tdo.setAppUser(transaction.getAppUser());
+                        tdo.setClient(transaction.getClient());
+                        tdo.setMontant(transaction.getMontant());
+                        tdo.setDateTransaction(transaction.getDateTransaction());
+                        tdo.setReference(transaction.getReference());
+                        tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
+                        tdo.setStatut(transaction.getStatut());
+                        tdo.setDateCreation(transaction.getDateCreation());
+                        return tdo;
+                    }
+            ).collect(Collectors.toList());
+            model.addAttribute("transactions", transactionDtoList);
             model.addAttribute("nbPages", transactions.getTotalPages());
             model.addAttribute("currentPage", transactions.getNumber() + 1);
             model.addAttribute("nbElements", transactions.getTotalElements());
@@ -325,7 +348,7 @@ public class TransactionController {
     })
     public String getTransactionForm(@PathVariable(value = "type") String type,
                                      @PathVariable(value = "transaction_id", required = false) Transaction transaction,
-                                     Model model, Principal principal) {
+                                     Model model, Principal principal) throws Exception {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
@@ -335,7 +358,7 @@ public class TransactionController {
         Banque banque = (Banque) session.getAttribute("banque");
         Client client = loggedUser.getClient();
         if (client == null) {
-            if (loggedUser == null || loggedUser.getClient() == null) {
+            if (loggedUser.getClient() == null) {
                 return "error/403";
             }
         }
@@ -354,7 +377,7 @@ public class TransactionController {
                                                Model model, Principal principal, RedirectAttributes redirectAttributes) throws Exception {
 
 
-        Client client=clientService.findById(cryptoUtils.decrypt(clt));
+        Client client = clientService.findById(CryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -365,12 +388,12 @@ public class TransactionController {
             return "error/500";
         }
         if (type.equals("domiciliation")) {
-            if (transactionService.checkIfHasNotTransactionPendingTransaction(client).size() > 0) {
+            if (transactionService.checkIfHasNotTransactionPendingTransaction(banque, client).size() > 0) {
                 // Means that custumer has some pending transactions
                 String msg = "Attention, Il se peut que ce client  ait une transaction en cours" +
                         " non apurée . Priere de verifier ";
                 redirectAttributes.addFlashAttribute("flashMessage", msg);
-                return "redirect:/transactions";
+                return "redirect:/clients";
             }
         }
         setFormTransactionData(banque, client, type, transaction, model);
@@ -380,18 +403,25 @@ public class TransactionController {
         return "edit_transaction_form";
     }
 
-    private void setFormTransactionData(Banque banque, Client client, String type, Transaction transaction, Model model) {
+    private void setFormTransactionData(Banque banque, Client client, String type, Transaction transaction, Model model) throws Exception {
         TransactionForm transactionForm;
         if (transaction != null) {
             transactionForm = new TransactionForm(transaction, type);
         } else {
             transactionForm = new TransactionForm(banque, client, type);
         }
+        String id = CryptoUtils.encrypt(client.getId());
+
         transactionForm.setType(type);
         Iterable<TypeDeTransaction> typesTransaction = null;
         if (type.equalsIgnoreCase("domiciliation")) {
+            String uri = "/transaction/new/" + id + "/client/{type}";
+            model.addAttribute("newTransactionLink", uri);
             typesTransaction = typeDeTransactionService.getTypesTransactionByIsImport(true);
         } else {
+            String uri = "/transaction/new/" + id + "/client/{type}";
+            model.addAttribute("newTransactionLink", uri);
+
             typesTransaction = typeDeTransactionService.getTypesTransactionByIsImport(false);
         }
         model.addAttribute("listDevises", deviseService.getAll());
@@ -414,7 +444,6 @@ public class TransactionController {
      * @param principal
      * @return
      */
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_MACKER", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @PostMapping("/save-transaction")
     public ModelAndView saveTransaction(
             @ModelAttribute @Validated TransactionForm transactionForm,
@@ -511,7 +540,7 @@ public class TransactionController {
             }
         }
         Transaction saved = transactionService.saveTransaction(transaction);
-        String id =cryptoUtils.encrypt(saved.getId());
+        String id = CryptoUtils.encrypt(saved.getId());
 
         String lettreUri = "/" + id + "-lettre-engagement";
 
@@ -523,16 +552,17 @@ public class TransactionController {
     }
 
     /**
-     * @param transaction
+     * @param transactionId
      * @param model
      * @param authentication
      * @param principal
      * @return
      */
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_SUPERUSER", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @GetMapping("/transaction-{id}/details")
-    public String showTransactionDetails(@PathVariable("id") Transaction transaction, Model model, Authentication authentication, Principal principal) {
+    public String showTransactionDetails(@PathVariable("id") String transactionId, Model model, Authentication authentication, Principal principal) throws Exception {
 
+
+        Transaction transaction = transactionService.getTransaction(CryptoUtils.decrypt(transactionId)).get();
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -546,6 +576,7 @@ public class TransactionController {
         if (authentication.getAuthorities().contains("ROLE_ADMIN") && !transaction.getBanque().equals(loggedUser.getBanque())) {
             return "error/403";
         }
+
 
         Iterable<ActionTransaction> actions = actionTransactionService.getActionsTransaction(transaction);
 
@@ -571,6 +602,7 @@ public class TransactionController {
         model.addAttribute("activeMenu", 2);
         model.addAttribute("actiSub", 1);
         model.addAttribute("actions", actions);
+        model.addAttribute("uri", "/import-files/" + CryptoUtils.encrypt(transaction.getId()) + "/transaction");
         model.addAttribute("typefinancement", typeFinancementRepository.findAll());
         model.addAttribute("dash", "transaction");
         model.addAttribute("das", "all");
@@ -628,7 +660,7 @@ public class TransactionController {
 
             redirectAttributes.addFlashAttribute("message", "Transaction rejetée ! Le client a ete notifié");
         }
-        String id =cryptoUtils.encrypt(form.getTransaction().getId());
+        String id = CryptoUtils.encrypt(form.getTransaction().getId());
 
         return "redirect:/transaction-" + id + "/details";
     }
@@ -945,7 +977,6 @@ public class TransactionController {
         return file.getAbsolutePath();
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/set-transaction-{id}-reference-and-date")
     public String setReferenceAndDate(
             @PathVariable("id") Transaction transaction,
@@ -953,17 +984,18 @@ public class TransactionController {
             @RequestParam(value = "typefinancement", required = false, defaultValue = "0") long financement,
             @RequestParam(value = "taux", required = false) String taux,
             @RequestParam(value = "dateValeur", required = false) String dateValeur,
+            @RequestParam(value = "batebeac", required = false) String batebeac,
             RedirectAttributes redirectAttributes, Principal principal, Authentication authentication) throws Exception {
 
         if (authentication.getAuthorities().stream().
                 anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO")) || authentication.getAuthorities().stream().
-                anyMatch(a -> a.getAuthority().equals("ROLE_MAKER_TO"))) {
-            if (taux == null && dateValeur == null && !authentication.getAuthorities().stream().
-                    anyMatch(a -> a.getAuthority().equals("ROLE_TREASURY"))) {
+                anyMatch(a -> a.getAuthority().equals("ROLE_MAKER_TO")) || authentication.getAuthorities().stream().
+                anyMatch(a -> a.getAuthority().equals("ROLE_TREASURY"))) {
+            if (financement != 0) {
                 transaction.setTypeFinancement(typeFinancementRepository.getById(financement));
                 transactionService.saveTransaction(transaction);
 
-                String id=cryptoUtils.encrypt(transaction.getId());
+                String id = CryptoUtils.encrypt(transaction.getId());
                 ActionTransaction actionTransaction = new ActionTransaction();
                 actionTransaction.setTransaction(transaction);
                 actionTransaction.setAction("Ajout du type de préfinancement ");
@@ -975,12 +1007,31 @@ public class TransactionController {
 
             }
         }
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        if (authentication.getAuthorities().stream().
+                anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO"))) {
+            if (batebeac != null) {
+                transaction.setDateValeurBeac(sdf.parse(batebeac));
+                transactionService.saveTransaction(transaction);
+
+                String id = CryptoUtils.encrypt(transaction.getId());
+                ActionTransaction actionTransaction = new ActionTransaction();
+                actionTransaction.setTransaction(transaction);
+                actionTransaction.setAction("Ajout date de validation Beac ");
+                AppUser loggedUser = userService.getLoggedUser(principal);
+                actionTransaction.setAppUser(loggedUser);
+                actionTransaction.setCommentaire("Ajout du type de préfinancement  effectué avec succès");
+                actionTransactionService.saveActionTransaction(actionTransaction);
+                return "redirect:/transaction-" + id + "/details";
+
+            }
+        }
+
         try {
-            if (date != null || dateValeur != null) {
+            if (date == null || taux == null || dateValeur == null) {
                 redirectAttributes.addFlashAttribute("flashMessage",
-                        "Oops Une erreur est survenue , veuillez verifier que vous y etes autorise ou que vous avez bienrenseignez les differentes dates");
+                        "Oops Une erreur est survenue , veuillez verifier que vous y etes autorise ou que vous avez bien renseignez les differentes dates");
             }
             Date dateTransaction = sdf.parse(date);
 
@@ -1007,7 +1058,7 @@ public class TransactionController {
             notification.setMessage(message);
             notification.setRead(false);
             notification.setUtilisateur(transaction.getClient().getUser());
-            notification.setHref("/transaction-" + transaction.getId() + "/details");
+            notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
             notificationService.save(notification);
             transaction.setDelay(calendar.getTime());
             transactionService.saveTransaction(transaction);
@@ -1029,7 +1080,7 @@ public class TransactionController {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("flashMessage", "Verifier que vous avez saisie une date valide");
         }
-        String id =cryptoUtils.encrypt(transaction.getId());
+        String id = CryptoUtils.encrypt(transaction.getId());
 
         return "redirect:/transaction-" + id + "/details";
     }
@@ -1072,7 +1123,7 @@ public class TransactionController {
             actionTransaction.setCommentaire(message);
             actionTransactionService.saveActionTransaction(actionTransaction);
         }
-        String id =cryptoUtils.encrypt(transaction.getId());
+        String id = CryptoUtils.encrypt(transaction.getId());
         return "redirect:/transaction-" + id + "/details";
     }
 

@@ -22,6 +22,10 @@ public class StatusTransaction {
     public static final String SENDBACK_CUSTOMER_STR = "send-back-to-customer";
     public static final int SENDBACK_CUSTOMER = 4;
     public static final int SENDBACK_MACKER = 5;
+    public static final int SENDBACK_TOPC = 51;
+    public static final int SENDBACK_TOPM = 52;
+    public static final int SENDBACK_TDEM = 53;
+    public static final int SENDBACK_TDC = 54;
     public static final String SENDBACK_MACKER_STR = "send-back-to-macker";
     public static final String SENDBACK_CHECKER_STR = "send-back-to-checker";
     public static final int SENDBACK_CHECKER = 6;
@@ -33,6 +37,21 @@ public class StatusTransaction {
 
     public static final int INVALID_STATUS = -2;
 
+//    ===========================================================================================
+//    LES STATUTS DE L'APUREMENT
+
+    public static final int APUREMENT_WAITING_DATE = 0;
+
+    public static final int  APUREMENT_WAITING_FILES = 1;
+
+    public static final int APUREMENT_HAS_FILES = 2;
+
+    public static final int APUREMENT_IS_VALIDATED = 3;
+
+    public static final int APUREMENT_REJETER = -500;
+    public static final int APUREMENT_ANULER = -1000;
+
+
     // ========================================================================
     // LES TYPES DE TRANSACTIONS
     public static final String TYPE_NORMAL = "normal";
@@ -43,6 +62,8 @@ public class StatusTransaction {
 
     public static final int DELAY_TRANSACTION_IMPORTATION_BIENS = 30;
     public static final int DELAY_TRANSACTION_IMPORTATION_SERVICES = 90;
+
+    public static final int DEFAULT_DELAY_TRANSACTION = 20;
 
     public static final String IMP_BIENS = "biens";
     public static final String IMP_SERVICES = "services";

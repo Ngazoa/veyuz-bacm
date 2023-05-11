@@ -2,15 +2,13 @@ package com.akouma.veyuzwebapp.controller;
 
 import com.akouma.veyuzwebapp.form.DomiciliationForm;
 import com.akouma.veyuzwebapp.form.ImportFileForm;
-
-import com.akouma.veyuzwebapp.form.UserForm;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
 import com.akouma.veyuzwebapp.model.Domiciliation;
 import com.akouma.veyuzwebapp.service.*;
-
 import com.akouma.veyuzwebapp.utils.CheckSession;
+import com.akouma.veyuzwebapp.utils.CryptoUtils;
 import com.akouma.veyuzwebapp.validator.DomiciliationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,8 +20,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,27 +35,24 @@ import java.util.Date;
 @Controller
 public class DomiciliationController {
 
+    private final int max = 10;
+    private final int page = 1;
+    @Autowired
+    HttpSession session;
     @Autowired
     private DomiciliationService domiciliationService;
     @Autowired
     private TypeDeTransactionService typeDeTransactionService;
     @Autowired
     private DeviseService deviseService;
-
     @Autowired
     private DomiciliationValidator domiciliationValidator;
-
-    @Autowired
-    HttpSession session;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private ClientService clientService;
-
-    private final int max = 10;
-    private final int page = 1;
+    @Autowired
+    private CryptoUtils cryptoUtils;
 
     public DomiciliationController(HttpSession session) {
         this.session = session;
@@ -71,7 +64,6 @@ public class DomiciliationController {
         if (target == null) {
             return;
         }
-        System.out.println("Target=" + target);
 
         if (target.getClass() == DomiciliationForm.class) {
             dataBinder.setValidator(domiciliationValidator);
@@ -79,15 +71,15 @@ public class DomiciliationController {
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE","ROLE_CHECKER_TO","ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/domiciliations", "/domiciliations/page={page}"})
-    public String showDomiciliations (
+    public String showDomiciliations(
             @PathVariable(value = "page", required = false) Integer page,
             Authentication authentication,
             Model model, Principal principal) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
-        if (!CheckSession.checkSessionData(session) || principal == null ) {
+        if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
         }
         if (page != null && page <= 0) {
@@ -95,7 +87,7 @@ public class DomiciliationController {
         }
 
         Banque banque = (Banque) session.getAttribute("banque");
-        if (page == null ) {
+        if (page == null) {
             page = this.page;
         }
         page--;
@@ -114,20 +106,20 @@ public class DomiciliationController {
             domiciliations = domiciliationService.getDomiciliations(banque, max, page);
         } else {
             domiciliations = domiciliationService.getDomiciliationsClientBanque(banque, client, max, page);
-            System.out.println("Je recupere uniquement mes domiciliatons");
+
         }
 
         int nbPages = domiciliations.getTotalPages();
         if (nbPages > 1) {
             int[] pages = new int[nbPages];
-            for(int i = 0; i < nbPages; i++) {
-                pages[i] = i+1;
+            for (int i = 0; i < nbPages; i++) {
+                pages[i] = i + 1;
             }
             model.addAttribute("pages", pages);
         }
 
         System.out.println(domiciliations.getNumber());
-        model.addAttribute("currentPage", domiciliations.getNumber()+1);
+        model.addAttribute("currentPage", domiciliations.getNumber() + 1);
         model.addAttribute("nbPages", nbPages);
         model.addAttribute("nbElements", domiciliations.getTotalElements());
 
@@ -137,16 +129,16 @@ public class DomiciliationController {
         model.addAttribute("activeMenu", 5);
         model.addAttribute("actiSub", null);
         model.addAttribute("uri", "/domiciliations/page={page}");
-        model.addAttribute("dash","domi");
+        model.addAttribute("dash", "domi");
 
 
         return "domiciliation_list";
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE","ROLE_CHECKER_TO","ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/domiciliation-{id}/details")
     public String showDomiciliationDetails(
-            @PathVariable("id")Domiciliation domiciliation,
+            @PathVariable("id") Domiciliation domiciliation,
             Model model, RedirectAttributes redirectAttributes,
             Principal principal, Authentication authentication) {
 
@@ -170,7 +162,7 @@ public class DomiciliationController {
         }
 
         model.addAttribute("domiciliation", domiciliation);
-        model.addAttribute("dash","domi");
+        model.addAttribute("dash", "domi");
 
         return "domiciliation_details";
     }
@@ -205,33 +197,32 @@ public class DomiciliationController {
                 return "error/403";
             }
         }
-         System.out.println(" CLirnt******\n "+domiciliationService.getDomiciliationsClient(banque,client)+"\n ******************");
         DomiciliationForm domiciliationForm = new DomiciliationForm(banque);
         model.addAttribute("domiciliationForm", domiciliationForm);
         setModelData(model, banque, client);
-        model.addAttribute("dash","domiciliation");
+        model.addAttribute("dash", "domiciliation");
 //        model.addAttribute("domiciliation",domiciliationService.getDomiciliationsClient(banque,client));
 
         return "domiciliation_form";
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE","ROLE_CHECKER_TO","ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/domiciliations/new/{id}"})
     public String showDomiciliationFormAd(
             Model model,
-            @PathVariable("id") Client client) {
-
+            @PathVariable("id") String id) throws Exception {
+        Client client = clientService.findById(cryptoUtils.decrypt(id));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
 
         Banque banque = (Banque) session.getAttribute("banque");
 
         // SI TON COMPTE A LE ROLE DE CLIENT ET QUE TON COMPTE NE FAIT PAS DE REFERENCE A L'ENTITE CLIENT ON REVOIE UNE ERREUR 403
 
-        System.out.println(" CLirnt******\n "+domiciliationService.getDomiciliationsClient(banque,client)+"\n ******************");
+
         DomiciliationForm domiciliationForm = new DomiciliationForm(banque);
         model.addAttribute("domiciliationForm", domiciliationForm);
         setModelData(model, banque, client);
-        model.addAttribute("dash","domiciliation");
+        model.addAttribute("dash", "domiciliation");
 //        model.addAttribute("domiciliation",domiciliationService.getDomiciliationsClient(banque,client));
 
         return "domiciliation_form";
@@ -242,7 +233,7 @@ public class DomiciliationController {
         Collection<Domiciliation> domiciliations;
         if (client == null) {
             domiciliations = domiciliationService.getDomiciliations(banque, 15, 0).getContent();
-        }else {
+        } else {
             domiciliations = client.getDomiciliations();
         }
         model.addAttribute("banque", banque);
@@ -253,12 +244,12 @@ public class DomiciliationController {
         model.addAttribute("domiciliations", domiciliations);
         model.addAttribute("activeMenu", 5);
         model.addAttribute("actiSub", null);
-        model.addAttribute("dash","domiciliation");
+        model.addAttribute("dash", "domiciliation");
 
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE","ROLE_CHECKER_TO","ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @PostMapping("/save-domiciliation")
     public String saveDomiciliation(
             @ModelAttribute @Validated DomiciliationForm domiciliationForm,
@@ -273,9 +264,9 @@ public class DomiciliationController {
 
         if (result.hasErrors()) {
             setModelData(model, domiciliationForm.getBanque(), domiciliationForm.getClient());
-            String msg = "Une erreur s'est glissée dans votre formulaire de données . Erreur : "+ result;
+            String msg = "Une erreur s'est glissée dans votre formulaire de données . Erreur : " + result;
             redirectAttributes.addFlashAttribute("flashMessage", msg);
-            System.out.println("Nous sommes ici"+ result);
+
             return "domiciliation_form";
         }
 
@@ -294,13 +285,13 @@ public class DomiciliationController {
 
         String msg = "La domiciliation que vous avez ajoute a été enregistrée avec success. Veuillez  ajouter la documentation necessaire ";
         redirectAttributes.addFlashAttribute("flashMessage", msg);
-        model.addAttribute("dash","domi");
+        model.addAttribute("dash", "domi");
 
         return redirectUri;
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_CHECKER_TO","ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/admin/domiciliations/import")
     public String showImportDomiciliationForm(
             Model model,
@@ -317,15 +308,15 @@ public class DomiciliationController {
         model.addAttribute("isImport", true);
         model.addAttribute("postUri", "/post-import-domiciliations");
         model.addAttribute("importFileForm", new ImportFileForm(banque));
-        model.addAttribute("formTitle","importer les domiciliations");
-        model.addAttribute("dash","params");
+        model.addAttribute("formTitle", "importer les domiciliations");
+        model.addAttribute("dash", "params");
         model.addAttribute("setItem", "domi");
 
         return "parametres";
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_CHECKER_TO","ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @PostMapping("/post-import-domiciliations")
     public String importDomiciliations(
             @ModelAttribute ImportFileForm importFile,

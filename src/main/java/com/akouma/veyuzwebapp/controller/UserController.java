@@ -111,7 +111,7 @@ public class UserController {
         model.addAttribute("banque", userForm.getBanque());
         model.addAttribute("showEditForm", true);
         if (result.hasErrors()) {
-            System.out.println("Nous sommes ici");
+
             return "users";
         }
         AppUser newAppUser = null;
@@ -122,14 +122,8 @@ public class UserController {
             return "users";
         }
 
-
         String msg = "L'utilisateur a ete ajoute avec succes.";
         redirectAttributes.addFlashAttribute("flashMessage", msg);
-
-//<<<<<<< HEAD
-//
-//        return "redirect:/admin-user-" + newAppUser.getId() + "/roles/add";
-//=======
         return "redirect:/admin-users-list";
 
     }
@@ -151,7 +145,6 @@ public class UserController {
         model.addAttribute("banque", banque);
         model.addAttribute("users", userService.getBanqueUsers(banque));
         model.addAttribute("showList", true);
-
         model.addAttribute("newUserFormUri", "/admin/add-user");
         model.addAttribute("editUserFormUri", "/admin/{id}/edit-{user_id}/user");
         model.addAttribute("configAccessUri", "/form/user/{id}/access");
@@ -159,7 +152,6 @@ public class UserController {
         model.addAttribute("blockUserUri", "/enable/user/{id}/block");
         model.addAttribute("activeUserUri", "/enable/user/{id}/active");
         model.addAttribute("dash","admin");
-
         return "users";
     }
 
@@ -181,13 +173,10 @@ public class UserController {
 
         UserRoleForm rolesFom = new UserRoleForm();
         rolesFom.setAppUser(appUser);
-
         model.addAttribute("roles", roleService.getRoles());
-        System.out.println(roleService.getRoles());
         model.addAttribute("user", appUser);
         model.addAttribute("rolesForm", rolesFom);
         model.addAttribute("dash","admin");
-
         model.addAttribute("banque", banque);
 
         return "roles_list";
@@ -231,14 +220,11 @@ public class UserController {
         boolean action = etat == 1;
 
         userService.bloquerUserBank(appUser, action);
-
         String msg = "Vous avez bloqué " + appUser.getNom();
         if (action) {
             msg = "Vous avez activé " + appUser.getNom();
         }
-
         redirectAttributes.addFlashAttribute("flashMessage", msg);
-
         return "redirect:/admin-users-list";
     }
 

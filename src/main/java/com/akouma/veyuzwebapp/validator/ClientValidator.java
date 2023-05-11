@@ -32,15 +32,7 @@ public class ClientValidator implements Validator {
         ClientForm clientForm = (ClientForm) target;
         AppUser appUser = clientForm.getAppUser();
         // Check the fields of AppUserForm.
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.nom", "NotEmpty.userForm.nom");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "dateNaissanceStr", "NotEmpty.userForm.dateNaissanceStr");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.adresse", "NotEmpty.userForm.adresse");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.email", "NotEmpty.userForm.email");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.password", "NotEmpty.userForm.password");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "NotEmpty.userForm.confirmPassword");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.gender", "NotEmpty.userForm.gender");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.telephone1", "NotEmpty.userForm.telephone1");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.lieuNaissance", "NotEmpty.userForm.lieuNaissance");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "denomination", "NotEmpty.userForm.userName");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telephone", "NotEmpty.userForm.userName");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "kycFile", "NotEmpty.userForm.userName");
@@ -58,20 +50,6 @@ public class ClientValidator implements Validator {
             }
         }
 
-        if (!errors.hasFieldErrors("appUser.userName")) {
-            AppUser dbUser = userService.getUserByUserName(appUser.getUserName());
-            if (dbUser != null) {
-                // Username is not available.
-                errors.rejectValue("appUser.userName", "Duplicate.userForm.userName");
-            }
-        }
-
-
-//        if (clientForm.getCodeVeyuz() != null && clientForm.getCodeVeyuz() != "") {
-//            if (!clientService.getByCode(clientForm.getCodeVeyuz())) {
-//                errors.rejectValue("codeVeyuz", "NoCodeFound.clientForm.codeVeyuz");
-//            }
-//        }
 
         if (!errors.hasFieldErrors("typeClient")) {
             if (!clientForm.getTypeClient().equals("particulier") && !clientForm.getTypeClient().equals("entreprise")) {
@@ -79,10 +57,5 @@ public class ClientValidator implements Validator {
             }
         }
 
-        if (!errors.hasErrors()) {
-            if (!clientForm.getConfirmPassword().equals(appUser.getPassword())) {
-                errors.rejectValue("confirmPassword", "Match.userForm.confirmPassword");
-            }
-        }
     }
 }

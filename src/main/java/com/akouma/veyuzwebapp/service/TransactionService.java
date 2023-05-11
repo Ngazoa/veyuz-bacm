@@ -1,7 +1,6 @@
 package com.akouma.veyuzwebapp.service;
 
 import com.akouma.veyuzwebapp.form.ImportFileForm;
-
 import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.*;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
@@ -30,14 +29,19 @@ import java.util.concurrent.TimeUnit;
 public class TransactionService {
 
     @Autowired
+    FileStorageService fileStorageService;
+    @Autowired
+    DeviseRepository deviseRepository;
+    @Autowired
     private TransactionRepository transactionRepository;
-
     @Autowired
     private ClientRepository clientRepository;
-@Autowired
-FileStorageService fileStorageService;
     @Autowired
     private TypeDeTransactionRepository typeDeTransactionRepository;
+    @Autowired
+    private BeneficiaireRepository beneficiaireRepository;
+    @Autowired
+    private DomiciliationRepository domiciliationRepository;
 
     public TransactionRepository getTransactionRepository() {
         return transactionRepository;
@@ -79,16 +83,6 @@ FileStorageService fileStorageService;
         this.domiciliationRepository = domiciliationRepository;
     }
 
-    @Autowired
-    DeviseRepository deviseRepository;
-
-    @Autowired
-    private BeneficiaireRepository beneficiaireRepository;
-
-    @Autowired
-    private DomiciliationRepository domiciliationRepository;
-
-
     public Optional<Transaction> getTransaction(final Long id) {
 
         return transactionRepository.findById(id);
@@ -111,8 +105,11 @@ FileStorageService fileStorageService;
     public Iterable<Transaction> getTransactionsClient(Banque banque, Client client) {
         return transactionRepository.findByBanqueAndClientOrderByDateCreationDesc(banque, client);
     }
-    public List<Transaction> checkIfHasNotTransactionPendingTransaction(Client client){
-        return  transactionRepository.findByClientAndTypeDeTransaction_IsImportAndIsApured(client,true,false);
+
+    public List<Transaction> checkIfHasNotTransactionPendingTransaction(Banque banque, Client client) {
+        return transactionRepository.
+                findByBanqueAndClientAndTypeDeTransaction_IsImportAndHasSaction(banque, client,
+                        true, true);
     }
 
 
@@ -122,6 +119,7 @@ FileStorageService fileStorageService;
 
     /**
      * Cette fonction permet de recuperer la liste des transactions effectuees dans une banque donnee
+     *
      * @param banque
      * @param maxResults
      * @param page
@@ -131,12 +129,13 @@ FileStorageService fileStorageService;
         return transactionRepository.findByBanqueAndHasFilesOrderByDateCreationDesc(banque, true, PageRequest.of(page, maxResults));
     }
 
-    public Page<Transaction> getAllTransactionsForBanqueAgence(Banque banque,AppUser user, int maxResults, int page) {
-        return transactionRepository.findByBanqueAndAppUserAndHasFilesOrderByDateCreationDesc(banque,user, true, PageRequest.of(page, maxResults));
+    public Page<Transaction> getAllTransactionsForBanqueAgence(Banque banque, AppUser user, int maxResults, int page) {
+        return transactionRepository.findByBanqueAndAppUserAndHasFilesOrderByDateCreationDesc(banque, user, true, PageRequest.of(page, maxResults));
     }
 
     /**
      * Cette fonction permet de recuperer les transactions effectuees avant une date donnee dans une banque
+     *
      * @param banque
      * @param date
      * @param maxResults
@@ -149,6 +148,7 @@ FileStorageService fileStorageService;
 
     /**
      * Cette fonction permet de recuperer les transactions effectuees apres une date donnee dans une banque
+     *
      * @param banque
      * @param date
      * @param maxResults
@@ -161,6 +161,7 @@ FileStorageService fileStorageService;
 
     /**
      * Cette fonction permet de lister toutes les transactions en deux dates dans une banque donnee
+     *
      * @param banque
      * @param dateInf
      * @param dateSup
@@ -175,6 +176,7 @@ FileStorageService fileStorageService;
     /**
      * Cette fonction permet de recuperer la liste des transactions effectuees par un client
      * dans une banque
+     *
      * @param banque
      * @param client
      * @param maxResults
@@ -188,6 +190,7 @@ FileStorageService fileStorageService;
     /**
      * Cette fonction permet de recuperer les transactions effectuées par un client dans une banque donnee en
      * utilisant un domiciliation donnee.
+     *
      * @param banque
      * @param client
      * @param domiciliation
@@ -220,7 +223,7 @@ FileStorageService fileStorageService;
     }
 
     public Page<Transaction> getTransactionsByStatus(Banque banque, String status, int max, int page, Client client,
-    AppUser appuser) {
+                                                     AppUser appuser) {
         int statut = -2;
         switch (status) {
             case StatusTransaction.CHECKED_STR:
@@ -253,7 +256,7 @@ FileStorageService fileStorageService;
             case StatusTransaction.TOPS2_STR:
                 statut = StatusTransaction.TRANSMIS_CHECKER_2;
                 break;
-            case "sendback" :
+            case "sendback":
                 statut = 10;
                 break;
             default:
@@ -263,15 +266,20 @@ FileStorageService fileStorageService;
         if (client == null) {
             if (statut == 10) {
                 return transactionRepository.findByBanqueAndHasFilesAndStatutOrStatutOrderByDelayDesc(banque, true, StatusTransaction.SENDBACK_CUSTOMER, StatusTransaction.SENDBACK_MACKER, PageRequest.of(page, max));
+            } else {
+                if (appuser != null) {
+                    return transactionRepository.findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(banque, appuser, statut, PageRequest.of(page, max));
+                }
+                return transactionRepository.findByBanqueAndStatutOrderByDateCreationDesc(banque, statut, PageRequest.of(page, max));
             }
-            return transactionRepository.findByBanqueAndStatutAndHasFilesOrderByDateCreationDesc(banque, statut, true, PageRequest.of(page, max));
+           // return transactionRepository.findByBanqueAndStatutAndHasFilesOrderByDateCreationDesc(banque, statut, true, PageRequest.of(page, max));
         }
         if (statut == 10) {
             statut = StatusTransaction.SENDBACK_CUSTOMER;
 //            return transactionRepository.findByBanqueAndClientAndStatutOrderByDelayDesc(banque, client, StatusTransaction.SENDBACK_CUSTOMER, PageRequest.of(page, max));
         }
-        if(appuser!=null){
-            return transactionRepository.findByBanqueAndAppUserAndClientAndStatutOrderByDateCreationDesc(banque,appuser, client, statut, PageRequest.of(page, max));
+        if (appuser != null) {
+            return transactionRepository.findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(banque, appuser, statut, PageRequest.of(page, max));
         }
 
 
@@ -282,7 +290,7 @@ FileStorageService fileStorageService;
         Collection<HashMap<String, Object>> appurements = new ArrayList<>();
         Calendar dateDuJour = Calendar.getInstance();
 
-        for(Transaction t : all) {
+        for (Transaction t : all) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 //            long diff = dateDuJour.getTime().getTime() - t.getDateCreation().getTime();
             long diff = t.getDelay().getTime() - dateDuJour.getTime().getTime();
@@ -290,7 +298,7 @@ FileStorageService fileStorageService;
             if (t.getTypeDeTransaction().getType() != null) {
                 if (t.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
                     nbJourAttente = StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS;
-                }else if (t.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
+                } else if (t.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
                     nbJourAttente = StatusTransaction.DELAY_TRANSACTION_IMPORTATION_SERVICES;
                 }
             }
@@ -300,7 +308,7 @@ FileStorageService fileStorageService;
             if (t.getStatut() == StatusTransaction.VALIDATED) {
                 state = "Apurée";
                 etat = 1;
-            }else {
+            } else {
                 if (dateDuJour.getTime().getTime() > t.getDelay().getTime()) {
                     state = "Non apurée";
                     etat = -1;
@@ -333,7 +341,7 @@ FileStorageService fileStorageService;
         Collection<HashMap<String, Object>> appurements = new ArrayList<>();
         Calendar dateDuJour = Calendar.getInstance();
 
-        for(Transaction t : transactions) {
+        for (Transaction t : transactions) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 //            long diff = dateDuJour.getTime().getTime() - t.getDateCreation().getTime();
             Date delay = t.getDelay() == null ? new Date() : t.getDelay();
@@ -342,7 +350,7 @@ FileStorageService fileStorageService;
             if (t.getTypeDeTransaction().getType() != null) {
                 if (t.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
                     nbJourAttente = StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS;
-                }else if (t.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
+                } else if (t.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
                     nbJourAttente = StatusTransaction.DELAY_TRANSACTION_IMPORTATION_SERVICES;
                 }
             }
@@ -352,7 +360,7 @@ FileStorageService fileStorageService;
             if (t.getStatut() == StatusTransaction.VALIDATED) {
                 state = "Apurée";
                 etat = 1;
-            }else {
+            } else {
                 Date delai = t.getDelay() == null ? new Date() : t.getDelay();
                 if (dateDuJour.getTime().getTime() > delai.getTime()) {
                     state = "Non apurée";
@@ -390,6 +398,7 @@ FileStorageService fileStorageService;
 
         return formatTransactions(all);
     }
+
     public HashMap<String, Object> getTransactionsAsReporting(Banque banque, Client client, int max, int page) {
         Page<Transaction> all = transactionRepository.findByBanqueAndClientOrderByDateCreationDesc(banque, client, PageRequest.of(page, max));
 
@@ -417,7 +426,7 @@ FileStorageService fileStorageService;
     public String importData(ImportFileForm importFile, HttpServletRequest request) throws IOException {
         Upload u = new Upload();
         String uploadRootPath = "/tmp";
-        String file_root = u.uploadFile(importFile.getFile(),fileStorageService, uploadRootPath,request);
+        String file_root = u.uploadFile(importFile.getFile(), fileStorageService, uploadRootPath, request);
 
         String msg = "";
 
@@ -443,24 +452,40 @@ FileStorageService fileStorageService;
             while (cellIterator.hasNext()) {
                 Cell cell = cellIterator.next();
                 switch (cmp) {
-                    case 0: transaction.setClient(clientRepository.findFirstByReference(cell.getStringCellValue())); break;
-                    case 1: transaction.setReference(cell.getStringCellValue()); break;
-                    case 2 :transaction.setMontant((float) cell.getNumericCellValue()); break;
-                    case 3 :transaction.setDevise(deviseRepository.findFirstByCode(cell.getStringCellValue())); break;
-                    case 4: transaction.setStatut((int) cell.getNumericCellValue()); break;
-                    case 5: transaction.setTypeDeTransaction(typeDeTransactionRepository.findFirstByCode(cell.getStringCellValue())); break;
-                    case 6: transaction.setBeneficiaire(beneficiaireRepository.findFirstByReference(cell.getStringCellValue())); break;
-                    case 7: transaction.setDomiciliation(domiciliationRepository.findFirstByReference(cell.getStringCellValue())); break;
-                    case 8: transaction.setDateCreation(cell.getDateCellValue()); break;
+                    case 0:
+                        transaction.setClient(clientRepository.findFirstByReference(cell.getStringCellValue()));
+                        break;
+                    case 1:
+                        transaction.setReference(cell.getStringCellValue());
+                        break;
+                    case 2:
+                        transaction.setMontant((float) cell.getNumericCellValue());
+                        break;
+                    case 3:
+                        transaction.setDevise(deviseRepository.findFirstByCode(cell.getStringCellValue()));
+                        break;
+                    case 4:
+                        transaction.setStatut((int) cell.getNumericCellValue());
+                        break;
+                    case 5:
+                        transaction.setTypeDeTransaction(typeDeTransactionRepository.findFirstByCode(cell.getStringCellValue()));
+                        break;
+                    case 6:
+                        transaction.setBeneficiaire(beneficiaireRepository.findFirstByReference(cell.getStringCellValue()));
+                        break;
+                    case 7:
+                        transaction.setDomiciliation(domiciliationRepository.findFirstByReference(cell.getStringCellValue()));
+                        break;
+                    case 8:
+                        transaction.setDateCreation(cell.getDateCellValue());
+                        break;
                 }
                 cmp++;
             }
 
-            if (true){
+            if (true) {
                 transactionRepository.save(transaction);
-            }
-
-            else {
+            } else {
                 msg += "Imposible de sauvegarder cette transaction";
             }
         }
@@ -479,6 +504,7 @@ FileStorageService fileStorageService;
 
     /**
      * On utilise cette fonction pour la generation des fichiers
+     *
      * @param banque
      * @param hasFiles
      * @param client
@@ -492,11 +518,21 @@ FileStorageService fileStorageService;
         int state = 0;
         if (statut != null) {
             switch (statut) {
-                case StatusTransaction.WAITING_STR: state = StatusTransaction.WAITING;break;
-                case StatusTransaction.MACKED_STR: state = StatusTransaction.MACKED;break;
-                case StatusTransaction.VALIDATED_STR: state = StatusTransaction.VALIDATED;break;
-                case StatusTransaction.REJECTED_STR: state = StatusTransaction.REJECTED;break;
-                case StatusTransaction.CHECKED_STR: state = StatusTransaction.CHECKED;break;
+                case StatusTransaction.WAITING_STR:
+                    state = StatusTransaction.WAITING;
+                    break;
+                case StatusTransaction.MACKED_STR:
+                    state = StatusTransaction.MACKED;
+                    break;
+                case StatusTransaction.VALIDATED_STR:
+                    state = StatusTransaction.VALIDATED;
+                    break;
+                case StatusTransaction.REJECTED_STR:
+                    state = StatusTransaction.REJECTED;
+                    break;
+                case StatusTransaction.CHECKED_STR:
+                    state = StatusTransaction.CHECKED;
+                    break;
             }
         }
 
@@ -504,7 +540,7 @@ FileStorageService fileStorageService;
             transactions = transactionRepository.findByBanqueAndHasFiles(banque, hasFiles);
         } else if (client != null && statut == null) {
             transactions = transactionRepository.findByBanqueAndClientAndHasFiles(banque, client, hasFiles);
-        } else if (client != null && statut != null){
+        } else if (client != null && statut != null) {
             transactions = transactionRepository.findByBanqueAndClientAndHasFilesAndStatut(banque, client, hasFiles, state);
         } else if (statut != null && dateMax == null && dateMin == null && client == null) {
             transactions = transactionRepository.findByBanqueAndHasFilesAndStatut(banque, hasFiles, state);
@@ -540,10 +576,18 @@ FileStorageService fileStorageService;
         }
         int state = -5;
         switch (statut) {
-            case StatusTransaction.CHECKED_STR: state = StatusTransaction.CHECKED;break;
-            case StatusTransaction.MACKED_STR: state = StatusTransaction.MACKED;break;
-            case StatusTransaction.WAITING_STR: state = StatusTransaction.WAITING;break;
-            case StatusTransaction.VALIDATED_STR: state = StatusTransaction.VALIDATED;break;
+            case StatusTransaction.CHECKED_STR:
+                state = StatusTransaction.CHECKED;
+                break;
+            case StatusTransaction.MACKED_STR:
+                state = StatusTransaction.MACKED;
+                break;
+            case StatusTransaction.WAITING_STR:
+                state = StatusTransaction.WAITING;
+                break;
+            case StatusTransaction.VALIDATED_STR:
+                state = StatusTransaction.VALIDATED;
+                break;
         }
 
         Page<Transaction> transactions;
@@ -600,15 +644,6 @@ FileStorageService fileStorageService;
         }
         return transactionRepository.findByBanqueAndClientAndHasFilesTrueAndStatutNotAndDateCreationBetween(banque, client, StatusTransaction.REJECTED, dateJourMin, dateJourMax);
     }
-
-
-
-
-
-
-
-
-
 
 
 }

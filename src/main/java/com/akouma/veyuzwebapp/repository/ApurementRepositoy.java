@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.repository;
 
+import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Apurement;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
@@ -22,9 +23,10 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Page<Apurement> findByBanqueAndIsApured(Banque banque, boolean isApured, Pageable pageable);
 
     Page<Apurement> findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(Banque banque, Client client, boolean isApured, Pageable pageable);
-    Iterable<Apurement> findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(Banque banque, Client client, boolean isApured);
 
-    Page<Apurement> findByBanqueAndIsApuredAndDateExpirationIsNotNullOrderByIsApuredAsc(Banque banque, boolean isApured, Pageable pageable);
+    Page<Apurement> findByBanqueAndIsApuredAndStatusOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, Pageable pageable);
+
+    Iterable<Apurement> findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(Banque banque, Client client, boolean isApured);
 
     Iterable<Apurement> findByIsApuredAndIsExpired(boolean b, boolean b1);
 
@@ -47,6 +49,7 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Iterable<Apurement> findByBanqueAndIsApuredFalseAndIsExpiredFalse(Banque banque);
 
     Page<Apurement> findByBanqueAndIsApuredOrderByIsApuredAsc(Banque banque, boolean isApured, Pageable pageable);
+
     Iterable<Apurement> findByBanqueAndIsApuredOrderByIsApuredAsc(Banque banque, boolean isApured);
 
     Iterable<? extends Apurement> findByBanqueAndClientAndIsApuredFalseAndIsExpiredFalse(Banque banque, Client client);
@@ -58,4 +61,16 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Iterable<Apurement> findByBanqueAndAndClientAndReferenceTransactionContainingOrderByDateOuvertureDesc(Banque banque, Client client, String reference);
 
     Iterable<Apurement> findByBanqueAndReferenceTransactionContainingOrderByDateOuvertureDesc(Banque banque, String reference);
+
+    Page<Apurement> findByBanqueAndClientAndIsApuredAndStatusOrderByDateOuvertureDesc(Banque banque, Client client, boolean isApured, int status, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndIsApuredAndStatusAndAppUserOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, AppUser appUser, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndIsApuredAndStatusGreaterThanEqualAndAppUserOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, AppUser appUser, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndIsApuredAndStatusGreaterThanEqualOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndStatusAndAppUser(Banque banque, int apurementRejeter, AppUser loggedUser, Pageable pageable);
+
+    Page<Apurement> findByBanqueAndStatus(Banque banque, int apurementRejeter, Pageable pageable);
 }

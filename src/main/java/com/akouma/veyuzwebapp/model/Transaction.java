@@ -202,9 +202,11 @@ public class Transaction {
     private String taux;
     private Date dateValeur;
 
+    private boolean renvoye;
+
 
     @ManyToOne
-    @JoinColumn(name = "app_user_id")
+    @JoinColumn(name = "app_user_id", referencedColumnName = "id")
     private AppUser appUser;
 
     @ManyToOne
@@ -219,6 +221,8 @@ public class Transaction {
     public void setTypeFinancement(TypeFinancement typeFinancement) {
         this.typeFinancement = typeFinancement;
     }
+
+    private Date dateValeurBeac;
 
     public AppUser getAppUser() {
         return appUser;

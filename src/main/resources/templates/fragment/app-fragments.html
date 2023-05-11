@@ -181,7 +181,7 @@
 
             <li class='sidebar-item' th:classappend="${#strings.equals(dash, 'dash')} ? active : ''">
                 <a class="sidebar-link" th:href="@{/dashboard}">
-                    <i class="align-middle" data-feather="home"></i> <span class="align-middle">Dashboard</span>
+                    <i class="align-middle" data-feather="home"></i> <span class="align-middle">Tableau de bord</span>
                 </a>
             </li>
 
@@ -235,14 +235,23 @@
                 </a>
                 <ul id="apurments" class="sidebar-dropdown list-unstyled collapse "
                     th:classappend="${#strings.equals(dash, 'apurments')} ? show : ''" data-bs-parent="#sidebar">
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apwd')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/apurments-treasury-approved}">Validées par la trésorerie</a>
+                    </li>
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apw')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments}">En attente d'apurement</a>
                     </li>
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apa')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments-all}">Apurées</a>
                     </li>
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apr')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/apurments-rejetes}">Rejetés</a>
+                    </li>
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'ape')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments-expired}">Expirés / Sanctions</a>
+                    </li>
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apan')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/apurments-annules}">Annulés</a>
                     </li>
                 </ul>
             </li>

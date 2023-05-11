@@ -33,7 +33,7 @@
                                 <h3>
                                     Transaction Finanière
 
-                                    <small><a th:href="@{/transaction/new/{type}(type=${domiciliation})}">Passer en commerciale (domicialiation)</a></small>
+                                    <small><a th:href="@{${newTransactionLink}(type='domiciliation')}">Passer en commerciale (domicialiation)</a></small>
                                 </h3>
                                 <div class="input-group mb-3">
                                     <div class="mb-3">
@@ -89,7 +89,7 @@
                                 <h3>
                                     Transaction Commerciale
 
-                                    <small><a th:href="@{/transaction/new/{client_id}/client/{type}(client_id=${client.id}, type=${normal})}"> Passer en mode Transaction Financiere
+                                    <small><a th:href="@{${newTransactionLink}(type='normal')}"> Passer en mode Transaction Financiere
                                         (non domiciliée)</a></small>
                                 </h3>
                                 <div class="input-group mb-3">

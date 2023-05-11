@@ -198,6 +198,7 @@ public class Banque {
     @Column(name = "description", length = 10000, nullable = true)
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "banque", orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Beneficiaire> beneficiaires = new ArrayList<>();
 

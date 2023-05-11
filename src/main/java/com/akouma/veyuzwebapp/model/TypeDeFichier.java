@@ -76,6 +76,8 @@ public class TypeDeFichier {
         this.name = name;
     }
 
+    private boolean isObligatoire;
+
     @Override
     public int hashCode() {
         int hash = 0;
