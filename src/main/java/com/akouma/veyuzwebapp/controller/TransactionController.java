@@ -137,10 +137,10 @@ public class TransactionController {
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/transactions/{client_id}-client", "/transactions/{client_id}-client/page={page}"})
     public String getTransactionsClient(
-            @PathVariable("client_id") Client client,
+            @PathVariable("client_id") String clt,
             @PathVariable(value = "page", required = false) Integer page,
             Model model, Principal principal) throws Exception {
-
+        Client client = clientService.findById(CryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -319,6 +319,7 @@ public class TransactionController {
                         tdo.setReference(transaction.getReference());
                         tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                         tdo.setStatut(transaction.getStatut());
+                        tdo.setDateCreation(transaction.getDateCreation());
                         return tdo;
                     }
             ).collect(Collectors.toList());
@@ -443,7 +444,6 @@ public class TransactionController {
      * @param principal
      * @return
      */
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_MACKER", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @PostMapping("/save-transaction")
     public ModelAndView saveTransaction(
             @ModelAttribute @Validated TransactionForm transactionForm,
@@ -558,7 +558,6 @@ public class TransactionController {
      * @param principal
      * @return
      */
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_SUPERUSER", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @GetMapping("/transaction-{id}/details")
     public String showTransactionDetails(@PathVariable("id") String transactionId, Model model, Authentication authentication, Principal principal) throws Exception {
 
@@ -974,11 +973,9 @@ public class TransactionController {
         file.getParentFile().mkdirs();
         FileOutputStream outFile = new FileOutputStream(file);
         workbook.write(outFile);
-        System.out.println("Created file : " + file.getAbsolutePath());
         return file.getAbsolutePath();
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/set-transaction-{id}-reference-and-date")
     public String setReferenceAndDate(
             @PathVariable("id") Transaction transaction,
@@ -1026,7 +1023,6 @@ public class TransactionController {
                 actionTransaction.setCommentaire("Ajout du type de préfinancement  effectué avec succès");
                 actionTransactionService.saveActionTransaction(actionTransaction);
                 return "redirect:/transaction-" + id + "/details";
-
             }
         }
 
@@ -1035,16 +1031,16 @@ public class TransactionController {
                 redirectAttributes.addFlashAttribute("flashMessage",
                         "Oops Une erreur est survenue , veuillez verifier que vous y etes autorise ou que vous avez bien renseignez les differentes dates");
             }
-            Date dateTransaction = sdf.parse(date);
+            Date dateOperationTransaction = new Date();
 
             transaction.setReference(new ReferenceGenerator().generateReference());
-            transaction.setDateTransaction(dateTransaction);
+            transaction.setDateTransaction(dateOperationTransaction);
             transaction.setStatut(StatusTransaction.VALIDATED);
             transaction.setTaux(taux);
             transaction.setDateValeur(sdf.parse(dateValeur));
             // on determine la date d'expiration
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(dateTransaction);
+            calendar.setTime(dateOperationTransaction);
             if (transaction.getTypeDeTransaction().getType() != null) {
                 if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
                     calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);

@@ -4,6 +4,7 @@ import com.akouma.veyuzwebapp.form.DomiciliationForm;
 import com.akouma.veyuzwebapp.form.ImportFileForm;
 import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.*;
+import com.akouma.veyuzwebapp.utils.CryptoUtils;
 import com.akouma.veyuzwebapp.utils.Upload;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,6 +42,8 @@ public class DomiciliationService {
     private BeneficiaireRepository beneficiaireRepository;
     @Autowired
     private DeviseRepository deviseRepository;
+    @Autowired
+    private CryptoUtils cryptoUtils;
 
     public DomiciliationRepository getDomiciliationRepository() {
         return domiciliationRepository;
@@ -182,12 +185,14 @@ public class DomiciliationService {
         return msg;
     }
 
-    public Domiciliation saveDomiciliation(DomiciliationForm domiciliationForm) {
+    public Domiciliation saveDomiciliation(DomiciliationForm domiciliationForm) throws Exception {
         Domiciliation domiciliation = domiciliationForm.getDomiciliation();
         if (domiciliation == null || domiciliation.getId() == null) {
             domiciliation = new Domiciliation();
         }
-        domiciliation.setClient(domiciliationForm.getClient());
+
+        Client client=clientRepository.findById(cryptoUtils.decrypt(domiciliationForm.getClient())).orElse(null);
+        domiciliation.setClient(client);
         domiciliation.setMontant(domiciliationForm.getMontant());
         domiciliation.setBeneficiaire(domiciliationForm.getBeneficiaire());
         domiciliation.setBanque(domiciliationForm.getBanque());

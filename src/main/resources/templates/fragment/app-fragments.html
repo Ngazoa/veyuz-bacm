@@ -244,8 +244,14 @@
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apa')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments-all}">Apurées</a>
                     </li>
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apr')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/apurments-rejetes}">Rejetés</a>
+                    </li>
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'ape')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments-expired}">Expirés / Sanctions</a>
+                    </li>
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apan')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/apurments-annules}">Annulés</a>
                     </li>
                 </ul>
             </li>

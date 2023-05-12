@@ -49,6 +49,9 @@ public class Apurement {
     private Date dateEffective;
     private int status = StatusTransaction.APUREMENT_WAITING_DATE;
 
+    @Column(name = "jours_restant")
+    private String joursRestant;
+
 //    CETTE VARIABLE REPRESENTE LE USER AVEC LE ROLE AGENC QUI A INITIE LA TRANSACTION
     @ManyToOne
     @JoinColumn(name = "app_user_id", referencedColumnName = "id")
@@ -66,5 +69,8 @@ public class Apurement {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "apurement")
     @JsonBackReference
     private Collection<ApurementFichierManquant> fichiersManquants;
+
+    @Column(name = "moftif_rejet", length = 1000)
+    private String mofifRejet;
 
 }

@@ -1,18 +1,22 @@
 package com.akouma.veyuzwebapp.controller;
 
+import com.akouma.veyuzwebapp.dto.TransactionDto;
 import com.akouma.veyuzwebapp.form.BanqueForm;
 import com.akouma.veyuzwebapp.form.UserForm;
 import com.akouma.veyuzwebapp.form.UserRoleForm;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
+import com.akouma.veyuzwebapp.model.Transaction;
 import com.akouma.veyuzwebapp.repository.ApurementRepositoy;
 import com.akouma.veyuzwebapp.service.*;
 import com.akouma.veyuzwebapp.utils.CheckSession;
+import com.akouma.veyuzwebapp.utils.CryptoUtils;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import com.akouma.veyuzwebapp.utils.Upload;
 import com.akouma.veyuzwebapp.validator.AppUserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -27,9 +31,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class BanqueController {
+
     @Autowired
     FileStorageService fileStorageService;
     @Autowired
@@ -298,8 +307,31 @@ public class BanqueController {
             waiting = transactionService.getTransactionsByStatus(banque, StatusTransaction.WAITING_STR, 10000, 0, null, null).getTotalElements();
 
         }
+        Collection<HashMap<String, Object>> deviseDtoList = deviseService.getAll(banque, null);
+
         Long nbClient = clientService.count(banque);
         Long waitingAp;
+        Page<Transaction> transactionPage = transactionService.
+                getAllTransactionsForBanque(banque, 10, 0);
+        List<TransactionDto> transactionList = transactionPage.getContent().stream().map(
+                transaction -> {
+                    TransactionDto tdo = new TransactionDto();
+                    tdo.setBeneficiaire(transaction.getBeneficiaire());
+                    try {
+                        tdo.setId(CryptoUtils.encrypt(transaction.getId()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println(">>>>>>|||||||||||||||| "+e);
+
+                    }
+
+                    tdo.setClient(transaction.getClient());
+                    tdo.setMontant(transaction.getMontant());
+                    tdo.setStatut(transaction.getStatut());
+                    tdo.setAppUser(transaction.getAppUser());
+                    return tdo;
+                }
+        ).collect(Collectors.toList());
 
         waitingAp = apurementService.getApurementscount(banque, null, false).spliterator().estimateSize();
         if (authentication.getAuthorities().stream().
@@ -309,13 +341,16 @@ public class BanqueController {
             checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null, null).getTotalElements();
 
         }
+        System.out.println(">>>>>> "+deviseDtoList);
+        System.out.println("PPPPPPPP "+transactionPage);
+
 
         model.addAttribute("lastTransactions", transactionService.getAllTransactionsForBanque(banque, 10, 0).getContent());
         model.addAttribute("waiting", waiting);
         model.addAttribute("nbClient", nbClient);
         model.addAttribute("waitingAp", waitingAp);
         model.addAttribute("checked", checked);
-        model.addAttribute("devises", deviseService.getAll(banque, null));
+        model.addAttribute("devises", deviseDtoList);
         model.addAttribute("circularChartUri", "/build-circular-chart/" + banque.getId());
         model.addAttribute("lineChartUri", "/build-line-chart/" + banque.getId());
         model.addAttribute("barChartUri", "/build-bar-chart/" + banque.getId());

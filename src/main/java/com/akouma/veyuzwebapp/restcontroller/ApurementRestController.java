@@ -438,6 +438,57 @@ public class ApurementRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/rest-rejeter-apurement/{id}/rejeter")
+    public ResponseEntity<?> rejeterApurement(@PathVariable("id") Apurement apurement, @RequestParam("motif") String motifRejet) {
+        System.out.println("=================================================================");
+        System.out.println(motifRejet);
+        System.out.println("=================================================================");
+        HashMap<String, Object> response = new HashMap<>();
+        if (apurement.getIsApured()) {
+            response.put("error", true);
+            response.put("message", "Cette transaction est déjà apurée ! Vous ne pouvez plus la rejetée.");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        System.out.println("=================================================================");
+        System.out.println(motifRejet);
+        System.out.println("=================================================================");
+
+        apurement.setStatus(StatusTransaction.APUREMENT_REJETER);
+        apurement.setMofifRejet(motifRejet);
+
+        apurementService.saveApurement(apurement);
+
+        response.put("error", false);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/rest-annuler-apurement/{id}/annuler")
+    public ResponseEntity<?> annulerApurement(@PathVariable("id") Apurement apurement) {
+        HashMap<String, Object> response = new HashMap<>();
+        if (apurement.getIsApured()) {
+            response.put("error", true);
+            response.put("message", "Cette transaction est déjà apurée ! Vous ne pouvez plus l'annulé.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        if (apurement.getStatus() == StatusTransaction.APUREMENT_ANULER) {
+            response.put("error", true);
+            response.put("message", "Cette transaction est déjà annulé !");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        apurement.setStatus(StatusTransaction.APUREMENT_ANULER);
+        apurement.getTransaction().setStatut(StatusTransaction.APUREMENT_ANULER);
+        apurementService.saveApurement(apurement);
+        transactionService.saveTransaction(apurement.getTransaction());
+
+        response.put("error", false);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     /**
      * Cette fonction permet d'extraire les donnees dans le fichier excel
      * @param fileName

@@ -222,47 +222,15 @@ $("form#apurementForm").on("submit", function (e) {
 $(".apurement-btn-action").each(function () {
     var elt = $(this);
     elt.on("click", function (e) {
-        e.preventDefault()
+        e.preventDefault();
         ref = elt.data("ref");
         $("#modal").attr("data-ref", ref);
         $("#modal ul li a").removeClass("active");
         $('#fichiersManquant').addClass("active")
-        $('#fichiersManquant').trigger("click");
+        setTimeout(function(){
+            $('#fichiersManquant').trigger("click");
+        }, 1000)
         $("#modal").modal("show");
-    });
-})
-
-$('#modal-transmettre-pour-apurement form').on('submit', function(event) {
-    event.preventDefault();
-    var elt = $(this);
-    var data = elt.data("ref")
-    var date = elt.find('input').val()
-    $.ajax({
-        url: "/add-apurement-effective-date/" + data + "/" + date,
-        type: "GET",
-        dataType: "JSON",
-        beforeSend: function() {
-            elt.find(".loader").html(loader)
-        },
-        success: function(response) {
-            elt.find(".loader").html("")
-            if (response.isChanged) {
-                window.location.reload();
-            }else {
-                alert(response.errorMessage)
-            }
-        }
-    })
-})
-
-$(".edit-date-effective-apurement").each(function () {
-    var elt = $(this);
-    elt.on("click", function (e) {
-        e.preventDefault();
-        var ref = elt.data("ref");
-        $('#modal-transmettre-pour-apurement form').attr('data-ref', ref)
-        $('#modal-transmettre-pour-apurement form .loader').html("");
-        $('#modal-transmettre-pour-apurement').modal('show')
     });
 })
 
@@ -287,7 +255,7 @@ $('#fichiersManquant').on("click", function (e) {
 })
 
 $('#showFileForms').on("click", function (e) {
-//    var ref = $("#modal").data("ref");
+    // var ref = $("#modal").data("ref");
     $("#modal .tab-title").html("Formulaire pour déposer les fichiers manquants");
     $.ajax({
         url: "/rest-apurements/" + ref + "/files-forms",
@@ -368,7 +336,7 @@ function uploadFiles() {
 
 $('#filesSend').on("click", function (e) {
     // var ref = $("#modal").data("ref");
-    $("#modal .tab-title").html("Fichers transmis pour apurement");
+    $("#modal .tab-title").html("Fichiers déposés pour apurements");
     $.ajax({
         url: "/rest-apurements/" + ref + "/files",
         type: "GET",
@@ -508,7 +476,6 @@ var multipleUploadForm = document.querySelector('#multipleUploadForm');
 var multipleFileUploadInput = document.querySelector('#multipleFileUploadInput');
 var multipleFileUploadError = document.querySelector('#multipleFileUploadError');
 var multipleFileUploadSuccess = document.querySelector('#multipleFileUploadSuccess');
-var enterDateEffectiveForm = document.querySelector('#modal-transmettre-pour-apurement form');
 
 function uploadSingleFile(file) {
     var formData = new FormData();
@@ -581,4 +548,3 @@ multipleUploadForm.addEventListener('submit', function(event){
     uploadMultipleFiles(files);
     event.preventDefault();
 }, true);
-

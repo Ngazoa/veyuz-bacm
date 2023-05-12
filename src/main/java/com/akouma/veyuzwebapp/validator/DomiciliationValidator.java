@@ -13,8 +13,6 @@ public class DomiciliationValidator implements Validator {
     @Autowired
     private DomiciliationService domiciliationService;
     @Autowired
-    private ClientService clientService;
-    @Autowired
     private BeneficiaireService beneficiaireService;
     @Autowired
     private TypeDeTransactionService typeDeTransactionService;

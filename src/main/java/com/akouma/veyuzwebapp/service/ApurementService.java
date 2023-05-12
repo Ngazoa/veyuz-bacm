@@ -5,6 +5,7 @@ import com.akouma.veyuzwebapp.model.Apurement;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
 import com.akouma.veyuzwebapp.repository.ApurementRepositoy;
+import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -93,5 +94,13 @@ public class ApurementService {
             return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualAndAppUserOrderByDateOuvertureDesc(banque, isApured, status, appUser, PageRequest.of(page, max));
 
         return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualOrderByDateOuvertureDesc(banque, isApured, status, PageRequest.of(page, max));
+    }
+
+    public Page<Apurement> getAllByStatusAndBanqueApurements(Banque banque, int status, int max, Integer page) {
+        return apurementRepositoy.findByBanqueAndStatus(banque, status, PageRequest.of(page, max));
+    }
+
+    public Page<Apurement> getAllByBAnqueAndStatusAndUser(Banque banque, AppUser loggedUser, int status, int max, Integer page) {
+        return apurementRepositoy.findByBanqueAndStatusAndAppUser(banque, status, loggedUser, PageRequest.of(page, max));
     }
 }

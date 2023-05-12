@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-@Data
 @Service
 public class BeneficiaireService {
     public BeneficiaireRepository getBeneficiaireRepository() {
