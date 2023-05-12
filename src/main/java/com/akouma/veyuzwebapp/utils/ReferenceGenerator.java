@@ -23,7 +23,7 @@ public class ReferenceGenerator {
     private static String generateRandomNumber() {
         Date date = new Date();
         int number = dateToInt(date);
-        return String.format("%04d", number);
+        return String.format("%04d", number).substring(3);
     }
 
     public static int dateToInt(Date date) {
@@ -35,8 +35,9 @@ public class ReferenceGenerator {
     public String generateReference() {
         LocalDate date = LocalDate.now();
         int year = date.getYear();
+        String year2 = String.valueOf(year).substring(2);
         String prefix = generateRandomPrefix();
         String number = generateRandomNumber();
-        return "TT" + number + "" + year + "BA";
+        return "TT" + number + "" + year2 + "BA";
     }
 }

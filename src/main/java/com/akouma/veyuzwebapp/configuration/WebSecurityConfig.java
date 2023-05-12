@@ -45,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().antMatchers(
                 "/login",
-                "/logout",
+                "/logout","/reinitialiser","/reinitialiser-pass",
                 "/resources/**", "sweetalert2/**", "/css/**",
                 "/css/*", "/static/**" , "jquery/*", "/sweetalert2themebootstrap-4/**",
                 "/js/*", "/img/*","/fonts/*", "/img/avatars/*", "/img/icons/*",

@@ -6,8 +6,11 @@ import com.akouma.veyuzwebapp.service.BanqueService;
 import com.akouma.veyuzwebapp.service.MailService;
 import com.akouma.veyuzwebapp.service.UserService;
 import com.akouma.veyuzwebapp.utils.CheckSession;
+import com.akouma.veyuzwebapp.utils.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -81,6 +84,41 @@ public class MainController {
         return "welcomePage";
     }
 
+    @GetMapping("/reinitialiser")
+    public String reinitialser(Model model) {
+        return "reset-password";
+    }
+
+
+    @PostMapping("/reinitialiser-pass")
+    public String reinitialserSendMail(@RequestParam String email, Model model) {
+        try {
+            AppUser appUser = userService.getUserByEmail(email);
+            if (appUser == null) {
+                model.addAttribute("errorMessage", "Utilisateur non reconnu");
+            } else {
+                String pass = PasswordGenerator.generatePassword();
+
+                PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                String encrytedPassword = passwordEncoder.encode(pass);
+                appUser.setPassword(encrytedPassword);
+                userService.saveUser(appUser);
+                mailService.sendSimpleMessage(email,
+                        "Reinitialisation pass ",
+                        " Votre Mot de passe a ete bien reinitialise et le nouveau est : " + pass);
+                model.addAttribute("flashMessage", "Mot de passe reinitialise avec succes . veuillez" +
+                        "vous connecter a otre boite mail pour vous connecter");
+
+                return "loginPage";
+            }
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur survenu , impossible de continuer pour l' instant");
+        }
+
+        return "reset-password";
+    }
+
     @GetMapping("/parametres")
     public String showParametreView(Model model, Principal principal) {
         if (principal == null) {
@@ -104,7 +142,7 @@ public class MainController {
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String loginPage(Model model) {
-       // mailService.sendSimpleMessage("akouma.net@gmail.com","Belka TobBY","Jesus m'aime");
+        // mailService.sendSimpleMessage("akouma.net@gmail.com","Belka TobBY","Jesus m'aime");
         return "loginPage";
     }
 
