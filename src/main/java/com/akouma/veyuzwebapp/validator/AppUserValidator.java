@@ -13,8 +13,8 @@ import org.springframework.validation.Validator;
 @Component
 public class AppUserValidator implements Validator {
 
+    private static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$";
     private final EmailValidator emailValidator = EmailValidator.getInstance();
-
     @Autowired
     private UserService userService;
 
@@ -32,12 +32,16 @@ public class AppUserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "dateNaissanceStr", "NotEmpty.userForm.dateNaissanceStr");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "adresse", "NotEmpty.userForm.adresse");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "NotEmpty.userForm.email");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotEmpty.userForm.password");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "NotEmpty.userForm.confirmPassword");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "gender", "NotEmpty.userForm.gender");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telephone1", "NotEmpty.userForm.telephone1");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lieuNaissance", "NotEmpty.userForm.lieuNaissance");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userName", "NotEmpty.userForm.userName");
+
+        String password = appUserForm.getPassword();
+        if (!password.matches(PASSWORD_PATTERN)) {
+            errors.rejectValue("password", "password.invalid");
+        }
 
         if (!this.emailValidator.isValid(appUserForm.getEmail())) {
             // Invalid email.

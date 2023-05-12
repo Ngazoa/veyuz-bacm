@@ -54,10 +54,12 @@
                             <a th:if="${#authorization.expression('hasRole(''ROLE_AGENCE'')')
                              or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{${initierTransactionUri}(client_id=${b.id}, type='domiciliation')}" class="dropdown-item">Transaction Commerciale (domiciliation)</a>
                             <div class="dropdown-divider"></div>
-                            <a th:if="${#authorization.expression('hasRole(''ROLE_CHECKER'')')
-                            or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{/domiciliations/new/{id}(id=${b.id})}" class="dropdown-item">Domiciliations</a>
+<!--                            <a th:if="${#authorization.expression('hasRole(''ROLE_CHECKER'')')-->
+<!--                            or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{/domiciliations/new/{id}(id=${b.id})}" class="dropdown-item">Domiciliations</a>-->
+<!--                            <div class="dropdown-divider"></div>-->
+                            <a th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')}" class="dropdown-item" th:href="@{/client/{client_id}/mes-beneficiaires(client_id=${b.id})}">Gestion des bénéficiaires</a>
                             <div class="dropdown-divider"></div>
-                                   <div class="dropdown-divider"></div>
                             <a th:if="${b.kyc!=null}" class="dropdown-item" th:href="@{/downloadFile/kyc/{client_id}(client_id=${b.kyc})}">KYC</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item text-danger"  th:href="@{/clients-{client_id}/edit(client_id=${b.id})}">

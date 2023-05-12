@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.controller;
 
+import com.akouma.veyuzwebapp.dto.ClientDto;
 import com.akouma.veyuzwebapp.form.DomiciliationForm;
 import com.akouma.veyuzwebapp.form.ImportFileForm;
 import com.akouma.veyuzwebapp.model.AppUser;
@@ -254,7 +255,7 @@ public class DomiciliationController {
     public String saveDomiciliation(
             @ModelAttribute @Validated DomiciliationForm domiciliationForm,
             BindingResult result,
-            Model model, RedirectAttributes redirectAttributes, Principal principal) throws ParseException {
+            Model model, RedirectAttributes redirectAttributes, Principal principal) throws Exception {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
@@ -263,7 +264,8 @@ public class DomiciliationController {
 
 
         if (result.hasErrors()) {
-            setModelData(model, domiciliationForm.getBanque(), domiciliationForm.getClient());
+            System.out.println(result);
+            setModelData(model, domiciliationForm.getBanque(),null);
             String msg = "Une erreur s'est glissée dans votre formulaire de données . Erreur : " + result;
             redirectAttributes.addFlashAttribute("flashMessage", msg);
 

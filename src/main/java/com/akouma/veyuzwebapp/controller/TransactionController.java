@@ -973,7 +973,6 @@ public class TransactionController {
         file.getParentFile().mkdirs();
         FileOutputStream outFile = new FileOutputStream(file);
         workbook.write(outFile);
-        System.out.println("Created file : " + file.getAbsolutePath());
         return file.getAbsolutePath();
     }
 
@@ -1033,16 +1032,16 @@ public class TransactionController {
                 redirectAttributes.addFlashAttribute("flashMessage",
                         "Oops Une erreur est survenue , veuillez verifier que vous y etes autorise ou que vous avez bien renseignez les differentes dates");
             }
-            Date dateTransaction = sdf.parse(date);
+            Date dateOperationTransaction = new Date();
 
             transaction.setReference(new ReferenceGenerator().generateReference());
-            transaction.setDateTransaction(dateTransaction);
+            transaction.setDateTransaction(dateOperationTransaction);
             transaction.setStatut(StatusTransaction.VALIDATED);
             transaction.setTaux(taux);
             transaction.setDateValeur(sdf.parse(dateValeur));
             // on determine la date d'expiration
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(dateTransaction);
+            calendar.setTime(dateOperationTransaction);
             if (transaction.getTypeDeTransaction().getType() != null) {
                 if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
                     calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
