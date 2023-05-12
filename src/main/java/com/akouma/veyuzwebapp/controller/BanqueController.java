@@ -344,8 +344,7 @@ public class BanqueController {
         System.out.println(">>>>>> "+deviseDtoList);
         System.out.println("PPPPPPPP "+transactionPage);
 
-
-        model.addAttribute("lastTransactions", transactionService.getAllTransactionsForBanque(banque, 10, 0).getContent());
+        model.addAttribute("lastTransactions", transactionList);
         model.addAttribute("waiting", waiting);
         model.addAttribute("nbClient", nbClient);
         model.addAttribute("waitingAp", waitingAp);

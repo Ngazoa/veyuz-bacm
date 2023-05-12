@@ -266,7 +266,6 @@ public class DomiciliationController {
         if (result.hasErrors()) {
             System.out.println(result);
             setModelData(model, domiciliationForm.getBanque(),null);
-
             String msg = "Une erreur s'est glissée dans votre formulaire de données . Erreur : " + result;
             redirectAttributes.addFlashAttribute("flashMessage", msg);
 

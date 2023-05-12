@@ -486,7 +486,7 @@ public class TransactionService {
             if (true) {
                 transactionRepository.save(transaction);
             } else {
-                msg += "Imposible de sauvegarder cette transaction";
+                msg += "Impossible de sauvegarder cette transaction";
             }
         }
 

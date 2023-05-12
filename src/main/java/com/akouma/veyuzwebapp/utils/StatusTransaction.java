@@ -47,7 +47,6 @@ public class StatusTransaction {
     public static final int APUREMENT_HAS_FILES = 2;
 
     public static final int APUREMENT_IS_VALIDATED = 3;
-
     public static final int APUREMENT_REJETER = -500;
     public static final int APUREMENT_ANULER = -1000;
 

@@ -489,6 +489,31 @@ public class ApurementRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/rest-restaurer-apurement/{id}/restaurer")
+    public ResponseEntity<?> restaurerApurement(@PathVariable("id") Apurement apurement) {
+        HashMap<String, Object> response = new HashMap<>();
+        if (apurement.getIsApured()) {
+            response.put("error", true);
+            response.put("message", "Cette transaction est déjà apurée ! Vous ne pouvez plus l'annulé.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        if (apurement.getStatus() == StatusTransaction.APUREMENT_ANULER) {
+            response.put("error", true);
+            response.put("message", "Cette transaction est déjà annulé ! Vous ne pouvez plus la restaurer");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        apurement.setStatus(StatusTransaction.APUREMENT_WAITING_DATE);
+        apurement.getTransaction().setStatut(StatusTransaction.VALIDATED);
+        apurementService.saveApurement(apurement);
+        transactionService.saveTransaction(apurement.getTransaction());
+
+        response.put("error", false);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     /**
      * Cette fonction permet d'extraire les donnees dans le fichier excel
      * @param fileName

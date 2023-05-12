@@ -29,8 +29,31 @@
 
 <th:block id="others-js">
     <script>
-
         $(document).ready(function() {
+        $('.restaurer-apurement-btn').click(function(e) {
+                e.preventDefault();
+                if(confirm("Vous êtes sur le point de restaurer cette apurer. Etes-vous sure de vouloir poursuivre ?")) {
+                    const element = $(e.currentTarget);
+                    const tr = element.attr('data-parent-id');
+                    $.ajax({
+                        url: element.attr('href'),
+                        type: 'POST',
+                        dataType: 'JSON',
+                        success: function(response) {
+                            if (response.error) {
+                                showNotif(response.message, "warning", 5000);
+                            } else {
+                                showNotif("Apurement restauré avec succès !!!", "info", 2000);
+                                $('#' + tr).fadeOut(400);
+                            }
+                        },
+                        error: function() {
+                            showNotif("Une erreur est survenue ! Vérifier votre accès au serveur si le problème persite contactez votre fournisseur.", "warning", 5000);
+                        }
+                    });
+                }
+            })
+
             $('.annuler-definitivement-transaction').click(function(e) {
                 e.preventDefault();
                 if(confirm("Cette action est irreversible souhaitez vous poursuivre ?")) {
@@ -106,8 +129,6 @@
                 })
             })
         });
-
-
     </script>
 </th:block>
 
@@ -218,14 +239,14 @@
 
                         <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:data="${ap.id}" th:text="${#dates.format(ap.dateExpiration, 'dd-MM-yyyy')}" th:data-value="${#dates.format(ap.dateExpiration, 'yyyy-MM-dd')}" class="dateExpirationApurement"></td>
-
                         <td th:text="${ap.joursRestant}"></td>
-
                         <td>
                             <span th:if="${ap.status == 0}" class="badge bg-warning">Pas Transmis</span>
                             <span th:if="${ap.status == 1}" class="badge bg-info">En attente des fichiers</span>
                             <span th:if="${ap.isApured}" class="badge bg-success">Acceptée</span>
                             <span th:if="${ap.status == 2}" class="badge bg-info">En cours</span>
+                            <span th:if="${ap.status == -500}" class="badge bg-info">Rejeté</span>
+                            <span th:if="${ap.status == -1000}" class="badge bg-info">Annulé</span>
                         </td>
 
                         <td>
@@ -239,8 +260,11 @@
                                 <a th:if="${ap.status != -500 and ap.status != -1000}" href="" class="btn btn-warning btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-rejeted-apurement-' + ${ap.id}" title="Rejeter">
                                     <i class="fas fa-times"></i>
                                 </a>
-                                <a th:if="${ap.status != -1000}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="toggle" title="Annuler">
+                                <a th:if="${ap.status != -1000}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="tooltip" title="Annuler">
                                     <i class="fas fa-trash"></i>
+                                </a>
+                                <a th:if="${ap.status == -500}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-restaurer-apurement/' + ${ap.id} + '/restaurer'" class="btn btn-warning btn-sm restaurer-apurement-btn" data-bs-toggle="toltip" title="Restaurer">
+                                    <i class="fa fa-spinner" aria-hidden="true"></i>
                                 </a>
                             </th:bock>
                         </td>
@@ -373,7 +397,6 @@
                         </form>
                     </div>
                 </div>
-
             </div>
         </div>
 
