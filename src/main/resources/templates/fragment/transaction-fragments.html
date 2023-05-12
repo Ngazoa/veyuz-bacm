@@ -135,27 +135,27 @@
         <b class="chat-message-right mb-4">
             <button class="btn btn-primary" th:if="${transaction.statut == 0}">En attente de traitement</button>
             <button class="btn btn-info" th:if="${transaction.statut == 1 and !transaction.renvoye}">
-                <span th:text="${#authorization.expression('!hasRole(''ROLE_MACKER'')')? 'Transmis pour traitement au Trade I' :
+                <span th:text="${#authorization.expression('hasRole(''ROLE_MACKER'')')? 'Transmis pour Validation au Trade Checker' :
                   'En attente de traitement'}"></span>
             </button>
             <button class="btn btn-secondary" th:if="${transaction.statut == 2 and !transaction.renvoye}">
-                <span th:text="${#authorization.expression('!hasRole(''ROLE_CHECKER'')')? 'Transmis pour validation au Trade II' :
+                <span th:text="${#authorization.expression('hasRole(''ROLE_CHECKER'')')? 'Transmis pour Traitement au Treasory Ops I' :
                   'En attente de traitement'}"></span>
             </button>
             <button class="btn btn-success" th:if="${transaction.statut == 3 and transaction.apured == true}"><i
                     class="fas fa-check"></i> Apurée
             </button>
             <button class="btn btn-primary" th:if="${transaction.statut == 7 and !transaction.renvoye}">
-                <span th:text="${#authorization.expression('!hasRole(''ROLE_MAKER_TO'')')? 'Transmis pour traitement Treasory Ops' :
+                <span th:text="${#authorization.expression('hasRole(''ROLE_MAKER_TO'')')? 'Transmis pour Validation Treasory Ops Checker' :
                   'En attente de traitement'}"></span>
             </button>
             <button class="btn btn-info" th:if="${transaction.statut == 8 and !transaction.renvoye}">
-                <span th:text="${#authorization.expression('!hasRole(''ROLE_CHECKER_TO'')')? 'Transmis pour Validation Treasory ' :
+                <span th:text="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')? 'Transmis pour Complement Treasury ' :
                   'En attente de traitement'}"></span>
             </button>
 
             <button class="btn btn-warning" th:if="${transaction.statut == 9 and !transaction.renvoye}">
-                <span th:text="${#authorization.expression('!hasRole(''ROLE_TREASURY'')')? 'Transmis pour Trésorerie' :
+                <span th:text="${#authorization.expression('hasRole(''ROLE_TREASURY'')')? 'Transmis pour Trésorerie' :
                   'En attente de traitement'}"></span>
             </button>
 
