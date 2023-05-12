@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 public class DomiciliationForm {
 
-    private Client client;
+    private String client;
 
     private Banque banque;
 
@@ -53,13 +53,12 @@ public class DomiciliationForm {
         this.banque = banque;
     }
 
-    public DomiciliationForm(Banque banque, Client client) {
+    public DomiciliationForm(Banque banque, String client) {
         this.banque = banque;
         this.client = client;
     }
 
     public  DomiciliationForm(Domiciliation domiciliation) {
-        this.client = domiciliation.getClient();
         this.banque = domiciliation.getBanque();
         this.devise = domiciliation.getDevise();
         this.typeDeTransaction = domiciliation.getTypeDeTransaction();

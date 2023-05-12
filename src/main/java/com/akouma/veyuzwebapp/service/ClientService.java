@@ -379,6 +379,27 @@ System.out.println("====>1");
                 }
         ).collect(Collectors.toList());
     }
+    public ClientDto getClient(Client client) {
+                      if(client==null){
+                          return null;
+                      }
+                    ClientDto client1=new ClientDto();
+                    client1.setTelephone(client.getTelephone());
+                    try {
+                        client1.setId(cryptoUtils.encrypt(client.getId()));
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    client1.setUser(client.getUser());
+                    client1.setDomiciliations(client.getDomiciliations());
+                    client1.setKyc(client.getKyc());
+                    client1.setDenomination(client.getDenomination());
+                    client1.setReference(client.getReference());
+                    client1.setNumeroContribuable(client.getNumeroContribuable());
+                    client1.setTypeClient(client.getTypeClient());
+                    return client1;
+    }
 
     public Client getClientByReference(String referenceClient) {
         return clientRepository.findFirstByReference(referenceClient);

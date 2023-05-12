@@ -117,6 +117,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     Iterable<Transaction> findByBanqueAndHasFilesAndDevise(Banque banque, boolean b, Devise devise);
 
     Iterable<Transaction> findByBanqueAndClientAndHasFilesAndDevise(Banque banque, Client client, boolean b, Devise devise);
+    Iterable<Transaction> findByBanqueAndAppUserAndHasFilesAndDevise(Banque banque, AppUser client, boolean b, Devise devise);
 
     Iterable<Transaction> findByBanqueAndClient(Banque banque, Client client);
 

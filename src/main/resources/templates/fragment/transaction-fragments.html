@@ -372,10 +372,6 @@
                                 <b class="montant_format" th:utext="${transaction.montant}"></b>
                             </p>
                             <hr>
-                            <label class="form-label">Date de l'opération</label>
-                            <input class="form-control" name="date"
-                                   required th:value="${#dates.format(transaction.dateTransaction, 'yyyy-MM-dd')}"
-                                   type="date">
                             <label class="form-label">Date de Valeur</label>
                             <input class="form-control" name="dateValeur"
                                    required
