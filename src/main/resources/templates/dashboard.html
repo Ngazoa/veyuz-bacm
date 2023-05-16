@@ -202,8 +202,8 @@
                             </thead>
                             <tbody>
                             <tr th:each="t : ${lastTransactions}">
-                                <th:block th:if="t.AppUser.id!=null">
-                                <div th:if="${#authentication.getPrincipal().getId()!=t.AppUser.id and #authorization.expression('hasRole(''ROLE_AGENCE'')')}">
+                                <th:block th:if="t.AppUser!=null">
+                                <div th:if="${#authentication.getPrincipal().getId()==t.AppUser.id and #authorization.expression('hasRole(''ROLE_AGENCE'')')}">
                                 <td>
                                     <div class="d-flex">
                                         <div class="flex-shrink-0">
@@ -239,8 +239,8 @@
                                     <a th:href="@{/transaction-{id}/details(id=${t.id})}" class="btn btn-light">View</a>
                                 </td>
                                 </div>
-                                    <div th:unless="${#authentication.getPrincipal().getId()!=t.AppUser.id
-                                     and #authorization.expression('hasRole(''ROLE_AGENCE'')')}">
+                                    <div th:if="${#authentication.getPrincipal().getId()!=t.AppUser.id
+                                    and #authorization.expression('!hasRole(''ROLE_AGENCE'')')}">
                                         <td>
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0">
@@ -278,6 +278,7 @@
                                     </div>
                                 </th:block>
                             </tr>
+
                             </tbody>
                         </table>
                     </div>

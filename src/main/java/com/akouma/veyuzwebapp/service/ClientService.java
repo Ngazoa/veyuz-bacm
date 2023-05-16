@@ -9,7 +9,7 @@ import com.akouma.veyuzwebapp.repository.ClientRepository;
 import com.akouma.veyuzwebapp.repository.UserRepository;
 import com.akouma.veyuzwebapp.repository.UserRoleRepository;
 import com.akouma.veyuzwebapp.utils.CryptoUtils;
-import com.akouma.veyuzwebapp.utils.CustomerSpecification;
+import org.springframework.util.StringUtils;
 import com.akouma.veyuzwebapp.utils.Upload;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,11 +19,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -105,28 +107,6 @@ public class ClientService {
         return clienRenvoye;
     }
 
-    public List<Client> searchClientsByName(Banque banque, String nom) {
-        List<Client> clients = new ArrayList<>();
-        Iterable<AppUser> client = userRepository.findByNomLike(nom);
-        if (client != null) {
-            System.out.println("------------- : 0");
-            Client newClient;
-            Banque ClientBanque;
-            for (AppUser clt : client) {
-                newClient = clt.getClient();
-                ClientBanque = clt.getBanque();
-                if (newClient != null && ClientBanque != null) {
-                    if ((ClientBanque.getId() == banque.getId())) {
-                        System.out.println("------------- : 11");
-                        clients.add(newClient);
-                    }
-                }
-            }
-        }
-
-        return clients;
-    }
-
 
     public Client saveClient(Client client) {
         if (client.getReference() == null || client.getReference() == "") {
@@ -135,13 +115,12 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public List<Client> searchCustomers(String keyword) {
-        return clientRepository.findAll(
-                CustomerSpecification.nameContains(keyword)
-                        .or(CustomerSpecification.phoneContains(keyword))
-                        .or(CustomerSpecification.emailContains(keyword))
-                        .or(CustomerSpecification.surnameContains(keyword))
-        );
+    public List<Client> searchClientsByName(Banque banque,String query) {
+        List<Client> clients = clientRepository.
+                findByUser_BanqueLikeOrTelephoneContainingOrDenominationContainingOrReferenceContaining(banque,
+                query,query,query);
+        return clients;
+
     }
 
 
@@ -411,5 +390,29 @@ System.out.println("====>1");
         }
         List<ClientDto> clients = getClients(banque);
         return clients.size();
+    }
+
+    public class ClientSpecifications {
+        static Specification<Client> searchClients(Banque banque, String telephone, String denomination, String reference) {
+            return (root, query, builder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(builder.equal(root.get("user").get("banque"), banque));
+
+                if (telephone != null && !telephone.isEmpty()) {
+                    predicates.add(builder.like(root.get("telephone"), "%" + telephone ));
+                }
+
+                if (denomination != null && !denomination.isEmpty()) {
+                    predicates.add(builder.like(root.get("denomination"), "%" + denomination ));
+                }
+
+                if (reference != null && !reference.isEmpty()) {
+                    predicates.add(builder.like(root.get("reference"), "%" + reference ));
+                }
+
+                return builder.and(predicates.toArray(new Predicate[0]));
+            };
+        }
+
     }
 }

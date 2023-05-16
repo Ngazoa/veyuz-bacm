@@ -47,7 +47,8 @@ public class StatusTransaction {
     public static final int APUREMENT_HAS_FILES = 2;
 
     public static final int APUREMENT_IS_VALIDATED = 3;
-
+    public static final int APUREMENT_REJETER = -500;
+    public static final int APUREMENT_ANULER = -1000;
 
     // ========================================================================
     // LES TYPES DE TRANSACTIONS
@@ -57,8 +58,8 @@ public class StatusTransaction {
 
     public static final String[] statuts = {WAITING_STR, MACKED_STR, CHECKED_STR, VALIDATED_STR,REJECTED_STR};
 
-    public static final int DELAY_TRANSACTION_IMPORTATION_BIENS = 30;
-    public static final int DELAY_TRANSACTION_IMPORTATION_SERVICES = 90;
+    public static final int DELAY_TRANSACTION_IMPORTATION_BIENS = 90;
+    public static final int DELAY_TRANSACTION_IMPORTATION_SERVICES = 30;
 
     public static final int DEFAULT_DELAY_TRANSACTION = 20;
 

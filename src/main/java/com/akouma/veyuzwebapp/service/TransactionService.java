@@ -146,6 +146,15 @@ public class TransactionService {
         return transactionRepository.findByBanqueAndDateCreationBeforeOrderByDateCreationDesc(banque, date);
     }
 
+    public boolean checkReference(String ref) {
+        Transaction transaction
+                = transactionRepository.findByReference(ref);
+        if (transaction == null) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Cette fonction permet de recuperer les transactions effectuees apres une date donnee dans une banque
      *
@@ -272,7 +281,7 @@ public class TransactionService {
                 }
                 return transactionRepository.findByBanqueAndStatutOrderByDateCreationDesc(banque, statut, PageRequest.of(page, max));
             }
-           // return transactionRepository.findByBanqueAndStatutAndHasFilesOrderByDateCreationDesc(banque, statut, true, PageRequest.of(page, max));
+            // return transactionRepository.findByBanqueAndStatutAndHasFilesOrderByDateCreationDesc(banque, statut, true, PageRequest.of(page, max));
         }
         if (statut == 10) {
             statut = StatusTransaction.SENDBACK_CUSTOMER;

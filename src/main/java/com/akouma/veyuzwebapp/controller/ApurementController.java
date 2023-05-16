@@ -9,6 +9,7 @@ import com.akouma.veyuzwebapp.service.ApurementService;
 import com.akouma.veyuzwebapp.service.ClientService;
 import com.akouma.veyuzwebapp.service.UserService;
 import com.akouma.veyuzwebapp.utils.CheckSession;
+import com.akouma.veyuzwebapp.utils.JoursRestant;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,6 +82,10 @@ public class ApurementController {
             }
         }
 
+        apurements.forEach(apurement -> {
+            apurement.setJoursRestant(JoursRestant.getJoursRestant(apurement));
+        });
+
         model.addAttribute("apurements", apurements.getContent());
         model.addAttribute("currentPage", apurements.getNumber() + 1);
         model.addAttribute("banque", banque);
@@ -103,6 +108,134 @@ public class ApurementController {
         String uri = "/apurments/page={page}";
         model.addAttribute("uri", uri);
         model.addAttribute("das", "apw");
+        model.addAttribute("exportUri", "/" + banque.getId() + "-export/apurments?apured=false");
+        model.addAttribute("searchUri", "/search-apurements");
+
+        return "apurements/index";
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK"})
+    @GetMapping({"/apurments-annules", "/apurments-annules/page={page}"})
+    public String getApurementsAnnules(@RequestParam(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
+
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session)) {
+            return "redirect:/";
+        }
+
+        if (page != null && page <= 0) {
+            return "error/404";
+        }
+
+        if (page == null) {
+            page = this.page;
+        }
+        page--;
+
+        Banque banque = (Banque) session.getAttribute("banque");
+        AppUser loggedUser = userService.getLoggedUser(principal);
+
+        Page<Apurement> apurements;
+
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
+            apurements = apurementService.getAllByStatusAndBanqueApurements(banque, StatusTransaction.APUREMENT_ANULER, max, page);
+        }
+//        else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
+        else {
+//                ON GERE LE PROFIL AGENCE
+            apurements = apurementService.getAllByBAnqueAndStatusAndUser(banque, loggedUser, StatusTransaction.APUREMENT_ANULER, max, page);
+        }
+
+        apurements.forEach(apurement -> {
+            apurement.setJoursRestant(JoursRestant.getJoursRestant(apurement));
+        });
+
+        model.addAttribute("apurements", apurements.getContent());
+        model.addAttribute("currentPage", apurements.getNumber() + 1);
+        model.addAttribute("banque", banque);
+        model.addAttribute("nbPages", apurements.getTotalPages());
+        int nbPages = apurements.getTotalPages();
+        if (nbPages > 1) {
+            int[] pages = new int[nbPages];
+            for (int i = 0; i < nbPages; i++) {
+                pages[i] = i + 1;
+                System.out.println(i);
+            }
+            model.addAttribute("pages", pages);
+        }
+
+        ImportFile importFile = new ImportFile();
+        importFile.setBanque(banque);
+
+        model.addAttribute("importFile", importFile);
+        model.addAttribute("dash", "apurments");
+        String uri = "/apurments-annules/page={page}";
+        model.addAttribute("uri", uri);
+        model.addAttribute("das", "apan");
+        model.addAttribute("exportUri", "/" + banque.getId() + "-export/apurments?apured=false");
+        model.addAttribute("searchUri", "/search-apurements");
+
+        return "apurements/index";
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK"})
+    @GetMapping({"/apurments-rejetes", "/apurments-rejetes/page={page}"})
+    public String getApurementsRejetes(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
+
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session)) {
+            return "redirect:/";
+        }
+
+        if (page != null && page <= 0) {
+            return "error/404";
+        }
+
+        if (page == null) {
+            page = this.page;
+        }
+        page--;
+
+        Banque banque = (Banque) session.getAttribute("banque");
+        AppUser loggedUser = userService.getLoggedUser(principal);
+
+        Page<Apurement> apurements;
+
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
+            apurements = apurementService.getAllByStatusAndBanqueApurements(banque, StatusTransaction.APUREMENT_REJETER, max, page);
+        }
+//        else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
+        else {
+//                ON GERE LE PROFIL AGENCE
+            apurements = apurementService.getAllByBAnqueAndStatusAndUser(banque, loggedUser, StatusTransaction.APUREMENT_REJETER, max, page);
+        }
+
+        apurements.forEach(apurement -> {
+            apurement.setJoursRestant(JoursRestant.getJoursRestant(apurement));
+        });
+
+        model.addAttribute("apurements", apurements.getContent());
+        model.addAttribute("currentPage", apurements.getNumber() + 1);
+        model.addAttribute("banque", banque);
+        model.addAttribute("nbPages", apurements.getTotalPages());
+        int nbPages = apurements.getTotalPages();
+        if (nbPages > 1) {
+            int[] pages = new int[nbPages];
+            for (int i = 0; i < nbPages; i++) {
+                pages[i] = i + 1;
+                System.out.println(i);
+            }
+            model.addAttribute("pages", pages);
+        }
+
+        ImportFile importFile = new ImportFile();
+        importFile.setBanque(banque);
+
+        model.addAttribute("importFile", importFile);
+        model.addAttribute("dash", "apurments");
+        String uri = "/apurments-rejetes/page={page}";
+        model.addAttribute("uri", uri);
+        model.addAttribute("das", "apr");
         model.addAttribute("exportUri", "/" + banque.getId() + "-export/apurments?apured=false");
         model.addAttribute("searchUri", "/search-apurements");
 
@@ -153,7 +286,7 @@ public class ApurementController {
 
         model.addAttribute("importFile", importFile);
         model.addAttribute("dash", "apurments");
-        String uri = "/apurments/page={page}";
+        String uri = "/apurments-treasury-approved/page={page}";
         model.addAttribute("uri", uri);
         model.addAttribute("das", "apwd");
         model.addAttribute("exportUri", "/" + banque.getId() + "-export/apurments?apured=false");
@@ -210,7 +343,7 @@ public class ApurementController {
 
         model.addAttribute("importFile", importFile);
         model.addAttribute("dash", "apurments");
-        String uri = "/apurments/page={page}";
+        String uri = "/transactions-approuvees/page={page}";
         model.addAttribute("uri", uri);
         model.addAttribute("das", "apw");
         model.addAttribute("exportUri", "/" + banque.getId() + "-export/apurments?apured=false");
@@ -319,7 +452,7 @@ public class ApurementController {
 
         model.addAttribute("importFile", importFile);
         model.addAttribute("dash", "apurments");
-        String uri = "/apurments/page={page}";
+        String uri = "/apurments-expired/page={page}";
         model.addAttribute("uri", uri);
         model.addAttribute("das", "ape");
         model.addAttribute("exportUri", "/" + banque.getId() + "-export/apurments?expired=true");

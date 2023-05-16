@@ -32,4 +32,9 @@ public interface ClientRepository extends CrudRepository<Client, Long> {
 
     List<Client> findAll(Specification<Client> spec);
 
+    List<Client> findByUser_BanqueLikeOrTelephoneContainingOrDenominationContainingOrReferenceContaining(
+            Banque banque, String telephone, String denomination, String reference);
+
+
+
 }

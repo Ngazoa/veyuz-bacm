@@ -203,7 +203,7 @@ public class Transaction {
     private Date dateValeur;
 
     private boolean renvoye;
-
+    private boolean cycleNormalAcheve;
 
     @ManyToOne
     @JoinColumn(name = "app_user_id", referencedColumnName = "id")

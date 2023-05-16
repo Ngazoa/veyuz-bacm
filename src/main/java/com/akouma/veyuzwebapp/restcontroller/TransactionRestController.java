@@ -255,7 +255,6 @@ public class TransactionRestController {
                     anyMatch(a -> a.getAuthority().equals("ROLE_MAKER_TO"))
                     && transaction.getStatut() == StatusTransaction.CHECKED) {
                 transaction.setRenvoye(false);
-                System.out.println("******* Trae M"+transaction.getStatut());
 
                 transaction.setStatut(StatusTransaction.TRANSMIS_MAKER_2);
                 transactionService.saveTransaction(transaction);
@@ -276,7 +275,6 @@ public class TransactionRestController {
                     anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO"))
                     && transaction.getStatut() == StatusTransaction.TRANSMIS_MAKER_2) {
                 transaction.setRenvoye(false);
-                System.out.println("******* Treasury C"+transaction.getStatut());
 
                 if (transaction.getTypeFinancement() != null) {
                     transaction.setStatut(StatusTransaction.TRANSMIS_TRESORERIE);

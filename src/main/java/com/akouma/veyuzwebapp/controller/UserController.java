@@ -5,10 +5,7 @@ import com.akouma.veyuzwebapp.form.UserRoleForm;
 import com.akouma.veyuzwebapp.model.AppRole;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
-import com.akouma.veyuzwebapp.service.AppRoleService;
-import com.akouma.veyuzwebapp.service.BanqueService;
-import com.akouma.veyuzwebapp.service.UserRoleService;
-import com.akouma.veyuzwebapp.service.UserService;
+import com.akouma.veyuzwebapp.service.*;
 import com.akouma.veyuzwebapp.utils.CheckSession;
 import com.akouma.veyuzwebapp.validator.AppUserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +43,8 @@ public class UserController {
 
     @Autowired
     HttpSession session;
+    @Autowired
+    private MailService mailService;
 
     public UserController(HttpSession session) {
         this.session = session;
@@ -117,6 +116,10 @@ public class UserController {
         AppUser newAppUser = null;
         try {
             newAppUser = userService.saveUser(userForm, request);
+            mailService.sendSimpleMessage(userForm.getEmail(),
+                    "Votre compte a ete creer avec succes dans Veyuz plateforme ",
+                    " Votre Mot de passe  est : " + userForm.getPassword()+" Veuillez le modifier lors de votre connexion");
+
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Error: " + e.getMessage());
             return "users";

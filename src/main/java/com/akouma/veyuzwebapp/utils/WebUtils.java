@@ -36,14 +36,6 @@ public class WebUtils {
 
         }
       }
-      public static void main(String[]a){
-
-
-
-          System.out.println("--- "+new ReferenceGenerator().generateReference());
-
-
-          }
 
     ;
 
