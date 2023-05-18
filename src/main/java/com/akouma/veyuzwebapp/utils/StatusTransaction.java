@@ -58,8 +58,8 @@ public class StatusTransaction {
 
     public static final String[] statuts = {WAITING_STR, MACKED_STR, CHECKED_STR, VALIDATED_STR,REJECTED_STR};
 
-    public static final int DELAY_TRANSACTION_IMPORTATION_BIENS = 30;
-    public static final int DELAY_TRANSACTION_IMPORTATION_SERVICES = 90;
+    public static final int DELAY_TRANSACTION_IMPORTATION_BIENS = 90;
+    public static final int DELAY_TRANSACTION_IMPORTATION_SERVICES = 30;
 
     public static final int DEFAULT_DELAY_TRANSACTION = 20;
 

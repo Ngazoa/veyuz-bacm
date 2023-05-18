@@ -50,16 +50,16 @@
                                 <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
                                         type="button"></button>
                                 <div class="alert-message">
-                                    <strong>Accès refusé... Veuillez reessayer</strong>
+                                    <strong>Accès refusé... </strong>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body" th:if="${flashMessage!=null}">
-                            <div class="alert alert-danger alert-dismissible" role="alert">
+                            <div class="alert alert-success alert-dismissible" role="alert">
                                 <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
                                         type="button"></button>
                                 <div class="alert-message">
-                                    <strong th:text="${flashMessage}">Accès refusé... Veuillez reessayer</strong>
+                                    <strong th:text="${flashMessage}">Accès refusé...</strong>
                                 </div>
                             </div>
                         </div>

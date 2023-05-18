@@ -171,14 +171,14 @@
 
                             <table class="table mb-0">
                                 <tbody>
-                                    <tr th:each="d: ${devises}">
-                                        <td>
-                                            <i class="fas fa-circle fa-fw" th:classappend="${d.textColor}"></i>
-                                            <span th:text="${d.devise.code}"></span>
-                                            <span class="badge badge-success-light" th:text="${d.percentStr}"></span>
-                                        </td>
-                                        <td class="text-end" th:text="${d.nbTransactions}">4306</td>
-                                    </tr>
+                                <tr th:each="d: ${devises}">
+                                    <td>
+                                        <i class="fas fa-circle fa-fw" th:classappend="${d.textColor}"></i>
+                                        <span th:text="${d.devise.code}"></span>
+                                        <span class="badge badge-success-light" th:text="${d.percentStr}"></span>
+                                    </td>
+                                    <td class="text-end" th:text="${d.nbTransactions}">4306</td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -201,6 +201,83 @@
                             </tr>
                             </thead>
                             <tbody>
+                            <tr th:each="t : ${lastTransactions}">
+                                <th:block th:if="t.AppUser!=null">
+                                    <div th:if="${#authentication.getPrincipal().getId()==t.AppUser.id and #authorization.expression('hasRole(''ROLE_AGENCE'')')}">
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <div class="bg-light rounded-2">
+                                                        <img width="60" height="60" th:if="${t.client.user.avatar != null}" class="p-2" th:src="@{/upload/avatar/{img}(img=${t.client.user.avatar})}">
+                                                        <img width="60" height="60" th:unless="${t.client.user.avatar != null}" class="p-2" th:src="@{/img/avatars/avatar.png}">
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong th:text="${t.client.denomination}"></strong>
+                                                    <div class="text-muted" th:text="${t.motif}"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <strong class="montant_format"  th:text="${t.montant}"></strong>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column w-100">
+                                                <span th:if="${t.statut == 0}" class="badge bg-primary">En attente</span>
+                                                <span th:if="${t.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i> Traitement TRADE</span>
+                                                <span th:if="${t.statut == 2}" class="badge bg-secondary"><i class="fas fa-folder-open"></i> Validation TRADE</span>
+                                                <span th:if="${t.statut == 7}" class="badge bg-info"><i class="fas fa-folder-open"></i> Traitement TOPS</span>
+                                                <span th:if="${t.statut == 8}" class="badge bg-secondary"><i class="fas fa-folder-open"></i> Validation TOPS</span>
+                                                <span th:if="${t.statut == 9}" class="badge bg-warning"><i class="fas fa-folder-open"></i> Trésorerie</span>
+                                                <span th:if="${t.statut == 2}" class="badge bg-info">Approuvée</span>
+                                                <span th:if="${t.statut == 3}" class="badge bg-success"><i class="fas fa-check"></i> Validée</span>
+                                                <span th:if="${t.statut == -1}" class="badge bg-danger"><i class="fas fa-times"></i> Rejetée</span>
+                                                <span th:if="${t.statut == 4 or t.statut == 5}" class="badge bg-warning"><i class="fas fa-undo"></i> Renvoyée</span>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <a th:href="@{/transaction-{id}/details(id=${t.id})}" class="btn btn-light">View</a>
+                                        </td>
+                                    </div>
+                                    <div th:if="${#authentication.getPrincipal().getId()!=t.AppUser.id
+                                    and #authorization.expression('!hasRole(''ROLE_AGENCE'')')}">
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <div class="bg-light rounded-2">
+                                                        <img width="60" height="60" th:if="${t.client.user.avatar != null}" class="p-2" th:src="@{/upload/avatar/{img}(img=${t.client.user.avatar})}">
+                                                        <img width="60" height="60" th:unless="${t.client.user.avatar != null}" class="p-2" th:src="@{/img/avatars/avatar.png}">
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong th:text="${t.client.denomination}"></strong>
+                                                    <div class="text-muted" th:text="${t.motif}"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <strong class="montant_format"  th:text="${t.montant}"></strong>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column w-100">
+                                                <span th:if="${t.statut == 0}" class="badge bg-primary">En attente</span>
+                                                <span th:if="${t.statut == 1}" class="badge bg-info"><i class="fas fa-folder-open"></i> Traitement TRADE</span>
+                                                <span th:if="${t.statut == 2}" class="badge bg-secondary"><i class="fas fa-folder-open"></i> Validation TRADE</span>
+                                                <span th:if="${t.statut == 7}" class="badge bg-info"><i class="fas fa-folder-open"></i> Traitement TOPS</span>
+                                                <span th:if="${t.statut == 8}" class="badge bg-secondary"><i class="fas fa-folder-open"></i> Validation TOPS</span>
+                                                <span th:if="${t.statut == 9}" class="badge bg-warning"><i class="fas fa-folder-open"></i> Trésorerie</span>
+                                                <span th:if="${t.statut == 2}" class="badge bg-info">Approuvée</span>
+                                                <span th:if="${t.statut == 3}" class="badge bg-success"><i class="fas fa-check"></i> Validée</span>
+                                                <span th:if="${t.statut == -1}" class="badge bg-danger"><i class="fas fa-times"></i> Rejetée</span>
+                                                <span th:if="${t.statut == 4 or t.statut == 5}" class="badge bg-warning"><i class="fas fa-undo"></i> Renvoyée</span>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <a th:href="@{/transaction-{id}/details(id=${t.id})}" class="btn btn-light">View</a>
+                                        </td>
+                                    </div>
+                                </th:block>
+                            </tr>
 
                             </tbody>
                         </table>
@@ -227,17 +304,17 @@
                 </div>
             </div>
             <div class="col-12 col-lg-8 col-xxl-9 d-flex">
-                    <div class="card flex-fill">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Les 10 derniers jours</h5>
-                        </div>
-                        <div class="card-body d-flex w-100" id="bar-chart" th:data-uri="${barChartUri}">
-                            <div class="align-self-center chart chart-lg">
-                                <canvas id="chartjs-dashboard-bar"></canvas>
-                            </div>
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Les 10 derniers jours</h5>
+                    </div>
+                    <div class="card-body d-flex w-100" id="bar-chart" th:data-uri="${barChartUri}">
+                        <div class="align-self-center chart chart-lg">
+                            <canvas id="chartjs-dashboard-bar"></canvas>
                         </div>
                     </div>
                 </div>
+            </div>
 
         </div>
 

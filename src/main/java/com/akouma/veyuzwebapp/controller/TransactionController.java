@@ -1033,7 +1033,12 @@ public class TransactionController {
             }
             Date dateOperationTransaction = new Date();
 
-            transaction.setReference(new ReferenceGenerator().generateReference());
+            String ref=new ReferenceGenerator().generateReference();
+            while(transactionService.checkReference(ref)){
+                ref=new ReferenceGenerator().generateReference();
+            }
+
+            transaction.setReference(ref);
             transaction.setDateTransaction(dateOperationTransaction);
             transaction.setStatut(StatusTransaction.VALIDATED);
             transaction.setTaux(taux);
@@ -1059,6 +1064,7 @@ public class TransactionController {
             notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
             notificationService.save(notification);
             transaction.setDelay(calendar.getTime());
+            transaction.setCycleNormalAcheve(true);
             transactionService.saveTransaction(transaction);
             if (transaction.getTypeDeTransaction().isImport()) {
                 // Je deplace la transaction en question dans la table apurement

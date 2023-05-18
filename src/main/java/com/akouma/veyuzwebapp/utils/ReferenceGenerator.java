@@ -21,9 +21,19 @@ public class ReferenceGenerator {
     }
 
     private static String generateRandomNumber() {
+        // Get the current instance date
         Date date = new Date();
-        int number = dateToInt(date);
-        return String.format("%04d", number).substring(3);
+
+        // Set the seed of the random number generator to the milliseconds of the current date
+        Random random = new Random(date.getTime());
+
+        // Generate a random number
+        int randomNumber = random.nextInt(10000);
+
+        // Get the first 4 digits of the random number
+        String firstFourDigits = String.format("%04d", randomNumber).substring(0, 4);
+
+        return firstFourDigits;
     }
 
     public static int dateToInt(Date date) {
@@ -36,7 +46,6 @@ public class ReferenceGenerator {
         LocalDate date = LocalDate.now();
         int year = date.getYear();
         String year2 = String.valueOf(year).substring(2);
-        String prefix = generateRandomPrefix();
         String number = generateRandomNumber();
         return "TT" + number + "" + year2 + "BA";
     }

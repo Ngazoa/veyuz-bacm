@@ -205,7 +205,7 @@
         </div>
         <div class="card-body">
             <div>
-                <table class="table table-striped table-responsive" style="width:100%">
+                <table  class="table table-striped table-responsive" style="width:100%">
                     <thead>
                     <tr>
                         <th th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
@@ -250,22 +250,32 @@
                         </td>
 
                         <td>
-                            <a th:if="${!ap.isApured and (ap.status != 0 and ap.status != -500 and ap.status != -1000) and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
-                                <i data-feather="eye"></i>
-                            </a>
-                            <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-transmettre-pour-apurement-' + ${ap.id}">
-                                <i class="fas fa-paper-plane"></i>
-                            </a>
+                            <div class="d-inline">
+                                <a th:if="${!ap.isApured and (ap.status != 0 and ap.status != -500 and ap.status != -1000) and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
+                                    <i data-feather="eye"></i>
+                                </a>
+                            </div>
+                            <div class="d-inline">
+                                <a th:if="${ap.status == 0 and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')) }" th:data-ref="${ap.id}" href="" class="btn btn-info btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-transmettre-pour-apurement-' + ${ap.id}">
+                                    <i class="fas fa-paper-plane"></i>
+                                </a>
+                            </div>
                             <th:bock th:if="${!ap.isApured and (#authorization.expression('hasRole(''ROLE_TRADE_DESK'')') or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}">
-                                <a th:if="${ap.status != -500 and ap.status != -1000}" href="" class="btn btn-warning btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-rejeted-apurement-' + ${ap.id}" title="Rejeter">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                                <a th:if="${ap.status != -1000}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="tooltip" title="Annuler">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                                <a th:if="${ap.status == -500}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-restaurer-apurement/' + ${ap.id} + '/restaurer'" class="btn btn-warning btn-sm restaurer-apurement-btn" data-bs-toggle="toltip" title="Restaurer">
-                                    <i class="fa fa-spinner" aria-hidden="true"></i>
-                                </a>
+                                <div class="d-inline">
+                                    <a th:if="${ap.status != -500 and ap.status != -1000}" href="" class="btn btn-warning btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-rejeted-apurement-' + ${ap.id}" title="Rejeter">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                </div>
+                                <div class="d-inline">
+                                    <a th:if="${ap.status != -1000}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="tooltip" title="Annuler">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                <div class="d-inline">
+                                    <a th:if="${ap.status == -500}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-restaurer-apurement/' + ${ap.id} + '/restaurer'" class="btn btn-warning btn-sm restaurer-apurement-btn" data-bs-toggle="toltip" title="Restaurer">
+                                        <i class="fa fa-spinner" aria-hidden="true"></i>
+                                    </a>
+                                </div>
                             </th:bock>
                         </td>
                     </tr>
@@ -337,7 +347,7 @@
                                     <p>Cette transaction a été validée par le trésorier ! Entrer la date effective de débit et trasmettez à l'agence afin qui'il procède à l'upload des fichiers d'apurement</p>
                                 </div>
                                 <div class="form-group">
-                                    <input type="date" required class="form-control" name="dateeffctive" id="dateeffective">
+                                    <input type="date" required class="form-control" name="dateeffctive" id="dateeffective" />
                                 </div>
                                 <div class="loader"></div>
                             </div>
@@ -361,7 +371,7 @@
                                     <p>Cette transaction a été validée par le trésorier ! Entrer la date effective de débit et trasmettez à l'agence afin qui'il procède à l'upload des fichiers d'apurement</p>
                                 </div>
                                 <div class="form-group">
-                                    <input type="date" required class="form-control dateeffective" name="dateeffctive">
+                                    <input type="date" required class="form-control dateeffective" name="dateeffctive" />
                                 </div>
                                 <div class="loader"></div>
                             </div>

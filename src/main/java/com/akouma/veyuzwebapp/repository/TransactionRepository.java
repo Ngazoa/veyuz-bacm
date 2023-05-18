@@ -148,4 +148,6 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     boolean existsById(Long aLong);
 
     Page<Transaction> findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(Banque banque, AppUser appuser, int statut, Pageable pageable);
+
+    Transaction findByReference(String ref);
 }

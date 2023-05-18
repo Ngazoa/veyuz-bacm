@@ -42,8 +42,7 @@ public class MainController {
     }
 
     @GetMapping("/")
-    public String welcomePage(
-            Model model, Principal principal) {
+    public String welcomePage(Model model, Principal principal) {
         List<Banque> banquesList = null;
         String message = null;
         if (principal != null) {
@@ -100,20 +99,18 @@ public class MainController {
                 String pass = PasswordGenerator.generatePassword();
 
                 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-                String encrytedPassword = passwordEncoder.encode(pass);
-                appUser.setPassword(encrytedPassword);
+                String encryptedPassword = passwordEncoder.encode(pass);
+                appUser.setPassword(encryptedPassword);
                 userService.saveUser(appUser);
-                mailService.sendSimpleMessage(email,
-                        "Reinitialisation pass ",
-                        " Votre Mot de passe a ete bien reinitialise et le nouveau est : " + pass);
-                model.addAttribute("flashMessage", "Mot de passe reinitialise avec succes . veuillez" +
-                        "vous connecter a otre boite mail pour vous connecter");
+
+                mailService.sendSimpleMessage(email, "Reinitialisation pass ", " Votre Mot de passe a ete bien reinitialise et le nouveau est : " + pass);
+                model.addAttribute("flashMessage", "Mot de passe reinitialise avec succes . Veuillez " + "vous connecter a votre boite mail et recuperer le nouveau pass pour vous connecter");
 
                 return "loginPage";
             }
 
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Erreur survenu , impossible de continuer pour l' instant");
+            model.addAttribute("errorMessage", "Erreur survenue , impossible de continuer pour l' instant");
         }
 
         return "reset-password";
@@ -197,10 +194,7 @@ public class MainController {
     }
 
     @PostMapping("/Editpassword")
-    public String registerNewPassewor(Model model, Principal principal,
-                                      @RequestParam("inputPasswordCurrent") String oldpassword,
-                                      @RequestParam("inputPasswordNew") String newPaasowrd,
-                                      @RequestParam("inputPasswordNew2") String confirmPassword) {
+    public String registerNewPassewor(Model model, Principal principal, @RequestParam("inputPasswordCurrent") String oldpassword, @RequestParam("inputPasswordNew") String newPaasowrd, @RequestParam("inputPasswordNew2") String confirmPassword) {
         AppUser useConnecte = userService.getLoggedUser(principal);
 
         model.addAttribute("dash", "params");

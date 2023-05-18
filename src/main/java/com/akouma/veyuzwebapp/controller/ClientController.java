@@ -234,7 +234,6 @@ public class ClientController {
             BindingResult result,
             Model model, Principal principal,
             RedirectAttributes redirectAttributes, HttpServletRequest request) {
-        System.out.println("====><<<<13");
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {

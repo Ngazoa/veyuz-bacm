@@ -221,12 +221,12 @@
                 </ul>
             </li>
 
-            <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
-                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurement')} ? active : ''">
-                <a class="sidebar-link" th:href="@{/appurements}">
-                    <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Apurement</span>
-                </a>
-            </li>
+<!--            <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')-->
+<!--                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurement')} ? active : ''">-->
+<!--                <a class="sidebar-link" th:href="@{/appurements}">-->
+<!--                    <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Apurement</span>-->
+<!--                </a>-->
+<!--            </li>-->
 
             <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
@@ -264,7 +264,7 @@
 
             <li class="sibebar-item" th:classappend="${#strings.equals(dash, 'beneficiaires')} ? active : ''">
                 <a class="sidebar-link" th:href="@{/beneficiaires}">
-                    <i class="align-middle" data-feather="corner-right-down"></i> <span class="align-middle">Beneficiaires</span>
+                    <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Beneficiaires</span>
                 </a>
             </li>
 

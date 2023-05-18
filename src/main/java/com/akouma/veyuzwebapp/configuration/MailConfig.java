@@ -13,6 +13,7 @@ public class MailConfig {
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+       // mailSender.setHost("veyuzweb.azurewebsites.net");
         mailSender.setHost("localhost");
         mailSender.setPort(587);
 
