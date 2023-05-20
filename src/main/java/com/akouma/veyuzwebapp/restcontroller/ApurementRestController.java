@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -27,9 +26,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.poi.ss.usermodel.CellType._NONE;
-import static org.apache.poi.xslf.usermodel.SlideLayout.BLANK;
 
 @RestController
 public class ApurementRestController {
@@ -259,10 +255,11 @@ public class ApurementRestController {
      */
     @GetMapping("/rest-apurements/{id}/apurer")
     public ResponseEntity<?> apurer(@PathVariable("id")Apurement apurement, Authentication authentication) {
+        System.out.println("\n\n\n==============================\nOn veut apurer\n=======================================");
         HashMap<String, Object> response = new HashMap<>();
 
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
-                authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))) {
+        if(!(authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
+                authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN")))) {
             response.put("isOk", false);
             response.put("message", "Vous n'avez pas les authorisations nécessaires pour effectuer cette opération");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -377,12 +374,20 @@ public class ApurementRestController {
         }
         boolean isChanged = false;
 
-        if (date != null) {
+        Transaction transaction = apurement.getTransaction();
+
+        if (date != null && transaction != null && transaction.getDomiciliation() != null) {
+            // On commence par nous rassurer que la domiciliation a un montant suffisant
+            float newAmontDomiciliation = transaction.getDomiciliation().getMontantRestant() - transaction.getMontant();
+            if (newAmontDomiciliation < 0) {
+                hashMap.put("errorMessage", "Opération impossible le montant de la domiciliation est insuffisant");
+                hashMap.put("isChanged", isChanged);
+                return new ResponseEntity<>(hashMap, HttpStatus.OK);
+            }
             // on determine la date d'expiration
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
-            Transaction transaction = apurement.getTransaction();
-            if (transaction != null && transaction.getTypeDeTransaction().getType() != null) {
+            if (transaction.getTypeDeTransaction().getType() != null) {
                 if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
                     calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
                 } else if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
@@ -394,6 +399,10 @@ public class ApurementRestController {
                 calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
             }
 
+            // On décrémente la domiciliation
+            transaction.getDomiciliation().setMontantRestant(newAmontDomiciliation);
+
+            // On met à jour l'apurement
             apurement.setDateExpiration(calendar.getTime());
             apurement.setStatus(StatusTransaction.APUREMENT_WAITING_FILES);
             apurement.setDateEffective(date);
@@ -401,6 +410,9 @@ public class ApurementRestController {
             isChanged = true;
             hashMap.put("dateText", new SimpleDateFormat("dd-MM-yyyy").format(date));
             hashMap.put("dataValue", new SimpleDateFormat("yyyy-MM-dd").format(date));
+        }
+        else if (errorMessage == null && transaction != null && transaction.getDomiciliation() == null) {
+            errorMessage = "Action imposible! Cette transaction n'utilise aucune domiciliation";
         }
 
         hashMap.put("errorMessage", errorMessage);
@@ -455,7 +467,7 @@ public class ApurementRestController {
         System.out.println("=================================================================");
 
         apurement.setStatus(StatusTransaction.APUREMENT_REJETER);
-        apurement.setMofifRejet(motifRejet);
+        apurement.setMotifRejet(motifRejet);
 
         apurementService.saveApurement(apurement);
 

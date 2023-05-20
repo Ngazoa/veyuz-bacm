@@ -47,7 +47,7 @@ public class ApurementController {
         this.session = session;
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @GetMapping({"/apurments", "/apurments/page={page}"})
     public String getApurements(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
 
@@ -114,7 +114,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-annules", "/apurments-annules/page={page}"})
     public String getApurementsAnnules(@RequestParam(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
 
@@ -178,7 +178,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK", "ROLE_AGENCE", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-rejetes", "/apurments-rejetes/page={page}"})
     public String getApurementsRejetes(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
 
@@ -242,7 +242,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-treasury-approved", "/apurments-apurments-treasury-approved/page={page}"})
     public String getTransactionsValideesParLaTresorerie(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal) {
 
@@ -295,7 +295,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions-approuvees", "/transactions-approuvees/page={page}"})
     public String getTransactionsValidees(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal) {
 
@@ -352,7 +352,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-all", "/apurments-all/page={page}"})
     public String getAllApurements(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal) {
 
@@ -409,7 +409,8 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @GetMapping({"apurments-expired", "apurments-expired/page={page}"})
+    @Secured({"ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
+    @GetMapping({"apurments-expired", "apurments-expired/page={page}",})
     public String getAllExpiredApurements(Model model, Principal principal, @PathVariable(value = "page", required = false) Integer page) {
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
@@ -461,7 +462,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments/{referenceClient}", "/apurments/{referenceClient}/page={page}"})
     public String getCustomerApurements(@PathVariable String referenceClient, @PathVariable("page") Integer page, Principal principal, Model model) {
 
@@ -509,7 +510,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
+    @Secured({"ROLE_ADMIN", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-all/{referenceClient}", "/apurments-all/{referenceClient}/page={page}"})
     public String getCustomerAllApurements(@PathVariable String referenceClient, @PathVariable("page") Integer page, Principal principal, Model model) {
 
@@ -556,6 +557,7 @@ public class ApurementController {
         return "apurements/index";
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping("/search-apurements")
     public String rechercherApurements(@RequestParam String reference, Principal principal, Model model) {
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER

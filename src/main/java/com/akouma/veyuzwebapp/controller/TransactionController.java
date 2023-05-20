@@ -65,11 +65,7 @@ public class TransactionController {
     @Autowired
     private TypeFinancementRepository typeFinancementRepository;
     @Autowired
-    private Paginator paginator;
-    @Autowired
     private TransactionValidator transactionValidator;
-    @Autowired
-    private CryptoUtils cryptoUtils;
     @Autowired
     private ClientService clientService;
 
@@ -90,7 +86,7 @@ public class TransactionController {
         }
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_ADMIN", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions", "/transactions/page={page}"})
     public String getTransactions(
             @PathVariable(value = "page", required = false) Integer page,
@@ -134,7 +130,7 @@ public class TransactionController {
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions/{client_id}-client", "/transactions/{client_id}-client/page={page}"})
     public String getTransactionsClient(
             @PathVariable("client_id") String clt,
@@ -169,7 +165,7 @@ public class TransactionController {
         return "transactionslist";
     }
 
-
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions/{status}/page={page}", "/transactions/{status}"})
     public String getTransactionsByStatus(
             @PathVariable("status") String status,
@@ -221,7 +217,7 @@ public class TransactionController {
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @PostMapping(value = "/search-transactions-results", name = "pst")
     public String getPeriodiqueTransactions(
             @ModelAttribute SearchTransactionForm searchTransactionForm,
@@ -444,6 +440,7 @@ public class TransactionController {
      * @param principal
      * @return
      */
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @PostMapping("/save-transaction")
     public ModelAndView saveTransaction(
             @ModelAttribute @Validated TransactionForm transactionForm,
@@ -484,10 +481,10 @@ public class TransactionController {
         }
 
         transaction.setReference(transactionForm.getReference());
-        if (transactionForm.getDomiciliation() != null) {
-            float reste = transactionForm.getDomiciliation().getMontantRestant() - transactionForm.getMontant();
-            transactionForm.getDomiciliation().setMontantRestant(reste);
-        }
+        // if (transactionForm.getDomiciliation() != null) {
+        //     float reste = transactionForm.getDomiciliation().getMontantRestant() - transactionForm.getMontant();
+        //     transactionForm.getDomiciliation().setMontantRestant(reste);
+        // }
         transaction.setStatut(StatusTransaction.WAITING);
         transaction.setBanque(transactionForm.getBanque());
         transaction.setClient(transactionForm.getClient());

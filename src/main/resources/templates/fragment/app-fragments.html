@@ -231,7 +231,7 @@
             <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
                 <a data-bs-target="#apurments" data-bs-toggle="collapse" class="sidebar-link collapsed">
-                    <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Apurement 2.0</span>
+                    <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Apurement</span>
                 </a>
                 <ul id="apurments" class="sidebar-dropdown list-unstyled collapse "
                     th:classappend="${#strings.equals(dash, 'apurments')} ? show : ''" data-bs-parent="#sidebar">
@@ -252,7 +252,7 @@
                     </li>
                     <li class="sidebar-item" th:classappend="${#strings.equals(das, 'apan')} ? active : ''">
                         <a class="sidebar-link" th:href="@{/apurments-annules}">Annulés</a>
-                    </li>
+                    </li>.
                 </ul>
             </li>
 
