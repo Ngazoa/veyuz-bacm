@@ -143,6 +143,7 @@ public class UserService implements UserDetailsService {
         appUser.setGender(userForm.getGender());
 
         appUser.setBanque(userForm.getBanque());
+        appUser.setAgence(userForm.getAgence());
 
         System.out.println("C'est Fait !");
         return saveUser(appUser);

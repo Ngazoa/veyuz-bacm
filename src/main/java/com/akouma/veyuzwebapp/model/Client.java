@@ -133,6 +133,10 @@ public class Client {
     @JsonManagedReference
     private AppUser user;
 
+    @JoinColumn(name = "agence_id", referencedColumnName = "id")
+    @ManyToOne
+    private Agence agence;
+
     private String kyc;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -171,9 +175,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return "" +
-                " " + user.getNom() +" "+user.getPrenom()+
-                " denomination: '" + denomination + '\'' +
+        return " denomination: '" + denomination + '\'' +
                 " reference: '" + reference + '\'';
     }
 }

@@ -164,12 +164,12 @@ public class TransactionRestController {
                     transaction.setStatut(StatusTransaction.MACKED);
                     transactionService.saveTransaction(transaction);
                     this.saveTransactionAndAction(transaction, appUser, status, null);
-                    Notification notification = new Notification();
-                    notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
-                    notification.setRead(false);
-                    notification.setUtilisateur(transaction.getClient().getUser());
-                    notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-                    notificationService.save(notification);
+//                    Notification notification = new Notification();
+//                    notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
+//                    notification.setRead(false);
+//                    notification.setUtilisateur(transaction.getClient().getUser());
+//                    notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+//                    notificationService.save(notification);
                     isChange = true;
                     message = "L'operation a ete prise en compte ! la transaction a ete transmise pour le Trade desk Maker .";
 
@@ -226,12 +226,12 @@ public class TransactionRestController {
                 transaction.setStatut(StatusTransaction.MACKED);
                 transactionService.saveTransaction(transaction);
                 this.saveTransactionAndAction(transaction, appUser, status, "La transaction a ete transmise pour le Trade desk Maker");
-                Notification notification = new Notification();
-                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
-                notification.setRead(false);
-                notification.setUtilisateur(transaction.getClient().getUser());
-                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-                notificationService.save(notification);
+//                Notification notification = new Notification();
+//                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
+//                notification.setRead(false);
+//                notification.setUtilisateur(transaction.getClient().getUser());
+//                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+//                notificationService.save(notification);
                 isChange = true;
                 message = "L'operation a ete prise en compte ! la transaction a ete transmise pour le Trade desk Maker .";
 
@@ -242,12 +242,12 @@ public class TransactionRestController {
                 transaction.setStatut(StatusTransaction.CHECKED);
                 transactionService.saveTransaction(transaction);
                 this.saveTransactionAndAction(transaction, appUser, status, "La transaction a ete transmise pour le Trade desk Maker");
-                Notification notification = new Notification();
-                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
-                notification.setRead(false);
-                notification.setUtilisateur(transaction.getClient().getUser());
-                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-                notificationService.save(notification);
+//                Notification notification = new Notification();
+//                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
+//                notification.setRead(false);
+//                notification.setUtilisateur(transaction.getClient().getUser());
+//                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+//                notificationService.save(notification);
                 isChange = true;
                 message = "L'operation a ete prise en compte ! la transaction a ete transmise pour le Trade desk Maker .";
 
@@ -373,12 +373,12 @@ public class TransactionRestController {
                         this.saveTransactionAndAction(transaction, appUser, status, commentaire);
                         isChange = true;
                         message = "L'operation a ete prise en compte ! la transaction a été renvoyée au client pour complement.";
-                        Notification notification = new Notification();
-                        notification.setMessage("Une de vos transactions  vous a été renvoyée pour complément ! Voir l'historique en cliquant sur le lien precedent pour connaitre les motifs de ce renvoie.");
-                        notification.setRead(false);
-                        notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-                        notification.setUtilisateur(transaction.getClient().getUser());
-                        notificationService.save(notification);
+//                        Notification notification = new Notification();
+//                        notification.setMessage("Une de vos transactions  vous a été renvoyée pour complément ! Voir l'historique en cliquant sur le lien precedent pour connaitre les motifs de ce renvoie.");
+//                        notification.setRead(false);
+//                        notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+//                        notification.setUtilisateur(transaction.getClient().getUser());
+//                        notificationService.save(notification);
                     }
                 }
             }
@@ -492,12 +492,12 @@ public class TransactionRestController {
                         this.saveTransactionAndAction(transaction, appUser, status, null);
                         isChange = true;
                         message = "L'operation a ete prise en compte ! la transaction a été approuvée et validée.";
-                        Notification notification = new Notification();
-                        notification.setMessage("la transaction a été validée ! Maintenant encours d'apurement");
-                        notification.setRead(false);
-                        notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-                        notification.setUtilisateur(transaction.getClient().getUser());
-                        notificationService.save(notification);
+//                        Notification notification = new Notification();
+//                        notification.setMessage("la transaction a été validée ! Maintenant encours d'apurement");
+//                        notification.setRead(false);
+//                        notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+//                        notification.setUtilisateur(transaction.getClient().getUser());
+//                        notificationService.save(notification);
                         if (transaction.getTypeDeTransaction().isImport()) {
                             // Je deplace la transaction en question dans la table apurement
                             removeFromApurement(transaction);

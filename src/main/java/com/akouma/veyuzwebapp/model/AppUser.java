@@ -50,6 +50,10 @@ public class AppUser {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
+    @JoinColumn(name = "agence_id", referencedColumnName = "id")
+    @ManyToOne
+    private Agence agence;
+
     private String password;
 
     private String avatar;

@@ -13,8 +13,7 @@
             <th>Denomination</th>
             <th>Type</th>
             <th>Telephone</th>
-            <th>Email</th>
-            <th>Statut</th>
+            <th>Agence</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -24,22 +23,25 @@
             <td th:utext="${b.Denomination}"></td>
             <td th:utext="${b.typeClient}"></td>
             <td th:text="${b.telephone}"></td>
-            <td th:text="${b.user.email}"></td>
-            <td th:text="${b.user.isEnable}"></td>
             <td>
-                <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
-                    <a th:href="@{/clients-{id}/manage(id=${b.id})}">
-                        <span th:if="${b.user.isEnable}" class="badge bg-success">active</span>
-                        <span th:unless="${b.user.isEnable}" class="badge bg-danger">block</span>
-                    </a>
-                </th:block>
-                <th:block th:if="${ #authorization.expression('hasRole(''ROLE_AGENCE'')')}">
-                    <span th:if="${b.user.isEnable}" class="badge bg-success">active</span>
-                    <span th:unless="${b.user.isEnable}" class="badge bg-danger">block</span>
-                </th:block>
+                <span th:if="${b.agence != null}"  th:text="${b.agence.label}"></span>
+                <span th:if="${b.agence == null}">non définie</span>
             </td>
+<!--            <td th:text="${b.user.isEnable}"></td>-->
+<!--            <td>-->
+<!--                <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')-->
+<!--            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')-->
+<!--             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')}">-->
+<!--                    <a th:href="@{/clients-{id}/manage(id=${b.id})}">-->
+<!--                        <span th:if="${b.user.isEnable}" class="badge bg-success">active</span>-->
+<!--                        <span th:unless="${b.user.isEnable}" class="badge bg-danger">block</span>-->
+<!--                    </a>-->
+<!--                </th:block>-->
+<!--                <th:block th:if="${ #authorization.expression('hasRole(''ROLE_AGENCE'')')}">-->
+<!--                    <span th:if="${b.user.isEnable}" class="badge bg-success">active</span>-->
+<!--                    <span th:unless="${b.user.isEnable}" class="badge bg-danger">block</span>-->
+<!--                </th:block>-->
+<!--            </td>-->
             <td>
                 <div class="btn-group btn-group-sm">
                     <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -140,10 +142,17 @@
                                     <span th:if="${#fields.hasErrors('kycFile')}" class="text-danger">Ce champs est obligatoire</span>
                                 </div>
 
-                                <div class="mb-3 col-md-4">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" th:field="*{appUser.email}" placeholder="Email">
-                                    <span th:if="${#fields.hasErrors('appUser.email')}" class="text-danger">Cet email est utilisé ou n'est pas valide</span>
+<!--                                <div class="mb-3 col-md-4">-->
+<!--                                    <label class="form-label">Email</label>-->
+<!--                                    <input type="email" class="form-control" th:field="*{appUser.email}" placeholder="Email">-->
+<!--                                    <span th:if="${#fields.hasErrors('appUser.email')}" class="text-danger">Cet email est utilisé ou n'est pas valide</span>-->
+<!--                                </div>-->
+                                <div class="mb-3">
+                                    <label class="form-label">Agence</label>
+                                    <select class="form-select" th:field="*{agence}" required>
+                                        <option value="">Sélectionner une agence</option>
+                                        <option th:each="a, state : ${agences}" th:value="${a.id}" th:text="${a.label}"></option>
+                                    </select>
                                 </div>
 
                             </div>

@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.form;
 
+import com.akouma.veyuzwebapp.model.Agence;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class ClientForm {
     private Banque banque;
+    private Agence agence;
     private String denomination;
     private String numeroContribuable;
     private String telephone;
@@ -38,7 +40,9 @@ public class ClientForm {
         this.typeClient = client.getTypeClient();
         this.telephone = client.getTelephone();
         this.numeroContribuable = client.getNumeroContribuable();
-        this.appUser = client.getUser();
+        this.appUser = null;
+        this.agence = client.getAgence();
+//        this.appUser = client.getUser();
 
     }
 

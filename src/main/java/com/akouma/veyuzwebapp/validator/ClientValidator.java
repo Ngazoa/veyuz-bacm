@@ -31,23 +31,23 @@ public class ClientValidator implements Validator {
         ClientForm clientForm = (ClientForm) target;
         AppUser appUser = clientForm.getAppUser();
         // Check the fields of AppUserForm.
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.email", "NotEmpty.userForm.email");
+//        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "appUser.email", "NotEmpty.userForm.email");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "denomination", "NotEmpty.userForm.userName");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telephone", "NotEmpty.userForm.userName");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "kycFile", "NotEmpty.userForm.userName");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "typeClient", "NotEmpty.userForm.userName");
 
 
-        if (!this.emailValidator.isValid(appUser.getEmail())) {
-            // Invalid email.
-            errors.rejectValue("appUser.email", "Pattern.userForm.email");
-        } else if (appUser.getId() == null) {
-            AppUser dbUser = userService.getUserByEmail(appUser.getEmail());
-            if (dbUser != null) {
-                // Email has been used by another account.
-                errors.rejectValue("appUser.email", "Duplicate.userForm.email");
-            }
-        }
+//        if (!this.emailValidator.isValid(appUser.getEmail())) {
+//            // Invalid email.
+//            errors.rejectValue("appUser.email", "Pattern.userForm.email");
+//        } else if (appUser.getId() == null) {
+//            AppUser dbUser = userService.getUserByEmail(appUser.getEmail());
+//            if (dbUser != null) {
+//                // Email has been used by another account.
+//                errors.rejectValue("appUser.email", "Duplicate.userForm.email");
+//            }
+//        }
 
 
         if (!errors.hasFieldErrors("typeClient")) {

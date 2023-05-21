@@ -134,6 +134,15 @@
         </div>
         <div class="m-sm-4">
             <form enctype="multipart/form-data" method="post" th:action="@{${saveUserFormUri}}" th:object="${userForm}">
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label">Agence</label>
+                        <select th:field="*{agence}" class="form-control">
+                            <option value=""></option>
+                            <option th:each="a, state : ${agences}" th:value="${a.id}" th:text="${a.label}"></option>
+                        </select>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="mb-3 col-md-6">

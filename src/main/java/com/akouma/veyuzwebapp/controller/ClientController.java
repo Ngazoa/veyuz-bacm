@@ -6,6 +6,7 @@ import com.akouma.veyuzwebapp.form.ImportFileForm;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
+import com.akouma.veyuzwebapp.service.AgenceService;
 import com.akouma.veyuzwebapp.service.ClientService;
 import com.akouma.veyuzwebapp.service.PaysService;
 import com.akouma.veyuzwebapp.service.UserService;
@@ -47,6 +48,8 @@ public class ClientController {
     private UserService userService;
     @Autowired
     private CryptoUtils cryptoUtils;
+    @Autowired
+    private AgenceService agenceService;
 
     public ClientController(HttpSession session) {
         this.session = session;
@@ -110,13 +113,14 @@ public class ClientController {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    client1.setUser(client.getUser());
+//                    client1.setUser(client.getUser());
                     client1.setDomiciliations(client.getDomiciliations());
                     client1.setKyc(client.getKyc());
                     client1.setDenomination(client.getDenomination());
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
+                    client1.setAgence(client.getAgence());
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -223,6 +227,7 @@ public class ClientController {
         model.addAttribute("editClient", "editClient");
         model.addAttribute("dash", "client");
         model.addAttribute("setItem", "clients");
+        model.addAttribute("agences", agenceService.findAllAgences());
 
         return "parametres";
     }

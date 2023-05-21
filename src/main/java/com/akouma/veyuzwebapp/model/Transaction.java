@@ -18,7 +18,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * @author Sensei237
