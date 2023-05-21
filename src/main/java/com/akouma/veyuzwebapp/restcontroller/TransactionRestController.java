@@ -207,7 +207,7 @@ public class TransactionRestController {
                 this.saveTransactionAndAction(transaction, appUser, status,
                         "transmise au Treasory Ops Maker Pour traitement");
                 isChange = true;
-      System.out.println("******* CHECKER"+transaction.getStatut());
+
                 message = "L'opération a été transmise au Treasory Ops Maker Pour traitement";
                 Notification notification = new Notification();
                 notification.setMessage("La transaction  du client " + transaction.getClient().toString() + " a été validée et transmise au Treasory Ops Maker ");

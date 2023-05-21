@@ -50,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/css/*", "/static/**" , "jquery/*", "/sweetalert2themebootstrap-4/**",
                 "/js/*", "/img/*","/fonts/*", "/img/avatars/*", "/img/icons/*",
                 "/photos/*", "/upload/**", "sweetalert2/*", "/upload/avatar/clients/*",
-                "/upload/avatar/*", "/upload/fichiers_transactions/*"
+                "/upload/avatar/*", "/downloadFile/fichiers_transactions/*"
             ).permitAll();
 
         http.authorizeRequests()

@@ -222,7 +222,7 @@ public class Transaction {
         this.typeFinancement = typeFinancement;
     }
 
-    private Date dateValeurBeac;
+    private String refValeurBeac;
 
     public AppUser getAppUser() {
         return appUser;

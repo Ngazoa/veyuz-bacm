@@ -1011,16 +1011,16 @@ public class TransactionController {
         if (authentication.getAuthorities().stream().
                 anyMatch(a -> a.getAuthority().equals("ROLE_CHECKER_TO"))) {
             if (batebeac != null) {
-                transaction.setDateValeurBeac(sdf.parse(batebeac));
+                transaction.setRefValeurBeac(batebeac);
                 transactionService.saveTransaction(transaction);
 
                 String id = CryptoUtils.encrypt(transaction.getId());
                 ActionTransaction actionTransaction = new ActionTransaction();
                 actionTransaction.setTransaction(transaction);
-                actionTransaction.setAction("Ajout date de validation Beac ");
+                actionTransaction.setAction("Ajout Reference Beac ");
                 AppUser loggedUser = userService.getLoggedUser(principal);
                 actionTransaction.setAppUser(loggedUser);
-                actionTransaction.setCommentaire("Ajout du type de préfinancement  effectué avec succès");
+                actionTransaction.setCommentaire("Ajout referene Beac");
                 actionTransactionService.saveActionTransaction(actionTransaction);
                 return "redirect:/transaction-" + id + "/details";
             }
@@ -1146,7 +1146,11 @@ public class TransactionController {
         apurement.setDevise(transaction.getDevise().getCode());
         apurement.setMotif(transaction.getMotif());
         apurement.setDateExpiration(transaction.getDelay());
+        apurement.setStatus(StatusTransaction.APUREMENT_WAITING_DATE);
+        apurement.setTransaction(transaction);
+        apurement.setAppUser(transaction.getAppUser());
         Apurement savedApurement = apurementService.saveApurement(apurement);
+
         // on ajoute les fichiers de l'apurement
         for (Fichier f : transaction.getFichiers()) {
             String fileName = f.getTypeDeFichier() != null ? f.getTypeDeFichier().getName() : f.getFileTitle();

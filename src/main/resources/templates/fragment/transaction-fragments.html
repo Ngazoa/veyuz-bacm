@@ -126,9 +126,9 @@
 
     </p>
     <p>
-        <span>Date de Reference Beac</span>
-        <b th:if="${transaction.dateValeurBeac!=null}" th:utext="${transaction.dateValeurBeac}"></b>
-        <b th:if="${transaction.dateValeurBeac==null}"> **/**</b>
+        <span>Reference Beac</span>
+        <b th:if="${transaction.refValeurBeac!=null}" th:utext="${transaction.refValeurBeac}"></b>
+        <b th:if="${transaction.refValeurBeac==null}"> **/**</b>
 
     </p>
     <p>
@@ -227,7 +227,7 @@
         <div class="modal-body m-3">
             <label class="form-label" for="batebeac">Reference Beac:</label>
             <div class="d-flex justify-content-center">
-                <input class="form-control" id="batebeac" name="batebeac" required type="date">
+                <input class="form-control" id="batebeac" name="batebeac" required type="text">
                 <button class="btn btn-primary" th:if="transaction.statut!=3" type="submit">Valider</button>
             </div>
         </div>

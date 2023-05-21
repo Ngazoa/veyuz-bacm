@@ -72,7 +72,7 @@ public class ApurementRestController {
                     if (!f.getIsValidated()) {
                         v = "/rest-apurements/file/"+ f.getId() +"/true";
                     }
-                    String fLink = "/upload/fichiers_transactions/" + f.getFile();
+                    String fLink = "/downloadFile/fichiers_transactions/" + f.getFile();
 
                     data += "<p class=\"form-control fichier-apurement mb-3\">"+
                             "<a href='"+ fLink +"'>"+
@@ -141,7 +141,7 @@ public class ApurementRestController {
                             "<div class='input-group mb-4'>" +
                             "<input type='file' name='file' class='form-control'>";
                     if (f.getFile() != null) {
-                        String fLink = "/upload/fichiers_transactions/" + f.getFile();
+                        String fLink = "/downloadFile/fichiers_transactions/" + f.getFile();
                         forms += "<a target='_blank' title='Old file' href='"+fLink+"'><i class='fas fa-eye'></i> view</a>";
                     }
                     forms += "</div>" +
