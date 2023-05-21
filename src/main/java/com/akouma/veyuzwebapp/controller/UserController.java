@@ -46,6 +46,9 @@ public class UserController {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private AgenceService agenceService;
+
     public UserController(HttpSession session) {
         this.session = session;
     }
@@ -90,6 +93,7 @@ public class UserController {
         model.addAttribute("showEditForm", true);
         model.addAttribute("saveUserFormUri", "/admin-save-user");
         model.addAttribute("dash","admin");
+        model.addAttribute("agences", agenceService.findAllAgences());
 
         return "users";
     }

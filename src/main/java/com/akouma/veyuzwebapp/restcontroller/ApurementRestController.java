@@ -218,14 +218,14 @@ public class ApurementRestController {
         fichierManquantService.saveFichierManquant(fichier);
         apurementService.saveApurement(fichier.getApurement());
         // On envoie une notification
-        if (!validated) {
-            Notification notification = new Notification();
-            Transaction t = transactionService.getTransactionByReference(fichier.getApurement().getReferenceTransaction());
-            notification.setMessage("Le fichier " + fichier.getFileName() + " que vous avez deposé pour la transaction dont la reference est " + fichier.getApurement().getReferenceTransaction() + " a été rejeté !");
-            notification.setUtilisateur(t.getClient().getUser());
-            notification.setRead(false);
-            notificationService.save(notification);
-        }
+//        if (!validated) {
+//            Notification notification = new Notification();
+//            Transaction t = transactionService.getTransactionByReference(fichier.getApurement().getReferenceTransaction());
+//            notification.setMessage("Le fichier " + fichier.getFileName() + " que vous avez deposé pour la transaction dont la reference est " + fichier.getApurement().getReferenceTransaction() + " a été rejeté !");
+//            notification.setUtilisateur(t.getClient().getUser());
+//            notification.setRead(false);
+//            notificationService.save(notification);
+//        }
 
         String v = "/rest-apurements/file/"+ fichier.getId() +"/false";
         String fa = "<i class='fas fa-times-circle text-danger'></i>";
@@ -237,7 +237,6 @@ public class ApurementRestController {
             fa = "<i class='fas fa-check-circle text-success'></i>";
             title = "Valider le fichier";
         }
-
 
         response.put("message", message);
         response.put("isOk", true);

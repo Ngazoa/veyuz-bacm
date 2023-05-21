@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.form;
 
+import com.akouma.veyuzwebapp.model.Agence;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import lombok.Data;
@@ -45,6 +46,8 @@ public class UserForm {
 
     private Banque banque;
 
+    private Agence agence;
+
     public UserForm() {
         this.email = null;
         this.password = null;
@@ -61,6 +64,7 @@ public class UserForm {
         this.userId = null;
         this.userName = null;
         this.banque = null;
+        this.agence = null;
     }
 
     public UserForm(String email, String password, String confirmPassword, String avatar, String nom, String prenom,
@@ -82,6 +86,29 @@ public class UserForm {
         this.userId = userId;
         this.userName = userName;
         this.banque = banque;
+
+    }
+
+    public UserForm(String email, String password, String confirmPassword, String avatar, String nom, String prenom,
+                    Date dateNaissance, String lieuNaissance, String telephone1, String telephone2,
+                    String adresse, String gender, String userName, Banque banque, Long userId, Agence agence) {
+
+        this.email = email;
+        this.password = password;
+        this.avatar = avatar;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dateNaissance = dateNaissance;
+        this.lieuNaissance = lieuNaissance;
+        this.telephone1 = telephone1;
+        this.telephone2 = telephone2;
+        this.adresse = adresse;
+        this.gender = gender;
+        this.confirmPassword = confirmPassword;
+        this.userId = userId;
+        this.userName = userName;
+        this.banque = banque;
+        this.agence = agence;
 
     }
 

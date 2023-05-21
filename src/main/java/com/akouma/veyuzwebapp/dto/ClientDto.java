@@ -18,6 +18,7 @@ public class ClientDto {
     private Collection<Apurement> apurements;
     private Collection<Domiciliation> domiciliations;
     private AppUser user;
+    private Agence agence;
     private String kyc;
     private String numeroContribuable;
     private String telephone;

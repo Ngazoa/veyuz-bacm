@@ -128,15 +128,15 @@ public class TransactionExpiredSchedule {
                 if (!isComplete && (nbJoursEcoules >= 5 || nbJoursRestant <= 0)) {
                     // ON informe le client
                     if (nbJoursEcoules >= 5 && nbJoursRestant > 0) {
-                        Notification notification = new Notification();
-                        notification.setUtilisateur(t.getClient().getUser());
-                        notification.setRead(false);
-                        String lien = "transaction-"+t.getId()+"/details";
-                        notification.setHref(lien);
-                        String message = "Hi, il vous reste " + nbJoursRestant + " pour fournir toutes les pieces " +
-                                "justificatives de votre transaction.";
-                        notification.setMessage(message);
-                        notificationService.save(notification);
+//                        Notification notification = new Notification();
+//                        notification.setUtilisateur(t.getClient().getUser());
+//                        notification.setRead(false);
+//                        String lien = "transaction-"+t.getId()+"/details";
+//                        notification.setHref(lien);
+//                        String message = "Hi, il vous reste " + nbJoursRestant + " pour fournir toutes les pieces " +
+//                                "justificatives de votre transaction.";
+//                        notification.setMessage(message);
+//                        notificationService.save(notification);
                     }
 
                     // Envoie de la mise en demeure au format html

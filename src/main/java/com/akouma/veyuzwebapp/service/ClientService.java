@@ -149,7 +149,7 @@ public class ClientService {
         if (client.getReference() == null) {
             client.setReference("C-" + new Date().getTime() + "-VEYUZ");
         }
-System.out.println("====>1");
+        System.out.println("====>1");
         String codeVeyuz = client.getCodeVeyuz();
 
         if (client.getCodeVeyuz() == null || client.getCodeVeyuz().trim() == "") {
@@ -177,19 +177,20 @@ System.out.println("====>1");
             banques.add(clientForm.getBanque());
         }
         client.setBanques(banques);
+        client.setAgence(clientForm.getAgence());
 
         Client savedClient = saveClient(client);
 
-        AppUser appUser = clientForm.getAppUser();
+//        AppUser appUser = clientForm.getAppUser();
 
-        String avatar = u.uploadFile(clientForm.getAvatar(),fileStorageService, "/avatar",request);
+//        String avatar = u.uploadFile(clientForm.getAvatar(),fileStorageService, "/avatar",request);
 
 //        AppUser appUser = new AppUser();
-        appUser.setAvatar(avatar);
-        appUser.setEnable(false);
-        appUser.setClient(savedClient);
+//        appUser.setAvatar(avatar);
+//        appUser.setEnable(false);
+//        appUser.setClient(savedClient);
 
-        userRepository.save(appUser);
+//        userRepository.save(appUser);
 
 //        appUser.getUserRoles().add(userRole);
 

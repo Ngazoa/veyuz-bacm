@@ -642,12 +642,12 @@ public class TransactionController {
             transactionService.saveTransaction(transaction);
             actionTransactionService.saveActionTransaction(action);
 
-            Notification notification = new Notification();
-            notification.setMessage(form.getMotif());
-            notification.setUtilisateur(form.getTransaction().getClient().getUser());
-            notification.setRead(false);
-
-            notificationService.getNotificationRepository(notification);
+//            Notification notification = new Notification();
+//            notification.setMessage(form.getMotif());
+//            notification.setUtilisateur(form.getTransaction().getClient().getUser());
+//            notification.setRead(false);
+//
+//            notificationService.getNotificationRepository(notification);
 
 //            Envoie de mail ici
 
@@ -1054,12 +1054,12 @@ public class TransactionController {
             }
             String message = "L'operation a ete prise en compte ! la transaction a été approuvée et validée par la trésorerie. Puis transmise pour apurement !";
             // message = "L'opération a été transmise à la trésorerie !";
-            Notification notification = new Notification();
-            notification.setMessage(message);
-            notification.setRead(false);
-            notification.setUtilisateur(transaction.getClient().getUser());
-            notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-            notificationService.save(notification);
+//            Notification notification = new Notification();
+//            notification.setMessage(message);
+//            notification.setRead(false);
+//            notification.setUtilisateur(transaction.getClient().getUser());
+//            notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+//            notificationService.save(notification);
             transaction.setDelay(calendar.getTime());
             transaction.setCycleNormalAcheve(true);
             transactionService.saveTransaction(transaction);
