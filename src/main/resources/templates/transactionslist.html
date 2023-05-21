@@ -71,13 +71,13 @@
                                 <button type="submit" class="btn btn-primary">Appliquer</button>
                             </div>
                         </th:block>
-                        <th:block th:if="${newTransactionLink != null}" sec:authorize="hasRole('ADMIN')">
+                        <th:block th:if="${newTransactionLink != null}" sec:authorize="hasRole('ADMIN') or hasRole('AGENCE')">
                             <div class="col-md-2">
                                 <div class="btn-group btn-group-lg">
                                     <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Nouvelle transaction
                                     </button>
-                                    <div class="dropdown-menu" style="">
+                                    <div class="dropdown-menu">
                                         <a class="dropdown-item" th:href="@{${newTransactionLink}(client_id=${client.id}, type='normal')}">Transaction Financière</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" th:href="@{${newTransactionLink}(client_id=${client.id}, type='domiciliation')}">Utiliser une transaction commerciale</a>
@@ -92,7 +92,7 @@
                                     <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Nouvelle transaction
                                     </button>
-                                    <div class="dropdown-menu" style="">
+                                    <div class="dropdown-menu">
                                         <a class="dropdown-item" th:href="@{/transaction/new/{type}(type='normal')}">Transaction Financière</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" th:href="@{/transaction/new/{type}(type='domiciliation')}">Transaction commerciale</a>

@@ -329,6 +329,7 @@ public class BanqueController {
                     tdo.setMontant(transaction.getMontant());
                     tdo.setStatut(transaction.getStatut());
                     tdo.setAppUser(transaction.getAppUser());
+                    tdo.setDevise(transaction.getDevise());
                     return tdo;
                 }
         ).collect(Collectors.toList());

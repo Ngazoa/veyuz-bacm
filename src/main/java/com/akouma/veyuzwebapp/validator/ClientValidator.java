@@ -1,7 +1,6 @@
 package com.akouma.veyuzwebapp.validator;
 
 import com.akouma.veyuzwebapp.form.ClientForm;
-import com.akouma.veyuzwebapp.form.UserForm;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.service.ClientService;
 import com.akouma.veyuzwebapp.service.UserService;

@@ -5,7 +5,6 @@
     <title>Title</title>
 </head>
 <body>
-
 <div th:fragment="list-client">
     <table id="datatables-reponsive" class="table table-striped" style="width:100%">
         <thead>
@@ -35,7 +34,6 @@
                         <span th:if="${b.user.isEnable}" class="badge bg-success">active</span>
                         <span th:unless="${b.user.isEnable}" class="badge bg-danger">block</span>
                     </a>
-
                 </th:block>
                 <th:block th:if="${ #authorization.expression('hasRole(''ROLE_AGENCE'')')}">
                     <span th:if="${b.user.isEnable}" class="badge bg-success">active</span>
@@ -47,7 +45,7 @@
                     <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Select
                     </button>
-                    <div class="dropdown-menu" style="">
+                    <div class="dropdown-menu">
                         <a href="" class="dropdown-item">Profile</a>
                         <div class="dropdown-divider"></div>
                         <a th:href="@{${clientTransactionUri}(client_id=${b.id})}" class="dropdown-item">Liste des Transactions</a>
@@ -55,7 +53,6 @@
                              or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{${initierTransactionUri}(client_id=${b.id}, type='normal')}" class="dropdown-item">Initier une transaction Financière</a>
                         <a th:if="${#authorization.expression('hasRole(''ROLE_AGENCE'')')
                              or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{${initierTransactionUri}(client_id=${b.id}, type='domiciliation')}" class="dropdown-item">Transaction Commerciale (domiciliation)</a>
-
                         <div class="dropdown-divider"></div>
                         <!--                            <a th:if="${#authorization.expression('hasRole(''ROLE_CHECKER'')')-->
                         <!--                            or #authorization.expression('hasRole(''ROLE_MACKER'')')}" th:href="@{/domiciliations/new/{id}(id=${b.id})}" class="dropdown-item">Domiciliations</a>-->

@@ -35,6 +35,7 @@ public class ApurementService {
         if (client == null) {
             return apurementRepositoy.findByBanqueAndIsApuredOrderByIsApuredAsc(banque, isApured);
         }
+
         return apurementRepositoy.findByBanqueAndClientAndIsApuredOrderByIsApuredAsc(banque, client, isApured);
     }
 

@@ -1,6 +1,5 @@
 package com.akouma.veyuzwebapp.controller;
 
-import com.akouma.veyuzwebapp.dto.ClientDto;
 import com.akouma.veyuzwebapp.form.DomiciliationForm;
 import com.akouma.veyuzwebapp.form.ImportFileForm;
 import com.akouma.veyuzwebapp.model.AppUser;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -72,7 +70,7 @@ public class DomiciliationController {
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER"})
     @GetMapping({"/domiciliations", "/domiciliations/page={page}"})
     public String showDomiciliations(
             @PathVariable(value = "page", required = false) Integer page,
@@ -136,7 +134,7 @@ public class DomiciliationController {
         return "domiciliation_list";
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER"})
     @GetMapping("/domiciliation-{id}/details")
     public String showDomiciliationDetails(
             @PathVariable("id") Domiciliation domiciliation,
@@ -168,7 +166,7 @@ public class DomiciliationController {
         return "domiciliation_details";
     }
 
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_SUPERADMIN"})
+    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_SUPERADMIN", "ROLE_AGENCE"})
     @GetMapping({"/domiciliations/new"})
     public String showDomiciliationForm(
             Model model,

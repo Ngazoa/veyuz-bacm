@@ -50,7 +50,7 @@ public class Apurement {
     private int status = StatusTransaction.APUREMENT_WAITING_DATE;
 
     @Column(name = "jours_restant")
-    private String joursRestant;
+    private Integer joursRestant;
 
 //    CETTE VARIABLE REPRESENTE LE USER AVEC LE ROLE AGENC QUI A INITIE LA TRANSACTION
     @ManyToOne
@@ -71,6 +71,6 @@ public class Apurement {
     private Collection<ApurementFichierManquant> fichiersManquants;
 
     @Column(name = "moftif_rejet", length = 1000)
-    private String mofifRejet;
+    private String motifRejet;
 
 }

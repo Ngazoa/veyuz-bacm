@@ -1,9 +1,6 @@
 package com.akouma.veyuzwebapp.validator;
 
-import com.akouma.veyuzwebapp.form.BanqueForm;
 import com.akouma.veyuzwebapp.form.BeneficiaireForm;
-import com.akouma.veyuzwebapp.form.ClientForm;
-import com.akouma.veyuzwebapp.model.AppUser;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
