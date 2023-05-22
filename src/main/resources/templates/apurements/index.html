@@ -284,25 +284,25 @@
                                         </a>
                                     </div>
                                     <th:bock th:if="${!ap.isApured and (#authorization.expression('hasRole(''ROLE_TRADE_DESK'')') or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}">
-                                    <div class="d-inline">
-                                        <a th:if="${ap.status != -500 and ap.status != -1000}" href="" class="btn btn-warning btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-rejeted-apurement-' + ${ap.id}" title="Rejeter">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </div>
-                                    <div class="d-inline">
-                                        <a th:if="${ap.status != -1000}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="tooltip" title="Annuler">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                    <div class="d-inline" th:if="${(#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}">
-<!--                                        <a th:if="${ap.status == -500}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-restaurer-apurement/' + ${ap.id} + '/restaurer'" class="btn btn-warning btn-sm restaurer-apurement-btn" data-bs-toggle="toltip" title="Resoumettre les fichiers">-->
-<!--                                            <i class="fa fa-spinner" aria-hidden="true"></i>-->
-<!--                                        </a>-->
-                                        <a th:if="${ap.status == -500}" th:data-ref="${ap.id}" th:data-parent-id="'ligne' + ${ap.id}" href="#" class="btn btn-warning btn-sm apurement-btn-action" data-bs-toggle="tooltip" title="Resoumettre les fichiers">
-                                            <i class="fa fa-spinner" aria-hidden="true"></i>
-                                        </a>
-                                    </div>
-                                </th:bock>
+                                        <div class="d-inline">
+                                            <a th:if="${ap.status != -500 and ap.status != -1000 and ap.status > 1}" href="" class="btn btn-warning btn-sm" data-bs-toggle="modal" th:data-bs-target="'#modal-rejeted-apurement-' + ${ap.id}" title="Rejeter">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </div>
+                                        <div class="d-inline">
+                                            <a th:if="${ap.status != -1000 and ap.status > 1}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-annuler-apurement/' + ${ap.id} + '/annuler'" class="btn btn-danger btn-sm annuler-definitivement-transaction" data-bs-toggle="tooltip" title="Annuler">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                        <div class="d-inline" th:if="${(#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}">
+    <!--                                        <a th:if="${ap.status == -500}" th:data-parent-id="'ligne' + ${ap.id}" th:href="'/rest-restaurer-apurement/' + ${ap.id} + '/restaurer'" class="btn btn-warning btn-sm restaurer-apurement-btn" data-bs-toggle="toltip" title="Resoumettre les fichiers">-->
+    <!--                                            <i class="fa fa-spinner" aria-hidden="true"></i>-->
+    <!--                                        </a>-->
+                                            <a th:if="${ap.status == -500}" th:data-ref="${ap.id}" th:data-parent-id="'ligne' + ${ap.id}" href="#" class="btn btn-warning btn-sm apurement-btn-action" data-bs-toggle="tooltip" title="Resoumettre les fichiers">
+                                                <i class="fa fa-spinner" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </th:bock>
                                 </th:block>
                             </td>
                         </tr>

@@ -14,4 +14,6 @@ public class ApurementFileForm {
 
     private MultipartFile file;
 
+    private boolean file_checkbox;
+
 }
