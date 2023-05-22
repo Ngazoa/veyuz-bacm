@@ -11,6 +11,7 @@ import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -221,6 +222,9 @@ public class AppUser {
     private String adresse;
 
     private String gender;
+    private String codeAuthentication;
+    private LocalDateTime dateCodeAuthentication;
+    private boolean statusCodeAuth;
 
     @Column(nullable = false, unique = true, length = 25)
     private String userName;

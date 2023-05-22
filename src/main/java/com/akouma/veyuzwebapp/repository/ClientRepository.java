@@ -21,6 +21,8 @@ public interface ClientRepository extends CrudRepository<Client, Long> {
 
     long countByAgence(Agence agence);
 
+    Page<Client> findByBanquesAndAgenceOrderByUser_NomAsc(Banque banques, Agence agence, Pageable pageable);
+
     List<Client> findDistinctByUser_Client_TelephoneAndBanques_Clients_DenominationAndUser_Client_UserAllIgnoreCaseOrderByBanques_Clients_DenominationAsc(String telephone, String denomination, AppUser user, Sort sort);
     Page<Client> findDistinctReferenceByBanques(Banque banque, Pageable pageable);
 
@@ -32,6 +34,10 @@ public interface ClientRepository extends CrudRepository<Client, Long> {
 
     List<Client> findDistinctReferenceByBanques(Banque banque);
     Client findByTelephone(String name);
+
+    List<Client> findByUserAndAgence(AppUser user, Agence agence);
+
+
     Iterable<Client> findByDenominationLike(String name);
 
     List<Client> findAll(Specification<Client> spec);

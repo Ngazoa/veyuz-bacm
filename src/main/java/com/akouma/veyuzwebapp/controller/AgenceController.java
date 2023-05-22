@@ -41,7 +41,6 @@ public class AgenceController {
             model.addAttribute("agence",id);
         }else{
             model.addAttribute("agence", agence);
-
         }
         return "agence-list";
     }

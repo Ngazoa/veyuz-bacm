@@ -275,13 +275,11 @@
                 </a>
             </li>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <li class="sidebar-item" th:classappend="${#strings.equals(dash, 'client')} ? active : ''">
                     <a class="sidebar-link" th:href="@{/clients}">
                         <i class="align-middle" data-feather="users"></i> <span class="align-middle">Clients</span>
                     </a>
                 </li>
-            </th:block>
 
             <li class="sidebar-item" th:classappend="${#strings.equals(dash, 'params')} ? active : ''">
                 <a class="sidebar-link" th:href="@{/parametres}">

@@ -3,6 +3,7 @@ package com.akouma.veyuzwebapp.controller;
 import com.akouma.veyuzwebapp.dto.ClientDto;
 import com.akouma.veyuzwebapp.form.ClientForm;
 import com.akouma.veyuzwebapp.form.ImportFileForm;
+import com.akouma.veyuzwebapp.model.Agence;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
@@ -68,16 +69,17 @@ public class ClientController {
         }
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
-    @GetMapping({"/clients", "/clients/page={page}"})
+    @GetMapping({"/clients", "/clients/page={page}", "/clients/{agence}/page={page}", "/clients/{agence}"})
     public String showClientsList(
             @PathVariable(value = "page", required = false) Integer page,
+            @PathVariable(required = false, value = "agence") Agence agence,
             Model model, Principal principal) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
         }
+        AppUser loggedUser = userService.getLoggedUser(principal);
 
         Banque banque = (Banque) session.getAttribute("banque");
 
@@ -89,8 +91,14 @@ public class ClientController {
             page = this.page;
         }
         page--;
+        Page pagesClients = null;
+        if (loggedUser.getAgence() != null) {
+            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
 
-        Page pagesClients = clientService.getClients(banque, 50, page);
+        } else {
+            pagesClients = clientService.getClients(banque, 50, page);
+
+        }
 
         int nbPages = pagesClients.getTotalPages();
         if (nbPages > 1) {
@@ -131,7 +139,13 @@ public class ClientController {
         model.addAttribute("user", userService.getLoggedUser(principal));
         model.addAttribute("showClientList", true);
         model.addAttribute("profile", null);
-        model.addAttribute("uri", "/clients/page={page}");
+        if (agence != null) {
+            model.addAttribute("uri", "/clients/" + agence.getId() + "/page={page}");
+
+        } else {
+            model.addAttribute("uri", "/clients/page={page}");
+
+        }
         model.addAttribute("nbElements", pagesClients.getTotalElements());
 
         model.addAttribute("dash", "client");
@@ -177,10 +191,15 @@ public class ClientController {
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
         }
-
+        Iterable<Client> Clients = null;
         Banque banque = (Banque) session.getAttribute("banque");
+        //     AppUser loggedUser = userService.getLoggedUser(principal);
 
-        Iterable<Client> Clients = clientService.searchClientsByName(banque, telephone);
+//        if (loggedUser.getAgence() != null) {
+//            Clients = clientService.searchClientsAgenceByName(banque, loggedUser.getAgence(), telephone);
+//        } else {
+        Clients = clientService.searchClientsByName(banque, telephone);
+//        }
 
         model.addAttribute("clientTransactionUri", "/transactions/{client_id}-client");
         model.addAttribute("initierTransactionUri", "/transaction/new/{client_id}/client/{type}");
@@ -202,7 +221,7 @@ public class ClientController {
             @PathVariable(value = "client_id", required = false) String clt,
             Model model, Principal principal) throws Exception {
         Client client = null;
-        if(clt!=null) {
+        if (clt != null) {
             client = clientService.findById(cryptoUtils.decrypt(clt));
         }
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
@@ -294,7 +313,7 @@ public class ClientController {
     public String blockClient(@PathVariable("id") String clt, Principal principal, RedirectAttributes redirectAttributes
             , Model model) throws Exception {
 
-        Client client =clientService.findById(cryptoUtils.decrypt(clt));
+        Client client = clientService.findById(cryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
