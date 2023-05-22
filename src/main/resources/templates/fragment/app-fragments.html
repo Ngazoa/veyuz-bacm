@@ -231,7 +231,7 @@
             <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
                 <a data-bs-target="#apurments" data-bs-toggle="collapse" class="sidebar-link collapsed">
-                    <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Apurement</span>
+                    <i class="align-middle" data-feather="compass"></i> <span class="align-middle">Apurement</span>
                 </a>
                 <ul id="apurments" class="sidebar-dropdown list-unstyled collapse "
                     th:classappend="${#strings.equals(dash, 'apurments')} ? show : ''" data-bs-parent="#sidebar">
@@ -264,7 +264,7 @@
 
             <li class="sibebar-item" th:classappend="${#strings.equals(dash, 'beneficiaires')} ? active : ''">
                 <a class="sidebar-link" th:href="@{/beneficiaires}">
-                    <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Beneficiaires</span>
+                    <i class="align-middle" data-feather="corner-down-right"></i> <span class="align-middle">Beneficiaires</span>
                 </a>
             </li>
 
@@ -293,6 +293,14 @@
                     <a class="sidebar-link" th:href="@{/admin-users-list}">
                         <i class="align-middle" data-feather="user"></i> <span
                             class="align-middle">Agences/Admin</span>
+                    </a>
+                </li>
+            </th:block>
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+                <li class="sidebar-item" th:classappend="${#strings.equals(agence, 'agence')} ? active : ''">
+                    <a class="sidebar-link" th:href="@{/agency/all}">
+                        <i class="align-middle" data-feather="activity"></i> <span
+                            class="align-middle">Agences</span>
                     </a>
                 </li>
             </th:block>

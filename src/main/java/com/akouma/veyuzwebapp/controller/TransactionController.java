@@ -12,6 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
@@ -68,6 +69,9 @@ public class TransactionController {
     private TransactionValidator transactionValidator;
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private AgenceService agenceService;
 
     public TransactionController(HttpSession session) {
         this.session = session;
@@ -128,7 +132,39 @@ public class TransactionController {
 
         return "transactionslist";
     }
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
+    @GetMapping({"/transactions/{agence_id}-agence", "/transactions/{agence_id}-agence/page={page}"})
+    public String getTransactionsClient(
+            @PathVariable("agence_id") Long id,
+            @PathVariable(value = "page", required = false) Integer page,
+            Model model, Principal principal) throws Exception {
+        Agence agence = agenceService.getAgenceById(id);
 
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session) || principal == null) {
+            return "redirect:/";
+        }
+
+        Banque banque = (Banque) session.getAttribute("banque");
+
+        if (page == null || page <= 0) {
+            page = this.page;
+        }
+        page--;
+
+        Page<Transaction> transactions = transactionService.getPageableTransactionsHasFilesForAgence(banque, agence, true, max, page);
+
+        String uri = "/transactions/" + agence.getId() + "-agence/page={page}";
+        model.addAttribute("clients", clientService.countClientAgence(agence));
+        model.addAttribute("transactionsCount", transactionService.getcountByAgence(banque,agence));
+        model.addAttribute("transactionApur",
+                transactionService.getcountByAgenceAndStatut(banque,agence, StatusTransaction.VALIDATED));
+        model.addAttribute("transactionWait",
+                transactionService.getcountByAgenceAndStatut(banque,agence, StatusTransaction.WAITING));
+        addTransactionViewDataAgence(agence, model, banque, transactions, uri);
+        model.addAttribute("dash", "transaction");
+        return "agence-detail";
+    }
 
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions/{client_id}-client", "/transactions/{client_id}-client/page={page}"})
@@ -284,7 +320,54 @@ public class TransactionController {
         model.addAttribute("transactions", transactions);
         return "transactionslist";
     }
+    private void addTransactionViewDataAgence(Agence agence, Model model, Banque banque,
+                                        Page<Transaction> transactions,
+                                        String uri) {
+        model.addAttribute("banque", banque);
+        if (transactions != null) {
+            int nbPages = transactions.getTotalPages();
+            if (nbPages > 1) {
+                int[] pages = new int[nbPages];
+                for (int i = 0; i < nbPages; i++) {
+                    pages[i] = i + 1;
+                }
+                model.addAttribute("pages", pages);
+            }
+            List<TransactionDto> transactionDtoList = transactions.getContent().stream().map(
+                    transaction -> {
+                        TransactionDto tdo = new TransactionDto();
+                        tdo.setBeneficiaire(transaction.getBeneficiaire());
+                        try {
+                            tdo.setId(CryptoUtils.encrypt(transaction.getId()));
 
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        tdo.setAppUser(transaction.getAppUser());
+                        tdo.setClient(transaction.getClient());
+                        tdo.setMontant(transaction.getMontant());
+                        tdo.setDateTransaction(transaction.getDateTransaction());
+                        tdo.setReference(transaction.getReference());
+                        tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
+                        tdo.setStatut(transaction.getStatut());
+                        tdo.setDateCreation(transaction.getDateCreation());
+                        return tdo;
+                    }
+            ).collect(Collectors.toList());
+            model.addAttribute("transactions", transactionDtoList);
+            model.addAttribute("nbPages", transactions.getTotalPages());
+            model.addAttribute("currentPage", transactions.getNumber() + 1);
+            model.addAttribute("nbElements", transactions.getTotalElements());
+
+        }
+        model.addAttribute("importFile", new ImportFileForm(banque));
+        model.addAttribute("activeMenu", 2);
+        model.addAttribute("actiSub", 1);
+        model.addAttribute("agence", agence);
+        model.addAttribute("searchTransactionUri", "/search-transactions-results");
+        model.addAttribute("dash", "transaction");
+
+    }
     private void addTransactionViewData(Client client, Model model, Banque banque,
                                         Page<Transaction> transactions, SearchTransactionForm searchTransactionForm,
                                         String uri) {
@@ -495,6 +578,7 @@ public class TransactionController {
         transaction.setDomiciliation(transactionForm.getDomiciliation());
         transaction.setBeneficiaire(transactionForm.getBeneficiaire());
         transaction.setMotif(transactionForm.getMotif());
+        transaction.setAgence(transactionForm.getClient().getAgence());
         transaction.setAppUser(userService.getLoggedUser(principal));// Permet de recuperer l'initiateur de l'operation
 
         if (transactionForm.getDateTransactionStr() != null) {
@@ -1029,8 +1113,9 @@ public class TransactionController {
                         "Oops Une erreur est survenue , veuillez verifier que vous y etes autorise ou que vous avez bien renseignez les differentes dates");
             }
             Date dateOperationTransaction = new Date();
+            Banque banque = (Banque) session.getAttribute("banque");
 
-            String ref=new ReferenceGenerator().generateReference();
+            String ref=transactionService.generateTransactionNumber(banque);
             while(transactionService.checkReference(ref)){
                 ref=new ReferenceGenerator().generateReference();
             }

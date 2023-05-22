@@ -360,7 +360,7 @@ $('#filesSend').on("click", function (e) {
 })
 
 function montant_format(number) {
-    var decimals = 2;
+    var decimals = 3;
     var dec_point = '.';
     var thousands_sep = ',';
     number = (number + '')

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface TransactionRepository extends CrudRepository<Transaction, Long> {
+    long countByBanqueAndAgenceAndStatut(Banque banque, Agence agence, int statut);
+    long countByBanqueAndAgence(Banque banque, Agence agence);
 
     Page<Transaction> findAll(Pageable pageable);
 
@@ -56,6 +59,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     Page<Transaction> findByBanqueAndAppUserAndHasFilesOrderByDateCreationDesc(Banque banque,AppUser user, boolean hasFiles, Pageable pageable);
 
     Page<Transaction> findByBanqueAndClientAndHasFilesOrderByDateCreationDesc(Banque banque, Client client, boolean hasFiles, Pageable pageable);
+    Page<Transaction> findByBanqueAndAgenceAndHasFilesOrderByDateCreationDesc(Banque banque, Agence client, boolean hasFiles, Pageable pageable);
 
     Page<Transaction> findByBanqueAndStatutAndHasFilesOrderByDateCreationDesc(Banque banque, int statut, boolean hasFiles, Pageable pageable);
 
@@ -122,6 +126,10 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     Iterable<Transaction> findByBanqueAndClient(Banque banque, Client client);
 
     Iterable<Transaction> findByBanque(Banque banque);
+
+    Optional<Transaction> findFirstByBanqueOrderByIdDesc(Banque banque);
+
+    Optional<Transaction> findFirstByBanqueAndReferenceIsNotNullOrderByIdDesc(Banque banque);
 
     Iterable<Transaction> findByBanqueAndClientAndHasFilesTrue(Banque banque, Client client);
 

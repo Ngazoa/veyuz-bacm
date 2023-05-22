@@ -97,6 +97,9 @@ public class ClientService {
     public Page<Client> getClients(Banque banque, int maxResults, int page) {
         return clientRepository.findDistinctReferenceByBanques(banque, PageRequest.of(page, maxResults));
     }
+    public long countClientAgence(Agence agence){
+        return clientRepository.countByAgence(agence);
+    }
 
     public Iterable<Client> searchClients(Banque banque, String nom) {
         List<Client> clienRenvoye = new ArrayList<>();

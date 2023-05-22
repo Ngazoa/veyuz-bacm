@@ -73,9 +73,9 @@
                                     <small class="text-info" th:text="*{montantMax}"></small>
                                     <div class="input-group mb-3">
                                         <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
-                                             'groupSeparator': ',', 'digits': 2,
+                                             'groupSeparator': ',', 'digits': 3,
                                             'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
-                                               placeholder="0.00">
+                                               placeholder="0.000">
                                         <br>
                                         <span th:if="${#fields.hasErrors('montantTexte')}" style="float:right;margin-top:-24px" class="text-danger">Vous devez saisir un montant valide</span>
 
@@ -132,9 +132,9 @@
                                     <small class="text-info" th:text="*{montantMax}"></small>
                                     <div class="mb-3">
                                         <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
-                                         'groupSeparator': ',', 'digits': 2,
+                                         'groupSeparator': ',', 'digits':3,
                                         'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
-                                               placeholder="0.00">
+                                               placeholder="0.000">
                                         <br>
                                         <span th:if="${#fields.hasErrors('montantTexte')}" style="float:right;margin-top:-24px" class="text-danger">Vous devez saisir un montant valide</span>
                                         <!-- <input type="number" min="0" disabled max="" th:field="*{montant}" class="form-control" required>-->

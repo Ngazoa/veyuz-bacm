@@ -131,6 +131,7 @@
                             <th>Date Creat</th>
                             <th>Montant</th>
                             <th>Agence</th>
+                            <th>Initiateur</th>
                             <th>Statut</th>
                             <th>Action</th>
                         </tr>
@@ -144,6 +145,7 @@
                             <td th:utext="${transaction.beneficiaire.name}"></td>
                             <td th:text="${transaction.dateCreation}" />
                             <td class="montant_format" th:text="${transaction.montant}"></td>
+                            <td th:text="${transaction.client.agence != null ? transaction.client.agence.label : ''}"></td>
                             <td th:if="${transaction.appUser!=null}" th:text="${transaction.appUser.nom}"></td>
                             <td th:if="${transaction.appUser==null}">/</td>
                             <td>

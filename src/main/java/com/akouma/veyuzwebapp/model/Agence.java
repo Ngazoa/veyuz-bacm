@@ -21,6 +21,10 @@ public class Agence {
 
     private String label;
 
+    private String address;
+    private String phone;
+    private boolean status;
+
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "agence")
     private Collection<AppUser> appUsers;

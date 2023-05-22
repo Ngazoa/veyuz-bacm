@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.repository;
 
+import com.akouma.veyuzwebapp.model.Agence;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.model.Client;
@@ -14,8 +15,11 @@ import java.util.List;
 
 @Repository
 public interface ClientRepository extends CrudRepository<Client, Long> {
+    long countByBanques_BanqueAndAgence(Banque banque, Agence agence);
 
     List<Client> findByBanques_BanqueOrderByUser_NomAsc(Banque banque, Sort sort);
+
+    long countByAgence(Agence agence);
 
     List<Client> findDistinctByUser_Client_TelephoneAndBanques_Clients_DenominationAndUser_Client_UserAllIgnoreCaseOrderByBanques_Clients_DenominationAsc(String telephone, String denomination, AppUser user, Sort sort);
     Page<Client> findDistinctReferenceByBanques(Banque banque, Pageable pageable);

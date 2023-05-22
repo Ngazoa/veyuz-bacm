@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ *
  */
 package com.akouma.veyuzwebapp.model;
 
@@ -222,6 +221,18 @@ public class Transaction {
     }
 
     private String refValeurBeac;
+
+    @ManyToOne
+    @JoinColumn(name = "agence_id")
+    private Agence agence;
+
+    public Agence getAgence() {
+        return agence;
+    }
+
+    public void setAgence(Agence agence) {
+        this.agence = agence;
+    }
 
     public AppUser getAppUser() {
         return appUser;

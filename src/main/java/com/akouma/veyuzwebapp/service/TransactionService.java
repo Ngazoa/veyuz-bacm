@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -155,6 +157,43 @@ public class TransactionService {
         return true;
     }
 
+    public String generateTransactionNumber(Banque banque) {
+        // Get the current year
+        LocalDate date = LocalDate.now();
+        int year = date.getYear();
+        String currentYear = String.valueOf(year).substring(2);
+        // Retrieve the last transaction for the current year from the database
+        Optional<Transaction> lastTransaction = transactionRepository.findFirstByBanqueAndReferenceIsNotNullOrderByIdDesc(banque);
+
+        // Initialize the serial number
+        long serialNumber = 1;
+
+        // Increment the serial number if a last transaction exists for the current year
+        if (lastTransaction.isPresent()) {
+            Transaction lastTransactionEntity = lastTransaction.get();
+            long lastSerialNumber = lastTransactionEntity.getId();
+
+            String lstref=lastTransactionEntity.getReference();
+            lstref = lstref.replaceAll("[^0-9]", "");
+
+            String lastTwoDigits = lstref.substring(lstref.length() - 2);
+
+            // Check if the current year is different from the year of the last transaction
+            if (currentYear.trim().equals(lastTwoDigits.trim())) {
+                serialNumber = lastSerialNumber + 1;
+            }
+        }
+
+        // Format the serial number with leading zeros
+        String formattedSerialNumber = String.format("%04d", serialNumber);
+
+        // Generate the transaction number by concatenating the formatted serial number with the last 2 digits of the current year
+        String transactionNumber = formattedSerialNumber + currentYear;
+        System.out.println("*** "+transactionNumber);
+
+        return "TT"+transactionNumber+"BA";
+    }
+
     /**
      * Cette fonction permet de recuperer les transactions effectuees apres une date donnee dans une banque
      *
@@ -229,6 +268,14 @@ public class TransactionService {
                 isChanged = false;
         }
         return isChanged;
+    }
+
+    public long getcountByAgenceAndStatut(Banque banque,Agence agence,int statut){
+        return transactionRepository.countByBanqueAndAgenceAndStatut(banque,agence,statut);
+    }
+
+    public long getcountByAgence(Banque banque,Agence agence){
+        return transactionRepository.countByBanqueAndAgence(banque,agence);
     }
 
     public Page<Transaction> getTransactionsByStatus(Banque banque, String status, int max, int page, Client client,
@@ -509,6 +556,10 @@ public class TransactionService {
 
     public Page<Transaction> getPageableTransactionsHasFilesForClient(Banque banque, Client client, boolean hasFiles, int max, Integer page) {
         return transactionRepository.findByBanqueAndClientAndHasFilesOrderByDateCreationDesc(banque, client, hasFiles, PageRequest.of(page, max));
+    }
+
+    public Page<Transaction> getPageableTransactionsHasFilesForAgence(Banque banque, Agence client, boolean hasFiles, int max, Integer page) {
+        return transactionRepository.findByBanqueAndAgenceAndHasFilesOrderByDateCreationDesc(banque, client, hasFiles, PageRequest.of(page, max));
     }
 
     /**
