@@ -72,13 +72,14 @@ public class ApurementController {
         boolean isApured = false;
         if (loggedUser.getClient() != null) {
             apurements = apurementService.getApurementsHasFiles(banque, loggedUser.getClient(), max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
-        } else {
+        }
+        else {
 
             if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
                 apurements = apurementService.getNotApuredTransactions(banque, null, max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
             } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
 //                ON GERE LE PROFIL AGENCE
-                apurements = apurementService.getNotApuredTransactions(banque, loggedUser, max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
+                apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
             }
         }
 
@@ -143,7 +144,7 @@ public class ApurementController {
 //        else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
         else {
 //                ON GERE LE PROFIL AGENCE
-            apurements = apurementService.getAllByBAnqueAndStatusAndUser(banque, loggedUser, StatusTransaction.APUREMENT_ANULER, max, page);
+            apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, false, StatusTransaction.APUREMENT_ANULER);
         }
 
         apurements.forEach(apurement -> {
@@ -207,7 +208,7 @@ public class ApurementController {
 //        else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
         else {
 //                ON GERE LE PROFIL AGENCE
-            apurements = apurementService.getAllByBAnqueAndStatusAndUser(banque, loggedUser, StatusTransaction.APUREMENT_REJETER, max, page);
+            apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, false, StatusTransaction.APUREMENT_REJETER);
         }
 
         apurements.forEach(apurement -> {
@@ -244,7 +245,7 @@ public class ApurementController {
 
     @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-treasury-approved", "/apurments-apurments-treasury-approved/page={page}"})
-    public String getTransactionsValideesParLaTresorerie(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal) {
+    public String getTransactionsValideesParLaTresorerie(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
@@ -265,7 +266,10 @@ public class ApurementController {
 
         Page<Apurement> apurements;
         boolean isApured = false;
-        apurements = apurementService.getApurementsTreasurySend(banque, max, page, isApured, StatusTransaction.APUREMENT_WAITING_DATE);
+        apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, false, StatusTransaction.APUREMENT_WAITING_DATE);
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
+            apurements = apurementService.getApurementsTreasurySend(banque, max, page, isApured, StatusTransaction.APUREMENT_WAITING_DATE);
+        }
 
         model.addAttribute("apurements", apurements.getContent());
         model.addAttribute("currentPage", apurements.getNumber() + 1);

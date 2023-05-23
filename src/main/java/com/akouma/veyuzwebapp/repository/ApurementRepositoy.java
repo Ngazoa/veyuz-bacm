@@ -1,9 +1,6 @@
 package com.akouma.veyuzwebapp.repository;
 
-import com.akouma.veyuzwebapp.model.AppUser;
-import com.akouma.veyuzwebapp.model.Apurement;
-import com.akouma.veyuzwebapp.model.Banque;
-import com.akouma.veyuzwebapp.model.Client;
+import com.akouma.veyuzwebapp.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,4 +71,5 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
 
     Page<Apurement> findByBanqueAndStatus(Banque banque, int apurementRejeter, Pageable pageable);
 
+    Page<Apurement> findByBanqueAndIsApuredAndStatusGreaterThanEqualAndClientAgenceOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, Agence agence, Pageable of);
 }
