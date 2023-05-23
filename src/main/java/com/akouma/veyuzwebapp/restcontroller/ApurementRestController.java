@@ -61,7 +61,7 @@ public class ApurementRestController {
         if (apurement.getFichiersManquants() != null && !apurement.getFichiersManquants().isEmpty()){
             data = "";
             for (ApurementFichierManquant f : apurement.getFichiersManquants()) {
-                if (f.getFile() != null && f.isForApurement()) {
+                if ((f.getFile() != null || f.getIsValidated()) && f.isForApurement()) {
                     hasData = true;
 
                     String v = "/rest-apurements/file/"+ f.getId() +"/false";
@@ -135,6 +135,7 @@ public class ApurementRestController {
                             "<input type='hidden' name='fichierManquant' value='"+f.getId()+"'>" +
                             "<label class='form-label'>"+f.getFileName().toUpperCase()+"</label>" +
                             "<div class='input-group mb-4'>" +
+                            "<input type='checkbox' name='file_checkbox' class='checkbox' style='margin-right: 15px'>" +
                             "<input type='file' name='file' class='form-control'>";
                     if (f.getFile() != null) {
                         String fLink = "/downloadFile/fichiers_transactions/" + f.getFile();
@@ -144,7 +145,9 @@ public class ApurementRestController {
                             "</form>";
                 }
             }
-            forms += "</div><div class='mb-3 mt-3'><button type='button' id='addFilesButton' class='btn btn-primary'>Enregistrer</button></div>" +
+            forms += "</div><div class='mb-3 mt-3'>" +
+                    "<label style='margin-right: 15px'><input type='checkbox' class='checkbox-all'> Tout cocher</label>" +
+                    "<button type='button' id='addFilesButton' class='btn btn-primary'>Enregistrer</button></div>" +
                     "<div id='result' class='mt-1'></div>";
         }
 
@@ -167,6 +170,7 @@ public class ApurementRestController {
         try {
             Upload upload = new Upload();
             if (fileForm.getFile() != null) {
+                System.out.println(fileForm.isFile_checkbox());
                 String fileName = upload.uploadFile(fileForm.getFile(),fileStorageService, "fichiers_transactions",request);
                 if (fileName != null && fileForm.getFichierManquant() != null) {
 //                    System.out.println("I -"+fileName+" II- "+fileForm.getFichierManquant());
@@ -180,7 +184,15 @@ public class ApurementRestController {
                     }
                     message = fileForm.getFichierManquant().getFileName() + " a été déplacé et transmis";
                     isUpload = true;
-                }else {
+                }
+                else if (fileForm.isFile_checkbox()) {
+                    Apurement apurement = fileForm.getFichierManquant().getApurement();
+                    apurement.setStatus(StatusTransaction.APUREMENT_HAS_FILES);
+                    fileForm.getFichierManquant().setIsValidated(true);
+                    apurementService.saveApurement(apurement);
+                    message = fileForm.getFichierManquant().getFileName() + " a été déplacé et transmis";
+                    isUpload = true;
+                } else {
                     message = fileForm.getFichierManquant().getFileName() + " n'a pas pu être déplacé et transmis";
                 }
             }
@@ -268,7 +280,7 @@ public class ApurementRestController {
         String list = "<ul>";
         boolean isCompleted = true;
         for (ApurementFichierManquant fm : apurement.getFichiersManquants()) {
-            if (fm.isForApurement() && fm.getFile() == null) {
+            if (fm.isForApurement() && !fm.getIsValidated() && fm.getFile() == null) {
                 isCompleted = false;
                 list += "<li>" + fm.getFileName() + "</li>";
             }
@@ -432,7 +444,7 @@ public class ApurementRestController {
         if (apurement.getFichiersManquants() != null && !apurement.getFichiersManquants().isEmpty()){
             data = "";
             for (ApurementFichierManquant f : apurement.getFichiersManquants()) {
-                if (f.getFile() == null && f.isForApurement()) {
+                if (!f.getIsValidated() && f.getFile() == null && f.isForApurement()) {
                     hasData = true;
                     data += "<li>" + f.getFileName() + "</li>";
                 }

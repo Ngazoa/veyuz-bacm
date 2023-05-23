@@ -267,6 +267,13 @@ $('#showFileForms').on("click", function (e) {
                 $("#addFilesButton").on("click" ,function(e) {
                     uploadFiles();
                 });
+                $('.checkbox-all').change(function() {
+                    if ($(this).is(':checked')) {
+                        $("#waiting-files-list .checkbox").prop('checked', true)
+                    }else {
+                        $("#waiting-files-list .checkbox").prop('checked', false)
+                    }
+                })
             } else {
                 $("#waiting-files-list").html("Aucun fichier manquant trouvé !");
             }
