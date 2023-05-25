@@ -108,4 +108,8 @@ public class ApurementService {
         }
         return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualOrderByDateOuvertureDesc(banque, isApured, status, PageRequest.of(page, max));
     }
+
+    public Page<Apurement> getAgenceApurements(Banque banque, Agence agence, int max, Integer page, boolean isApured) {
+        return apurementRepositoy.findByBanqueAndIsApuredAndClientAgenceOrderByDateOuvertureDesc(banque, isApured, agence, PageRequest.of(page, max));
+    }
 }

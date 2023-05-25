@@ -72,4 +72,6 @@ public interface ApurementRepositoy extends CrudRepository<Apurement, Long> {
     Page<Apurement> findByBanqueAndStatus(Banque banque, int apurementRejeter, Pageable pageable);
 
     Page<Apurement> findByBanqueAndIsApuredAndStatusGreaterThanEqualAndClientAgenceOrderByDateOuvertureDesc(Banque banque, boolean isApured, int status, Agence agence, Pageable of);
+
+    Page<Apurement> findByBanqueAndIsApuredAndClientAgenceOrderByDateOuvertureDesc(Banque banque, boolean isApured, Agence agence, Pageable of);
 }
