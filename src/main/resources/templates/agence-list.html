@@ -99,7 +99,7 @@
                                         <option th:each="b, state : ${users}" th:value="${b.id}" th:text="${b.nom +' '+b.prenom}"></option>
                                     </select>
                                     <br />
-                                    <label for="status">Status:</label>
+                                    <label for="status">Activer:</label>
                                     <input   type="checkbox" th:field="*{status}" checked />
                                     <br />
                                     <br>
