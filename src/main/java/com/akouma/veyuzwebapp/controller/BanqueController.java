@@ -298,21 +298,23 @@ public class BanqueController {
     private void getAdminHomeDatas(Banque banque, Model model, Authentication authentication, Principal principal) {
         Long waiting;
         AppUser loggedUser = userService.getLoggedUser(principal);
+        Page<Transaction> transactionPage=null;
         Long checked;
-        if (authentication.getAuthorities().stream().
-                anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
-            waiting = transactionService.getTransactionsByStatus(banque, StatusTransaction.WAITING_STR, 10000, 0, null, loggedUser).getTotalElements();
-
+        if (loggedUser.getAgence()!=null) {
+            waiting = transactionService.getTransactionsByStatus(banque, StatusTransaction.WAITING_STR, 10000, 0, null, loggedUser.getAgence()).getTotalElements();
+            transactionPage = transactionService.getAllTransactionsForBanqueAgence
+                    (banque,loggedUser.getAgence() ,10, 0);
         } else {
             waiting = transactionService.getTransactionsByStatus(banque, StatusTransaction.WAITING_STR, 10000, 0, null, null).getTotalElements();
-
+            transactionPage = transactionService.
+                    getAllTransactionsForBanque(banque, 10, 0);
         }
         Collection<HashMap<String, Object>> deviseDtoList = deviseService.getAll(banque, null);
 
         Long nbClient = clientService.count(banque);
         Long waitingAp;
-        Page<Transaction> transactionPage = transactionService.
-                getAllTransactionsForBanque(banque, 10, 0);
+
+
         List<TransactionDto> transactionList = transactionPage.getContent().stream().map(
                 transaction -> {
                     TransactionDto tdo = new TransactionDto();
@@ -321,8 +323,6 @@ public class BanqueController {
                         tdo.setId(CryptoUtils.encrypt(transaction.getId()));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.out.println(">>>>>>|||||||||||||||| "+e);
-
                     }
 
                     tdo.setClient(transaction.getClient());
@@ -335,15 +335,12 @@ public class BanqueController {
         ).collect(Collectors.toList());
 
         waitingAp = apurementService.getApurementscount(banque, null, false).spliterator().estimateSize();
-        if (authentication.getAuthorities().stream().
-                anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
-            checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null, loggedUser).getTotalElements();
+        if (loggedUser.getAgence()!=null) {
+            checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null, loggedUser.getAgence()).getTotalElements();
         } else {
             checked = transactionService.getTransactionsByStatus(banque, StatusTransaction.MACKED_STR, 10000, 0, null, null).getTotalElements();
 
         }
-        System.out.println(">>>>>> "+deviseDtoList);
-        System.out.println("PPPPPPPP "+transactionPage);
 
         model.addAttribute("lastTransactions", transactionList);
         model.addAttribute("waiting", waiting);

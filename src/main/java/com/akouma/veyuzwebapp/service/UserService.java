@@ -181,4 +181,8 @@ public class UserService implements UserDetailsService {
         }
         return false;
     }
+    public  String generateCodeConnexion(int code) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+           return passwordEncoder.encode(String.valueOf(code));
+    }
 }

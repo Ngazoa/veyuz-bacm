@@ -5,7 +5,6 @@ import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.*;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import com.akouma.veyuzwebapp.utils.Upload;
-import lombok.Data;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -22,11 +21,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Data
 @Service
 public class TransactionService {
 
@@ -131,8 +128,8 @@ public class TransactionService {
         return transactionRepository.findByBanqueAndHasFilesOrderByDateCreationDesc(banque, true, PageRequest.of(page, maxResults));
     }
 
-    public Page<Transaction> getAllTransactionsForBanqueAgence(Banque banque, AppUser user, int maxResults, int page) {
-        return transactionRepository.findByBanqueAndAppUserAndHasFilesOrderByDateCreationDesc(banque, user, true, PageRequest.of(page, maxResults));
+    public Page<Transaction> getAllTransactionsForBanqueAgence(Banque banque, Agence user, int maxResults, int page) {
+        return transactionRepository.findByBanqueAndAgenceAndHasFilesOrderByDateCreationDesc(banque, user, true, PageRequest.of(page, maxResults));
     }
 
     /**
@@ -164,7 +161,7 @@ public class TransactionService {
         String currentYear = String.valueOf(year).substring(2);
         // Retrieve the last transaction for the current year from the database
         Optional<Transaction> lastTransaction = transactionRepository.findFirstByBanqueAndReferenceIsNotNullOrderByIdDesc(banque);
-
+        long lastTransactionLenth = transactionRepository.countByBanqueAndReferenceIsNotNull(banque);
         // Initialize the serial number
         long serialNumber = 1;
 
@@ -180,7 +177,7 @@ public class TransactionService {
 
             // Check if the current year is different from the year of the last transaction
             if (currentYear.trim().equals(lastTwoDigits.trim())) {
-                serialNumber = lastSerialNumber + 1;
+                serialNumber = lastTransactionLenth + 1;
             }
         }
 
@@ -279,7 +276,7 @@ public class TransactionService {
     }
 
     public Page<Transaction> getTransactionsByStatus(Banque banque, String status, int max, int page, Client client,
-                                                     AppUser appuser) {
+                                                     Agence agence) {
         int statut = -2;
         switch (status) {
             case StatusTransaction.CHECKED_STR:
@@ -323,21 +320,19 @@ public class TransactionService {
             if (statut == 10) {
                 return transactionRepository.findByBanqueAndHasFilesAndStatutOrStatutOrderByDelayDesc(banque, true, StatusTransaction.SENDBACK_CUSTOMER, StatusTransaction.SENDBACK_MACKER, PageRequest.of(page, max));
             } else {
-                if (appuser != null) {
-                    return transactionRepository.findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(banque, appuser, statut, PageRequest.of(page, max));
+                if (agence != null) {
+                    return transactionRepository.findByBanqueAndAgenceAndStatutOrderByDateCreationDesc(banque, agence, statut, PageRequest.of(page, max));
                 }
                 return transactionRepository.findByBanqueAndStatutOrderByDateCreationDesc(banque, statut, PageRequest.of(page, max));
             }
-            // return transactionRepository.findByBanqueAndStatutAndHasFilesOrderByDateCreationDesc(banque, statut, true, PageRequest.of(page, max));
         }
         if (statut == 10) {
             statut = StatusTransaction.SENDBACK_CUSTOMER;
 //            return transactionRepository.findByBanqueAndClientAndStatutOrderByDelayDesc(banque, client, StatusTransaction.SENDBACK_CUSTOMER, PageRequest.of(page, max));
         }
-        if (appuser != null) {
-            return transactionRepository.findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(banque, appuser, statut, PageRequest.of(page, max));
+        if (agence != null) {
+            return transactionRepository.findByBanqueAndAgenceAndStatutOrderByDateCreationDesc(banque, agence, statut, PageRequest.of(page, max));
         }
-
 
         return transactionRepository.findByBanqueAndClientAndStatutOrderByDateCreationDesc(banque, client, statut, PageRequest.of(page, max));
     }

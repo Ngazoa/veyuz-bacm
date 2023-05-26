@@ -1,12 +1,14 @@
 package com.akouma.veyuzwebapp.service;
 
 import com.akouma.veyuzwebapp.model.Agence;
+import com.akouma.veyuzwebapp.model.AppRole;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.UserRole;
 import com.akouma.veyuzwebapp.repository.AgenceRepository;
 import com.akouma.veyuzwebapp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -40,12 +42,11 @@ public class AgenceService {
                 .orElseThrow(() -> new NoSuchElementException("Agence not found with id: " + id));
     }
 
-
     public void saveAgence(Agence agence) {
         Agence agency = agenceRepository.save(agence);
         for (AppUser a :
                 agence.getAppUsers()) {
-            Collection<UserRole> userRoles = null;
+            Collection<UserRole> userRoles = new ArrayList<>();
             UserRole userRole = new UserRole();
 
             userRole.setAppUser(a);

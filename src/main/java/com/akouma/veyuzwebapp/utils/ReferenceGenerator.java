@@ -1,6 +1,8 @@
 package com.akouma.veyuzwebapp.utils;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Random;
 
@@ -48,5 +50,17 @@ public class ReferenceGenerator {
         String year2 = String.valueOf(year).substring(2);
         String number = generateRandomNumber();
         return "TT" + number + "" + year2 + "BA";
+    }
+    public static String generateCodeConnexion() {
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000); // Génère un nombre aléatoire entre 100000 et 999999
+        return String.valueOf(code);
+    }
+
+    public boolean isWithinTenMinutes(LocalDateTime date) {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(date, now);
+        long minutesDifference = Math.abs(duration.toMinutes());
+        return minutesDifference <= 10;
     }
 }

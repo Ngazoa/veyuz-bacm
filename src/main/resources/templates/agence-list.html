@@ -13,7 +13,7 @@
 
 <div id="main-content">
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-7" style="height: 473px; overflow-y: scroll;">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">Gestion Agences</h5>
@@ -40,7 +40,7 @@
                                     <td>
                                         <ul>
                                             <li th:each="appUser : ${a.appUsers}">
-                                                <span th:text="${appUser.userName}"></span>
+                                                <span th:text="${appUser.nom +' '+appUser.prenom}"></span>
                                             </li>
                                         </ul>
                                     </td>                                    <td th:text="${a.address}"></td>
@@ -96,13 +96,14 @@
                                     <label>Selectionner le responsable:</label>
                                     <select class="form-control form-select" th:field="*{appUsers}" required>
                                         <option value="">Selectionner un reponsable</option>
-                                        <option th:each="b, state : ${users}" th:value="${b.id}" th:text="${b.userName}"></option>
+                                        <option th:each="b, state : ${users}" th:value="${b.id}" th:text="${b.nom +' '+b.prenom}"></option>
                                     </select>
                                     <br />
-                                    <label for="status">Status:</label>
-                                    <input   type="checkbox" th:field="*{status}" />
+                                    <label for="status">Activer:</label>
+                                    <input   type="checkbox" th:field="*{status}" checked />
                                     <br />
-                                    <input class="form-control btn btn-info"  type="submit" value="Create" />
+                                    <br>
+                                    <input class="form-control btn btn-info"  type="submit" value="Sauvegarder" />
                                 </form>
 
                                 <form th:object="${agence}" th:action="@{/agency}" th:if="${agence.id != null}" method="post">
@@ -119,13 +120,14 @@
                                     <label>Selectionner le responsable:</label>
                                     <select class="form-control form-select" th:field="*{appUsers}" required>
                                         <option value="">Selectionner un reponsable</option>
-                                        <option th:each="b, state : ${users}" th:value="${b.id}" th:text="${b.userName}"></option>
+                                        <option th:each="b, state : ${users}" th:value="${b.id}" th:text="${b.nom +' '+b.prenom}"></option>
                                     </select>
                                     <br>
                                     <label for="status">Status:</label>
-                                    <input  type="checkbox" th:field="*{status}" />
+                                    <input  type="checkbox" th:field="*{status}" checked/>
                                     <br />
-                                    <input class="form-control btn btn-secondary"  type="submit" value="Update" />
+                                    <br>
+                                    <input class="form-control btn btn-secondary"  type="submit" value="Mettre a jour" />
 
                                     <br>
                                     <br>

@@ -9,7 +9,6 @@ import com.akouma.veyuzwebapp.repository.ClientRepository;
 import com.akouma.veyuzwebapp.repository.UserRepository;
 import com.akouma.veyuzwebapp.repository.UserRoleRepository;
 import com.akouma.veyuzwebapp.utils.CryptoUtils;
-import org.springframework.util.StringUtils;
 import com.akouma.veyuzwebapp.utils.Upload;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.Cell;
@@ -21,32 +20,34 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Data
 @Service
 public class ClientService {
 
+    private static String UPLOAD_DIR = "/kyc";
+    @Autowired
+    FileStorageService fileStorageService;
     @Autowired
     private ClientRepository clientRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private CryptoUtils cryptoUtils;
+    @Autowired
+    private AppRoleRepository appRoleRepository;
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     public ClientRepository getClientRepository() {
         return clientRepository;
@@ -80,16 +81,6 @@ public class ClientService {
         this.userRoleRepository = userRoleRepository;
     }
 
-    @Autowired
-    private AppRoleRepository appRoleRepository;
-
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-     @Autowired
-     FileStorageService fileStorageService;
-    private static String UPLOAD_DIR = "/kyc";
-
-
     public Optional<Client> getClient(final Long id) {
         return clientRepository.findById(id);
     }
@@ -97,8 +88,13 @@ public class ClientService {
     public Page<Client> getClients(Banque banque, int maxResults, int page) {
         return clientRepository.findDistinctReferenceByBanques(banque, PageRequest.of(page, maxResults));
     }
-    public long countClientAgence(Agence agence){
+
+    public long countClientAgence(Agence agence) {
         return clientRepository.countByAgence(agence);
+    }
+
+    public Page<Client>findAllClientAgence(Agence agence,Banque banque,int maxResults, int page) {
+        return clientRepository.findByBanquesAndAgenceOrderByUser_NomAsc(banque,agence, PageRequest.of(page, maxResults));
     }
 
     public Iterable<Client> searchClients(Banque banque, String nom) {
@@ -118,13 +114,22 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public List<Client> searchClientsByName(Banque banque,String query) {
+    public List<Client> searchClientsByName(Banque banque, String query) {
         List<Client> clients = clientRepository.
                 findByUser_BanqueLikeOrTelephoneContainingOrDenominationContainingOrReferenceContaining(banque,
-                query,query,query);
+                        query, query, query);
         return clients;
 
     }
+
+//    public List<Client> searchClientsAgenceByName(Banque banque,Agence agence, String query) {
+//        List<Client> clients = clientRepository.
+//                findByUser_AgenceAndBanqueLikeOrTelephoneContainingOrDenominationContainingOrReferenceContaining(
+//                        agence,banque,
+//                        query, query, query);
+//        return clients;
+//
+//    }
 
 
     public void setEnable(boolean isEnable, Client client) {
@@ -132,9 +137,9 @@ public class ClientService {
         clientRepository.save(client);
     }
 
-    public Client findById(long id){
-        Optional<Client> client=clientRepository.findById(id);
-        if(client.isEmpty()){
+    public Client findById(long id) {
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isEmpty()) {
             return null;
         }
         return client.get();
@@ -169,7 +174,7 @@ public class ClientService {
         client.setDenomination(clientForm.getDenomination());
         client.setTelephone(clientForm.getTelephone());
         client.setNumeroContribuable(clientForm.getNumeroContribuable());
-        String kyc = u.uploadFile(clientForm.getKycFile(),fileStorageService, uploadRootPath,request);
+        String kyc = u.uploadFile(clientForm.getKycFile(), fileStorageService, uploadRootPath, request);
         client.setKyc(kyc);
 
         Collection<Banque> banques = client.getBanques();
@@ -200,11 +205,11 @@ public class ClientService {
         return savedClient;
     }
 
-    public void importData(ImportFileForm importFile, Banque banque,HttpServletRequest request) throws IOException {
+    public void importData(ImportFileForm importFile, Banque banque, HttpServletRequest request) throws IOException {
 
         Upload u = new Upload();
         String uploadRootPath = "/tmp";
-        String file_root = u.uploadFile(importFile.getFile(),fileStorageService ,uploadRootPath,request);
+        String file_root = u.uploadFile(importFile.getFile(), fileStorageService, uploadRootPath, request);
         //Read XSL file
         String msg = null;
         FileInputStream inputStream = new FileInputStream(UPLOAD_DIR + "/tmp/" + file_root);
@@ -343,7 +348,7 @@ public class ClientService {
     public List<ClientDto> getClients(Banque banque) {
         return clientRepository.findDistinctReferenceByBanques(banque).stream().map(
                 client -> {
-                    ClientDto client1=new ClientDto();
+                    ClientDto client1 = new ClientDto();
                     client1.setTelephone(client.getTelephone());
                     try {
                         client1.setId(cryptoUtils.encrypt(client.getId()));
@@ -362,26 +367,27 @@ public class ClientService {
                 }
         ).collect(Collectors.toList());
     }
-    public ClientDto getClient(Client client) {
-                      if(client==null){
-                          return null;
-                      }
-                    ClientDto client1=new ClientDto();
-                    client1.setTelephone(client.getTelephone());
-                    try {
-                        client1.setId(cryptoUtils.encrypt(client.getId()));
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    client1.setUser(client.getUser());
-                    client1.setDomiciliations(client.getDomiciliations());
-                    client1.setKyc(client.getKyc());
-                    client1.setDenomination(client.getDenomination());
-                    client1.setReference(client.getReference());
-                    client1.setNumeroContribuable(client.getNumeroContribuable());
-                    client1.setTypeClient(client.getTypeClient());
-                    return client1;
+    public ClientDto getClient(Client client) {
+        if (client == null) {
+            return null;
+        }
+        ClientDto client1 = new ClientDto();
+        client1.setTelephone(client.getTelephone());
+        try {
+            client1.setId(cryptoUtils.encrypt(client.getId()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        client1.setUser(client.getUser());
+        client1.setDomiciliations(client.getDomiciliations());
+        client1.setKyc(client.getKyc());
+        client1.setDenomination(client.getDenomination());
+        client1.setReference(client.getReference());
+        client1.setNumeroContribuable(client.getNumeroContribuable());
+        client1.setTypeClient(client.getTypeClient());
+        return client1;
     }
 
     public Client getClientByReference(String referenceClient) {
@@ -403,15 +409,15 @@ public class ClientService {
                 predicates.add(builder.equal(root.get("user").get("banque"), banque));
 
                 if (telephone != null && !telephone.isEmpty()) {
-                    predicates.add(builder.like(root.get("telephone"), "%" + telephone ));
+                    predicates.add(builder.like(root.get("telephone"), "%" + telephone));
                 }
 
                 if (denomination != null && !denomination.isEmpty()) {
-                    predicates.add(builder.like(root.get("denomination"), "%" + denomination ));
+                    predicates.add(builder.like(root.get("denomination"), "%" + denomination));
                 }
 
                 if (reference != null && !reference.isEmpty()) {
-                    predicates.add(builder.like(root.get("reference"), "%" + reference ));
+                    predicates.add(builder.like(root.get("reference"), "%" + reference));
                 }
 
                 return builder.and(predicates.toArray(new Predicate[0]));

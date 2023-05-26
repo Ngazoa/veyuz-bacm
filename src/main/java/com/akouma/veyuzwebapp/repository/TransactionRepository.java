@@ -18,6 +18,8 @@ import java.util.Optional;
 @Transactional
 public interface TransactionRepository extends CrudRepository<Transaction, Long> {
     long countByBanqueAndAgenceAndStatut(Banque banque, Agence agence, int statut);
+
+    List<Transaction>findByBanqueAndAgenceAndStatut(Banque banque, Agence agence, int statut,Pageable pageable);
     long countByBanqueAndAgence(Banque banque, Agence agence);
 
     Page<Transaction> findAll(Pageable pageable);
@@ -131,6 +133,8 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
 
     Optional<Transaction> findFirstByBanqueAndReferenceIsNotNullOrderByIdDesc(Banque banque);
 
+    long countByBanqueAndReferenceIsNotNull(Banque banque);
+
     Iterable<Transaction> findByBanqueAndClientAndHasFilesTrue(Banque banque, Client client);
 
     Iterable<Transaction> findByBanqueAndHasFilesTrue(Banque banque);
@@ -155,7 +159,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     @Override
     boolean existsById(Long aLong);
 
-    Page<Transaction> findByBanqueAndAppUserAndStatutOrderByDateCreationDesc(Banque banque, AppUser appuser, int statut, Pageable pageable);
+    Page<Transaction> findByBanqueAndAgenceAndStatutOrderByDateCreationDesc(Banque banque, Agence agence, int statut, Pageable pageable);
 
     Transaction findByReference(String ref);
 }

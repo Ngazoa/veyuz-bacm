@@ -69,8 +69,10 @@ public class StatusTransaction {
     public static final String[] TEXT_COLORS = {"text-primary", "text-danger", "text-warning", "text-dark","text-secondary",
             "text-dribbble", "text-color1 ", "text-color2", "text-color3","text-color4",
             "text-color5", "text-color6", "text-color7", "text-color8","text-color9"};
-    public static final String[] BG_COLORS = {"#0066ff", "#fa0019", "#ffb10a", "#3d3c3b", "#3d3c3b",
-            "#ea4c89", "#dc4e41", "#1ab7ea", "#181717", "#ea4c89",
-            "#bd081c", "#0052cc", "#3b5998", "#fff", "#17a2b8"};
+    public static final String[] BG_COLORS = {
+            "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF", "#FF00FF", // Add more color codes as needed
+            "#FFA500", "#008000", "#800080", "#FFC0CB", "#800000", "#FF00FF",
+            "#FFD700", "#00CED1", "#FF4500"
+            };
 
 }

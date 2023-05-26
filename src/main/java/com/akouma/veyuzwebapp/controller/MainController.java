@@ -7,6 +7,7 @@ import com.akouma.veyuzwebapp.service.MailService;
 import com.akouma.veyuzwebapp.service.UserService;
 import com.akouma.veyuzwebapp.utils.CheckSession;
 import com.akouma.veyuzwebapp.utils.PasswordGenerator;
+import com.akouma.veyuzwebapp.utils.ReferenceGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,9 +21,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Random;
 
 @Controller
 public class MainController {
@@ -45,8 +47,9 @@ public class MainController {
     public String welcomePage(Model model, Principal principal) {
         List<Banque> banquesList = null;
         String message = null;
+        AppUser appUser = null;
         if (principal != null) {
-            AppUser appUser = userService.getLoggedUser(principal);
+            appUser = userService.getLoggedUser(principal);
             this.session.setAttribute("loggedUser", appUser);
             if (appUser == null) {
                 return "redirect:/404";
@@ -66,21 +69,55 @@ public class MainController {
                 }
             }
             this.session.setAttribute("loggedUser", appUser);
+
         } else {
             return "error/404";
         }
+        this.session.setAttribute("banqueList", appUser.getBanque());
 
-        if (banquesList.size() == 1) {
-            Optional<Banque> banque = banquesList.stream().findFirst();
+//        if (banquesList.size() == 1) {
+//            Optional<Banque> banque = banquesList.stream().findFirst();
+//            if (banque != null) {
+//                return "redirect:/dashboard-banque-" + banque.get().getId();
+//            }
+//        }
+//
+        model.addAttribute("message", message);
+//        model.addAttribute("banquesList", banquesList);
+        Random random = new Random();
+        int code = 10000 + random.nextInt(90000); // Génère un nombre aléatoire entre 10000 et 99999
+        String authCode = userService.generateCodeConnexion(code);
+
+        appUser.setCodeAuthentication(authCode);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        appUser.setDateCodeAuthentication(localDateTime);
+        appUser.setStatusCodeAuth(true);
+        userService.saveUser(appUser);
+
+        mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
+                "Bienvenue a vous  et votre code de connexion est  : " + code);
+        return "code-authentication";
+    }
+
+    @PostMapping("/valide-code")
+    public String manageCodeAuht(@RequestParam("code") String code, Principal principal, Model model) {
+        Banque banque = (Banque) session.getAttribute("banqueList");
+        AppUser appUser = userService.getLoggedUser(principal);
+        AppUser userCode = userService.getUserByEmail(appUser.getEmail());
+        PasswordEncoder codeEncoder = new BCryptPasswordEncoder();
+
+        boolean delay = new ReferenceGenerator().isWithinTenMinutes(userCode.getDateCodeAuthentication());
+
+        if (userCode.isStatusCodeAuth() && delay && codeEncoder.matches(code,
+                userCode.getCodeAuthentication())) {
             if (banque != null) {
-                return "redirect:/dashboard-banque-" + banque.get().getId();
+                appUser.setStatusCodeAuth(false);
+                userService.saveUser(appUser);
+                return "redirect:/dashboard-banque-" + banque.getId();
             }
         }
-
-        model.addAttribute("message", message);
-        model.addAttribute("banquesList", banquesList);
-
-        return "welcomePage";
+        model.addAttribute("errorMessage", "Une erreur est survenue");
+        return "code-authentication";
     }
 
     @GetMapping("/reinitialiser")

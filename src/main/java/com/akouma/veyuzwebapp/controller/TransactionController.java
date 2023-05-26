@@ -69,9 +69,9 @@ public class TransactionController {
     private TransactionValidator transactionValidator;
     @Autowired
     private ClientService clientService;
-
     @Autowired
     private AgenceService agenceService;
+
 
     public TransactionController(HttpSession session) {
         this.session = session;
@@ -90,11 +90,12 @@ public class TransactionController {
         }
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_ADMIN", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
-    @GetMapping({"/transactions", "/transactions/page={page}"})
+    @GetMapping({"/transactions", "/transactions/page={page}","/transactions-{agence}"
+            , "/transactions-{agence}/page={page}",})
     public String getTransactions(
             @PathVariable(value = "page", required = false) Integer page,
-            Model model, Authentication authentication, Principal principal) {
+            Model model, Authentication authentication, Principal principal,
+            @PathVariable(required = false,value = "agence") Long agenceId) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
@@ -109,14 +110,33 @@ public class TransactionController {
         }
         page--;
 
+        Agence agence=null;
+        if(agenceId!=null){
+            System.out.println("<<<< "+agenceId);
+            agence=agenceService.getAgenceById(agenceId);
+            transactions = transactionService.getPageableTransactionsHasFilesForAgence(banque, agence, true, max, page);
+
+            SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
+            searchTransactionForm.setBanque(banque);
+
+            String uri = "/transactions-"+agenceId+"/page={page}";
+            model.addAttribute("uri", uri);
+
+            addTransactionViewData(null, model, banque, transactions, searchTransactionForm, uri);
+            model.addAttribute("dash", "transaction");
+            model.addAttribute("das", "all");
+
+            return "transactionslist";
+
+        }
+
         AppUser loggedUser = userService.getLoggedUser(principal);
         // On verifie le role du user qui est connectee. si c'est un client alors on lui retourne la liste de ses transactions
         if (loggedUser.getClient() != null) {
             transactions = transactionService.getPageableTransactionsForClient(banque, loggedUser.getClient(), max, page);
 
-        } else if (authentication.getAuthorities().stream().
-                anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
-            transactions = transactionService.getAllTransactionsForBanqueAgence(banque, loggedUser, max, page);
+        } else if (loggedUser.getAgence()!=null) {
+            transactions = transactionService.getAllTransactionsForBanqueAgence(banque, loggedUser.getAgence(), max, page);
         } else {
             transactions = transactionService.getAllTransactionsForBanque(banque, max, page);
         }
@@ -202,23 +222,41 @@ public class TransactionController {
     }
 
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
-    @GetMapping({"/transactions/{status}/page={page}", "/transactions/{status}"})
+    @GetMapping({"/transactions/{status}/page={page}", "/transactions/{status}",
+            "/transactions-state/{agence}/{status}/page={page}","/transactions-state/{agence}/{status}"})
     public String getTransactionsByStatus(
             @PathVariable("status") String status,
             @PathVariable(value = "page", required = false) Integer page,
-
-            Model model, Authentication authentication, Principal principal) {
+            @PathVariable(required = false,value = "agence") Long agenceId,
+    Model model, Authentication authentication, Principal principal) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
         }
-
+        Page<Transaction> transactions;
         Banque banque = (Banque) session.getAttribute("banque");
         if (page == null || page <= 0) {
             page = this.page;
         }
         page--;
+        Agence agence=null;
+        if(agenceId!=null){
+            agence=agenceService.getAgenceById(agenceId);
+            transactions = transactionService.getTransactionsByStatus(banque, status, max, page, null,
+                    agence);
+
+            SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
+            searchTransactionForm.setBanque(banque);
+            String uri = "/transactions-state/"+agenceId+"/" + status + "/page={page}";
+            model.addAttribute("uri", uri);
+            model.addAttribute("withStatus", status);
+            addTransactionViewData(null, model, banque, transactions, searchTransactionForm, uri);
+            model.addAttribute("das", status);
+            model.addAttribute("dash", "transaction");
+            return "transactionslist";
+        }
+
 
         Client client = null;
 
@@ -231,10 +269,9 @@ public class TransactionController {
                 client = loggedUser.getClient();
             }
         }
-        Page<Transaction> transactions;
-        if (authentication.getAuthorities().stream().
-                anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
-            transactions = transactionService.getTransactionsByStatus(banque, status, max, page, client, loggedUser);
+
+        if (loggedUser.getAgence()!=null) {
+            transactions = transactionService.getTransactionsByStatus(banque, status, max, page, client, loggedUser.getAgence());
 
         } else {
             transactions = transactionService.getTransactionsByStatus(banque, status, max, page, client, null);
@@ -254,7 +291,7 @@ public class TransactionController {
 
 
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
-    @PostMapping(value = "/search-transactions-results", name = "pst")
+    @PostMapping({ "/search-transactions-results","/search-transactions-results/{agence}" })
     public String getPeriodiqueTransactions(
             @ModelAttribute SearchTransactionForm searchTransactionForm,
             Model model, RedirectAttributes redirectAttributes, Principal principal) throws ParseException {
