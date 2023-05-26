@@ -93,9 +93,12 @@ public class MainController {
         appUser.setDateCodeAuthentication(localDateTime);
         appUser.setStatusCodeAuth(true);
         userService.saveUser(appUser);
-
+         try{
         mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
                 "Bienvenue a vous  et votre code de connexion est  : " + code);
+         }catch (Exception e){
+             e.getStackTrace();
+         }
         return "code-authentication";
     }
 

@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.configuration;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -8,17 +9,31 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 @Configuration
-public class MailConfig {
+public class MalConfig {
+
+    private String dbUsername;
+    private String dbPassword;
+    private String host;
+    private int port;
+
+    public MalConfig() {
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+        // Access your environment variables using dotenv.get("KEY")
+        dbUsername = dotenv.get("usernameMail");
+        dbPassword = dotenv.get("passwordMail");
+        host = dotenv.get("hostMail");
+        port = Integer.parseInt(dotenv.get("portMail"));
+    }
 
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
        // mailSender.setHost("veyuzweb.azurewebsites.net");
-        mailSender.setHost("localhost");
-        mailSender.setPort(587);
+        mailSender.setHost(host);
+        mailSender.setPort(port);
 
-        mailSender.setUsername("ignored");
-        mailSender.setPassword("ignored");
+        mailSender.setUsername(dbUsername);
+        mailSender.setPassword(dbPassword);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
