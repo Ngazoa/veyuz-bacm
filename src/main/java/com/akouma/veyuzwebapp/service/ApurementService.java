@@ -1,9 +1,6 @@
 package com.akouma.veyuzwebapp.service;
 
-import com.akouma.veyuzwebapp.model.AppUser;
-import com.akouma.veyuzwebapp.model.Apurement;
-import com.akouma.veyuzwebapp.model.Banque;
-import com.akouma.veyuzwebapp.model.Client;
+import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.ApurementRepositoy;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,5 +100,16 @@ public class ApurementService {
 
     public Page<Apurement> getAllByBAnqueAndStatusAndUser(Banque banque, AppUser loggedUser, int status, int max, Integer page) {
         return apurementRepositoy.findByBanqueAndStatusAndAppUser(banque, status, loggedUser, PageRequest.of(page, max));
+    }
+
+    public Page<Apurement> findByAgence(Banque banque, Agence agence, int max, Integer page, boolean isApured, int status) {
+        if (agence != null) {
+            return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualAndClientAgenceOrderByDateOuvertureDesc(banque, isApured, status, agence, PageRequest.of(page, max));
+        }
+        return apurementRepositoy.findByBanqueAndIsApuredAndStatusGreaterThanEqualOrderByDateOuvertureDesc(banque, isApured, status, PageRequest.of(page, max));
+    }
+
+    public Page<Apurement> getAgenceApurements(Banque banque, Agence agence, int max, Integer page, boolean isApured) {
+        return apurementRepositoy.findByBanqueAndIsApuredAndClientAgenceOrderByDateOuvertureDesc(banque, isApured, agence, PageRequest.of(page, max));
     }
 }

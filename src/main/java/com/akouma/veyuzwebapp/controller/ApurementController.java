@@ -72,13 +72,17 @@ public class ApurementController {
         boolean isApured = false;
         if (loggedUser.getClient() != null) {
             apurements = apurementService.getApurementsHasFiles(banque, loggedUser.getClient(), max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
-        } else {
+        }
+        else {
 
-            if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
+            if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))
+                    || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK"))
+            ){
                 apurements = apurementService.getNotApuredTransactions(banque, null, max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
             } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
 //                ON GERE LE PROFIL AGENCE
-                apurements = apurementService.getNotApuredTransactions(banque, loggedUser, max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
+                System.out.println("Agence");
+                apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, isApured, StatusTransaction.APUREMENT_WAITING_FILES);
             }
         }
 
@@ -137,13 +141,15 @@ public class ApurementController {
 
         Page<Apurement> apurements;
 
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK"))
+        ){
             apurements = apurementService.getAllByStatusAndBanqueApurements(banque, StatusTransaction.APUREMENT_ANULER, max, page);
         }
 //        else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
         else {
-//                ON GERE LE PROFIL AGENCE
-            apurements = apurementService.getAllByBAnqueAndStatusAndUser(banque, loggedUser, StatusTransaction.APUREMENT_ANULER, max, page);
+//          ON GERE LE PROFIL AGENCE
+            apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, false, StatusTransaction.APUREMENT_ANULER);
         }
 
         apurements.forEach(apurement -> {
@@ -201,13 +207,16 @@ public class ApurementController {
 
         Page<Apurement> apurements;
 
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))){
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))
+            || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK"))
+        ){
             apurements = apurementService.getAllByStatusAndBanqueApurements(banque, StatusTransaction.APUREMENT_REJETER, max, page);
         }
 //        else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
         else {
 //                ON GERE LE PROFIL AGENCE
-            apurements = apurementService.getAllByBAnqueAndStatusAndUser(banque, loggedUser, StatusTransaction.APUREMENT_REJETER, max, page);
+            System.out.println("Agence");
+            apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, false, StatusTransaction.APUREMENT_REJETER);
         }
 
         apurements.forEach(apurement -> {
@@ -244,7 +253,7 @@ public class ApurementController {
 
     @Secured({"ROLE_ADMIN", "ROLE_TRADE_DESK",  "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-treasury-approved", "/apurments-apurments-treasury-approved/page={page}"})
-    public String getTransactionsValideesParLaTresorerie(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal) {
+    public String getTransactionsValideesParLaTresorerie(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
@@ -265,7 +274,12 @@ public class ApurementController {
 
         Page<Apurement> apurements;
         boolean isApured = false;
-        apurements = apurementService.getApurementsTreasurySend(banque, max, page, isApured, StatusTransaction.APUREMENT_WAITING_DATE);
+        apurements = apurementService.findByAgence(banque, loggedUser.getAgence(), max, page, false, StatusTransaction.APUREMENT_WAITING_DATE);
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK"))
+        ){
+            apurements = apurementService.getApurementsTreasurySend(banque, max, page, isApured, StatusTransaction.APUREMENT_WAITING_DATE);
+        }
 
         model.addAttribute("apurements", apurements.getContent());
         model.addAttribute("currentPage", apurements.getNumber() + 1);
@@ -354,7 +368,7 @@ public class ApurementController {
 
     @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/apurments-all", "/apurments-all/page={page}"})
-    public String getAllApurements(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal) {
+    public String getAllApurements(@PathVariable(value = "page", required = false) Integer page, Model model, Principal principal, Authentication authentication) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
@@ -373,12 +387,16 @@ public class ApurementController {
         Banque banque = (Banque) session.getAttribute("banque");
         AppUser loggedUser = userService.getLoggedUser(principal);
 
-        Page<Apurement> apurements;
+        Page<Apurement> apurements = null;
         boolean isApured = true;
         if (loggedUser.getClient() != null) {
             apurements = apurementService.getApurements(banque, loggedUser.getClient(), max, page, isApured);
         } else {
-            apurements = apurementService.getApurements(banque, null, max, page, isApured);
+            if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
+                apurements = apurementService.getAgenceApurements(banque, loggedUser.getAgence(), max, page, isApured);
+            }
+            else
+                apurements = apurementService.getApurements(banque, null, max, page, isApured);
         }
 
         model.addAttribute("apurements", apurements.getContent());
