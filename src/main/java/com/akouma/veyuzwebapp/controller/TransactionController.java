@@ -976,7 +976,6 @@ public class TransactionController {
         return "redirect:/transactions";
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/import-transactions")
     public String showImportTransactionFile(Model model, Principal principal) {
 
@@ -985,12 +984,10 @@ public class TransactionController {
             return "redirect:/";
         }
 
-        Banque banque = (Banque) session.getAttribute("banque");
-        model.addAttribute("banque", banque);
-        model.addAttribute("importFileForm", new ImportFileForm(banque));
+        model.addAttribute("type", "transaction");
         model.addAttribute("importTransaction", true);
         model.addAttribute("isImport", true);
-        model.addAttribute("postUri", "/post-import-transaction");
+        model.addAttribute("postUri", "/import");
         model.addAttribute("formTitle", "importer les transactions");
         model.addAttribute("dash", "params");
         model.addAttribute("setItem", "trans");

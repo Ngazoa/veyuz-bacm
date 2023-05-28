@@ -291,7 +291,6 @@ public class DomiciliationController {
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/admin/domiciliations/import")
     public String showImportDomiciliationForm(
             Model model,
@@ -306,11 +305,51 @@ public class DomiciliationController {
 
         model.addAttribute("banque", banque);
         model.addAttribute("isImport", true);
-        model.addAttribute("postUri", "/post-import-domiciliations");
-        model.addAttribute("importFileForm", new ImportFileForm(banque));
+        model.addAttribute("postUri", "/import");
+        model.addAttribute("type", "domiciliation");
         model.addAttribute("formTitle", "importer les domiciliations");
         model.addAttribute("dash", "params");
         model.addAttribute("setItem", "domi");
+
+        return "parametres";
+    }
+
+    @GetMapping("/admin/beneficiaire/import")
+    public String showImportBeneficiaireForm(
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session)) {
+            return "redirect:/";
+        }
+
+        model.addAttribute("isImport", true);
+        model.addAttribute("postUri", "/import");
+        model.addAttribute("type", "beneficiaire");
+        model.addAttribute("formTitle", "importer des beneficiaires");
+        model.addAttribute("dash", "params");
+        model.addAttribute("setItem", "benef");
+
+        return "parametres";
+    }
+
+    @GetMapping("/admin/agency/import")
+    public String showImportAgenceForm(
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session)) {
+            return "redirect:/";
+        }
+
+        model.addAttribute("isImport", true);
+        model.addAttribute("postUri", "/import");
+        model.addAttribute("type", "agence");
+        model.addAttribute("formTitle", "importer la liste des agences");
+        model.addAttribute("dash", "params");
+        model.addAttribute("setItem", "agence");
 
         return "parametres";
     }
