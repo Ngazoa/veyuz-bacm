@@ -22,6 +22,15 @@ public class CryptoUtils {
         return Base64.encodeBase64URLSafeString(encryptedValue);
     }
 
+    public static String encrypt(String value) throws Exception {
+        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+
+        byte[] encryptedValue = cipher.doFinal(value.getBytes());
+        return Base64.encodeBase64URLSafeString(encryptedValue);
+    }
+
     public static Long decrypt(String encryptedValue) throws Exception {
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), ALGORITHM);
         Cipher cipher = Cipher.getInstance(ALGORITHM);

@@ -54,6 +54,8 @@ public class TransactionRestController {
     private UserRoleService userRoleService;
     @Autowired
     private CryptoUtils cryptoUtils;
+    @Autowired
+    private MailService mailService;
 
     @Transactional
     @GetMapping("/rest-transaction-change-status/{id}/{user_id}/{status}")
@@ -226,12 +228,12 @@ public class TransactionRestController {
                 transaction.setStatut(StatusTransaction.MACKED);
                 transactionService.saveTransaction(transaction);
                 this.saveTransactionAndAction(transaction, appUser, status, "La transaction a ete transmise pour le Trade desk Maker");
-//                Notification notification = new Notification();
-//                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
-//                notification.setRead(false);
-//                notification.setUtilisateur(transaction.getClient().getUser());
-//                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-//                notificationService.save(notification);
+                Notification notification = new Notification();
+                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
+                notification.setRead(false);
+                notification.setUtilisateur(transaction.getClient().getUser());
+                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+                notificationService.save(notification);
                 isChange = true;
                 message = "L'operation a ete prise en compte ! la transaction a ete transmise pour le Trade desk Maker .";
 
@@ -242,12 +244,12 @@ public class TransactionRestController {
                 transaction.setStatut(StatusTransaction.CHECKED);
                 transactionService.saveTransaction(transaction);
                 this.saveTransactionAndAction(transaction, appUser, status, "La transaction a ete transmise pour le Trade desk Maker");
-//                Notification notification = new Notification();
-//                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
-//                notification.setRead(false);
-//                notification.setUtilisateur(transaction.getClient().getUser());
-//                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-//                notificationService.save(notification);
+                Notification notification = new Notification();
+                notification.setMessage("Une de vos transactions a été Approuvée et transmise pour le Trade desk Maker");
+                notification.setRead(false);
+                notification.setUtilisateur(transaction.getClient().getUser());
+                notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
+                notificationService.save(notification);
                 isChange = true;
                 message = "L'operation a ete prise en compte ! la transaction a ete transmise pour le Trade desk Maker .";
 
@@ -460,6 +462,9 @@ public class TransactionRestController {
 
             }
         }
+        mailService.sendSimpleMessage(transaction.getAppUser().getEmail()
+                ,"Renvoi de transaction "+transaction.getClient().getDenomination(),
+                message +" pour "+commentaire);
         response.put("message", message);
         response.put("isChange", isChange);
         return new ResponseEntity<>(response, HttpStatus.OK);

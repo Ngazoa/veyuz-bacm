@@ -15,6 +15,8 @@ public class MalConfig {
     private final String dbPassword;
     private final String host;
     private final int port;
+    private final String enableTls;
+    private final String enableAuth;
 
     public MalConfig() {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
@@ -23,6 +25,8 @@ public class MalConfig {
         dbPassword = dotenv.get("passwordMail");
         host = dotenv.get("hostMail");
         port = Integer.parseInt(dotenv.get("portMail"));
+        enableTls=dotenv.get("enableTls");
+        enableAuth=dotenv.get("enableAuth");
     }
 
     @Bean
@@ -35,8 +39,8 @@ public class MalConfig {
         mailSender.setPassword(dbPassword);
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true"); // enable TLS
+        props.put("mail.smtp.auth", enableAuth);
+        props.put("mail.smtp.starttls.enable", enableTls); // enable TLS
         props.put("mail.debug", "true");
         return mailSender;
     }
