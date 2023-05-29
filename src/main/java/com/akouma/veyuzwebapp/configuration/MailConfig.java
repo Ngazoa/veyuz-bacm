@@ -10,24 +10,24 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-    @Bean
-    public JavaMailSender getJavaMailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-       // mailSender.setHost("veyuzweb.azurewebsites.net");
-        mailSender.setHost("localhost");
-        mailSender.setPort(587);
-
-        mailSender.setUsername("ignored");
-        mailSender.setPassword("ignored");
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "false");
-        props.put("mail.smtp.starttls.enable", "false"); // enable TLS
-        props.put("mail.debug", "true");
-
-        return mailSender;
-    }
+//    @Bean
+//    public JavaMailSender getJavaMailSender() {
+//        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+//       // mailSender.setHost("veyuzweb.azurewebsites.net");
+//        mailSender.setHost("emmaberanger2@gmail.com");
+//        mailSender.setPort(587);
+//
+//        mailSender.setUsername("emmaberanger2@gmail.com");
+//        mailSender.setPassword("luceyqjpakntkwjm");
+//
+//        Properties props = mailSender.getJavaMailProperties();
+//        props.put("mail.transport.protocol", "smtp");
+//        props.put("mail.smtp.auth", "true");
+//        props.put("mail.smtp.starttls.enable", "true"); // enable TLS
+//        props.put("mail.debug", "true");
+//
+//        return mailSender;
+//    }
 //    @Bean
 //    public AmazonSimpleEmailService amazonSimpleEmailService() {
 //
