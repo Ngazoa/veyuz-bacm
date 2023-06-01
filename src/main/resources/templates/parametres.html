@@ -234,17 +234,17 @@
                         <h5 class="card-title mb-0">Liste des clients</h5>
                     </div>
                     <div class="card-body">
-                        <form enctype="multipart/form-data" id="importFileForm" method="post" th:action="${importUri}"
-                              th:object="${importFileForm}">
+                        <form enctype="multipart/form-data" id="importFileForm" method="post"
+                              th:action="@{/import}"
+                            >
                             <div class="form-group mb-3 mt-2">
                                 <label class="form-label">Importer votre fichier</label>
                                 <i class="text-info">(Excel avec extension xls)</i>
-                                <input accept=".xlsx" class="form-control" required th:field="*{file}" type="file">
-                                <input th:field="*{banque}" type="hidden"/>
+                                <input accept=".xlsx, .xls" class="form-control" required name="file" type="file">
+                                <input th:name="type"  th:value="${type}" type="hidden"/>
                             </div>
                             <div class="mb-3">
                                 <label class="form-check">
-                                    <input th:field="*{saveCustomer}" type="checkbox">
                                     <span class="form-check-label">Sauvegarder les clients dans veyuz</span>
                                 </label>
                             </div>

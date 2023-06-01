@@ -314,7 +314,6 @@ public class BanqueController {
         Long nbClient = clientService.count(banque);
         Long waitingAp;
 
-
         List<TransactionDto> transactionList = transactionPage.getContent().stream().map(
                 transaction -> {
                     TransactionDto tdo = new TransactionDto();

@@ -379,15 +379,11 @@ public class ClientController {
             return "redirect:/";
         }
 
-        Banque banque = (Banque) session.getAttribute("banque");
         model.addAttribute("dash", "params");
-
-        model.addAttribute("banque", banque);
-        model.addAttribute("importFileForm", new ImportFileForm(banque));
+        model.addAttribute("type", "client");
         model.addAttribute("isImport", true);
         model.addAttribute("importClient", true);
-        model.addAttribute("postUri", "/post-import-customers");
-
+        model.addAttribute("postUri", "/import");
         model.addAttribute("formTitle", "importer les clients");
         model.addAttribute("dash", "client");
         model.addAttribute("setItem", "clients");

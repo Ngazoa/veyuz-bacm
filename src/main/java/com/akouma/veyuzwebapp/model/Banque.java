@@ -51,13 +51,6 @@ public class Banque {
         this.lettres = lettres;
     }
 
-    public Collection<Mail> getMails() {
-        return mails;
-    }
-
-    public void setMails(Collection<Mail> mails) {
-        this.mails = mails;
-    }
 
     public Collection<AppUser> getUsers() {
         return users;
@@ -131,13 +124,6 @@ public class Banque {
         this.telephone = telephone;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public boolean isEnable() {
         return enable;
@@ -154,11 +140,7 @@ public class Banque {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "banque")
     @JsonBackReference
     private Collection<Lettre> lettres;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "banque")
-    @JsonBackReference
-    private Collection<Mail> mails;
-    
+
     @OneToMany(mappedBy = "banque")
     @JsonBackReference
     private Collection<AppUser> users;

@@ -7,9 +7,12 @@ package com.akouma.veyuzwebapp.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -25,47 +28,19 @@ public class Mail {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @JoinColumn(name = "banque_id", referencedColumnName = "id", nullable = false)
-    @ManyToOne(optional = false)
+
     @JsonManagedReference
-    private Banque banque;
+    @Column
+    private String receiver;
+    @JsonManagedReference
+    @Lob
+    private String subject;
+    @CreationTimestamp
+    private LocalDateTime dateCreation;
+    @JsonManagedReference
+    @Lob
+    private String message;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Banque getBanque() {
-        return banque;
-    }
-
-    public void setBanque(Banque banque) {
-        this.banque = banque;
-    }
-
-    public String getPrototype() {
-        return prototype;
-    }
-
-    public void setPrototype(String prototype) {
-        this.prototype = prototype;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    private String prototype;
-
-    private String type;
 
     @Override
     public int hashCode() {

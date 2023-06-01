@@ -453,12 +453,12 @@
 </div>
 
 <div th:fragment="import-transaction-form">
-    <form enctype="multipart/form-data" method="post" th:action="${postUri}" th:object="${importFileForm}">
+    <form enctype="multipart/form-data" method="post" th:action="${postUri}" >
         <div class="form-group mb-3 mt-2">
             <label class="form-label">Importer votre fichier</label>
-            <i class="text-info">(Excel avec extension .xls)</i>
-            <input class="form-control" name="file" required type="file">
-            <input name="banque" th:value="${banque.id}" type="hidden"/>
+            <i class="text-info">(Excel avec extension .xlsx)</i>
+            <input accept=".xlsx, .xls" class="form-control" name="file" required type="file">
+            <input name="type" th:value="${type}" type="hidden"/>
         </div>
         <button class="btn btn-primary" type="submit">Importer</button>
     </form>

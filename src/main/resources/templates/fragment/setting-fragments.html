@@ -32,6 +32,16 @@
                     Domiciliations
                 </a>
             </th:block>
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'benef')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/admin/beneficiaire/import}" role="tab">
+                    Beneficiaires
+                </a>
+            </th:block>
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:classappend="${#strings.equals(setItem, 'agence')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/admin/agency/import}" role="tab">
+                    Agences
+                </a>
+            </th:block>
 
             <th:block th:if="${#authorization.expression('hasRole(''ROLE_CLIENT'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'benef')} ? active : ''" th:if="${#authentication.getPrincipal().getClient() != null}" class="list-group-item list-group-item-action"
