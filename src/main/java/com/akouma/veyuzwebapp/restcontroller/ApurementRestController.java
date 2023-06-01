@@ -218,8 +218,8 @@ public class ApurementRestController {
     public ResponseEntity<?> validerFichier(@PathVariable("id") ApurementFichierManquant fichier, @PathVariable("validate") boolean validated, Authentication authentication) {
         HashMap<String, Object> response = new HashMap<>();
 
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
-            authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))) {
+        if (!authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
+            !authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPERADMIN"))) {
             response.put("isOk", false);
             response.put("message", "Vous n'avez pas les authorisations nécessaires pour effectuer cette opération");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -477,6 +477,11 @@ public class ApurementRestController {
         System.out.println(motifRejet);
         System.out.println("=================================================================");
 
+        for (ApurementFichierManquant fichierManquant: apurement.getFichiersManquants()) {
+            fichierManquant.setIsValidated(false);
+            this.fichierManquantService.saveFichierManquant(fichierManquant);
+        }
+
         apurement.setStatus(StatusTransaction.APUREMENT_REJETER);
         apurement.setMotifRejet(motifRejet);
 
@@ -500,6 +505,11 @@ public class ApurementRestController {
             response.put("error", true);
             response.put("message", "Cette transaction est déjà annulé !");
             return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        for (ApurementFichierManquant fichierManquant: apurement.getFichiersManquants()) {
+            fichierManquant.setIsValidated(false);
+            this.fichierManquantService.saveFichierManquant(fichierManquant);
         }
 
         apurement.setStatus(StatusTransaction.APUREMENT_ANULER);

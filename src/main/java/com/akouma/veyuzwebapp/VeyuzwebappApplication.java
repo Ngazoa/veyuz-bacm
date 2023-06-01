@@ -1,26 +1,30 @@
 package com.akouma.veyuzwebapp;
 
+import com.akouma.veyuzwebapp.graphique.Fenetre;
 import com.akouma.veyuzwebapp.property.FileStorageProperties;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.awt.*;
 
 @SpringBootApplication
 @EnableConfigurationProperties({
 		FileStorageProperties.class
 })
 
-public class VeyuzwebappApplication implements CommandLineRunner {
+public class VeyuzwebappApplication extends Fenetre {
 
 	public static void main(String[] args) {
-		SpringApplication.run(VeyuzwebappApplication.class, args);
-	}
+		var ctx = new SpringApplicationBuilder(VeyuzwebappApplication.class)
+				.headless(true).run(args);
 
-	@Override
-	public void run(String... args) throws Exception {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		System.out.println(encoder.encode("123400"));
+		EventQueue.invokeLater(() -> {
+
+			var ex = ctx.getBean(VeyuzwebappApplication.class);
+			ex.setVisible(true);
+		});
 	}
 }

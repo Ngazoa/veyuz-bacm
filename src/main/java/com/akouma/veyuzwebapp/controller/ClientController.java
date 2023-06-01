@@ -92,13 +92,13 @@ public class ClientController {
         }
         page--;
         Page pagesClients = null;
-        if (loggedUser.getAgence() != null) {
-            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
-
-        } else {
+//        if (loggedUser.getAgence() != null) {
+//            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
+//
+//        } else {
             pagesClients = clientService.getClients(banque, 50, page);
 
-        }
+//        }
 
         int nbPages = pagesClients.getTotalPages();
         if (nbPages > 1) {

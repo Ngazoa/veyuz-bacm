@@ -274,7 +274,7 @@
                                 <b th:if="${ap.isApured}">------</b>
                                 <th:block th:if="${!ap.isApured}">
                                     <div class="d-inline">
-                                        <a th:if="${!ap.isApured and (ap.status != 0 and ap.status != -500 and ap.status != -1000) and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
+                                        <a th:if="${!ap.isApured and (#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}" th:data-ref="${ap.id}" href="#" class="btn btn-info btn-sm apurement-btn-action">
                                             <i data-feather="eye"></i>
                                         </a>
                                     </div>

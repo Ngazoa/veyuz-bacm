@@ -94,6 +94,8 @@ public class MainController {
         appUser.setStatusCodeAuth(true);
         userService.saveUser(appUser);
 
+        System.out.println(code);
+
         mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
                 "Bienvenue a vous  et votre code de connexion est  : " + code);
         return "code-authentication";
