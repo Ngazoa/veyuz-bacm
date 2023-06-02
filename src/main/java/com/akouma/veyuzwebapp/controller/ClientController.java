@@ -370,7 +370,6 @@ public class ClientController {
         return "redirect:/clients";
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping("/import-clients")
     public String showImportClientForm(Model model) {
 

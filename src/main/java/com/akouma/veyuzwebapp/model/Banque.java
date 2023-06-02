@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -179,7 +181,7 @@ public class Banque {
 
     @Column(name = "description", length = 10000, nullable = true)
     private String description;
-
+    @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
     @OneToMany(mappedBy = "banque", orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Beneficiaire> beneficiaires = new ArrayList<>();

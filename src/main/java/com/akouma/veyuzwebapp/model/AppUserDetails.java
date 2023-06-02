@@ -3,13 +3,13 @@ package com.akouma.veyuzwebapp.model;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-
+@Data
 public class AppUserDetails  implements UserDetails {
     public Long getId() {
         return id;
@@ -27,13 +27,6 @@ public class AppUserDetails  implements UserDetails {
         this.notifications = notifications;
     }
 
-    public Collection<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(Collection<UserRole> userRoles) {
-        this.userRoles = userRoles;
-    }
 
     public Banque getBanque() {
         return banque;
@@ -159,7 +152,7 @@ public class AppUserDetails  implements UserDetails {
 
     private Collection<Notification> notifications;
 
-    private Collection<UserRole> userRoles;
+    private Set<AppRole> userRoles;
 
     private Banque banque;
 
@@ -212,7 +205,7 @@ public class AppUserDetails  implements UserDetails {
 
         notifications = appUser.getNotifications();
 
-        userRoles = appUser.getUserRoles();
+        userRoles = appUser.getAppRoles();
 
         banque = appUser.getBanque();
 

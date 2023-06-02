@@ -369,7 +369,7 @@ public class TransactionRestController {
             if ((transaction.getStatut() == StatusTransaction.WAITING || transaction.getStatut() == StatusTransaction.SENDBACK_MACKER) && transaction.getBanque().equals(appUser.getBanque())) {
                 AppRole roleMacker = roleService.getRoleByName("ROLE_MACKER");
                 if (roleMacker != null) {
-                    UserRole userRole = userRoleService.getUserRole(appUser, roleMacker);
+                    Object userRole = appUser.getAppRoles().contains(roleMacker);
                     if (userRole != null) {
                         transaction.setStatut(StatusTransaction.SENDBACK_CUSTOMER);
                         this.saveTransactionAndAction(transaction, appUser, status, commentaire);
@@ -491,7 +491,7 @@ public class TransactionRestController {
             if ((transaction.getStatut() == StatusTransaction.MACKED || transaction.getStatut() == StatusTransaction.SENDBACK_CHECKER) && transaction.getBanque().equals(appUser.getBanque())) {
                 AppRole roleChecker = roleService.getRoleByName("ROLE_CHECKER");
                 if (roleChecker != null) {
-                    UserRole userRole = userRoleService.getUserRole(appUser, roleChecker);
+                    Object userRole = appUser.getAppRoles().contains(roleChecker);
                     if (userRole != null) {
                         transaction.setStatut(StatusTransaction.VALIDATED);
                         this.saveTransactionAndAction(transaction, appUser, status, null);

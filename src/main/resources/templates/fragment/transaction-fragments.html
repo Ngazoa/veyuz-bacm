@@ -273,7 +273,7 @@
     </div>
     <div>
         <hr>
-
+        <th:block th:if="${#authorization.expression('!hasRole(''ROLE_CONTROLLER'')')}">
         <th:block th:if="${!transaction.cycleNormalAcheve}">
             <th:block sec:authorize="hasRole('ROLE_MACKER')">
                 <button class="btn btn-secondary" data-bs-target="#defaultModalPrimary" data-bs-toggle="modal"
@@ -342,6 +342,7 @@
                 <a style="float:right;" th:href="@{${uri}}"
                    th:if="${transaction.statut != V or transaction.statut != R}">Ajouter les documents</a>
             </th:block>
+        </th:block>
         </th:block>
         <div aria-hidden="true" class="modal fade" id="defaultModalPrimary1" role="dialog" tabindex="-1">
             <div class="modal-dialog" role="document">

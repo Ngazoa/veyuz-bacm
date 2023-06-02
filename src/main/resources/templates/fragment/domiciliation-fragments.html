@@ -180,8 +180,10 @@
                 </select>
                 <span th:if="${#fields.hasErrors('typeDeTransaction')}" style="float:right;margin-top:-24px" class="text-danger"><i class="fas fa-times"></i></span>
             </div>
-            <button type="submit" class="btn btn-primary">Créer</button>
+            <th:block th:if="${#authorization.expression('!hasRole(''ROLE_CONTROLLER'')')}">
 
+            <button type="submit" class="btn btn-primary">Créer</button>
+            </th:block>
         </form>
     </div>
 

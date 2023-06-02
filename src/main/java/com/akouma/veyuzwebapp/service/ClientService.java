@@ -323,8 +323,8 @@ public class ClientService {
 
                 AppRole appRoleClient = appRoleRepository.findFirstByRoleName("ROLE_CLIENT");
                 UserRole role = new UserRole();
-                role.setAppUser(appUser);
-                role.setAppRole(appRoleClient);
+//                role.setAppUser(appUser);
+//                role.setAppRole(appRoleClient);
 
                 UserRole userRole = userRoleRepository.save(role);
             } else {

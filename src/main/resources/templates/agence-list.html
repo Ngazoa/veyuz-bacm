@@ -74,7 +74,7 @@
         </div>
         <div class="col-md-5">
             <div class="card" th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')}">
+            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')  or #authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
                 <div class="card-header">
                     <h5 class="card-title">Ajouter ou editer une agence</h5>
                 </div>

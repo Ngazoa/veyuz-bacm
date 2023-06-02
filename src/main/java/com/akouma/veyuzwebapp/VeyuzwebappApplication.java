@@ -22,8 +22,10 @@ public class VeyuzwebappApplication implements CommandLineRunner {
 		String dbUrl = dotenv.get("DB_URL");
 		String dbUsername = dotenv.get("DB_USERNAME");
 		String dbPassword = dotenv.get("DB_PASSWORD");
-
+		String mailFrom = dotenv.get("mailFrom");
 		// Set database connection properties as system properties
+
+		System.setProperty("mailFrom", mailFrom);
 		System.setProperty("DB_URL", dbUrl);
 		System.setProperty("DB_USERNAME", dbUsername);
 		System.setProperty("DB_PASSWORD", dbPassword);

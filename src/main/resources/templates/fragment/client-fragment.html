@@ -176,10 +176,12 @@
 
             <input type="hidden" name="banque" th:value="${banque.id}">
             <input th:if="${client != null and client.id != null}" type="hidden" name="client" th:value="${client.id}">
+            <th:block th:if="${#authorization.expression('!hasRole(''ROLE_CONTROLLER'')')}">
 
             <div class="mt-3">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </div>
+            </th:block>
         </div>
     </form>
 </div>
