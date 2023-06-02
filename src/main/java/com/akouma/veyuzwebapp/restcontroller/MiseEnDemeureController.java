@@ -198,12 +198,7 @@ public class MiseEnDemeureController {
                     appUser.setClient(saved);
 //                    userService.saveUser(appUser);
                     AppRole appRoleClient = appRoleService.getRoleByName("ROLE_CLIENT");
-                    if (userRoleService.getUserRole(appUser, appRoleClient) == null) {
-                        UserRole role = new UserRole();
-                        role.setAppUser(appUser);
-                        role.setAppRole(appRoleClient);
-                        UserRole userRole = userRoleService.saveUserRole(role);
-                    }
+
                 }
             }
         }

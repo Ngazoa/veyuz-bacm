@@ -1,12 +1,14 @@
 package com.akouma.veyuzwebapp.service;
 
 import com.akouma.veyuzwebapp.form.UserForm;
+import com.akouma.veyuzwebapp.model.AppRole;
 import com.akouma.veyuzwebapp.model.AppUser;
 import com.akouma.veyuzwebapp.model.AppUserDetails;
 import com.akouma.veyuzwebapp.model.Banque;
 import com.akouma.veyuzwebapp.repository.AppRoleRepositoryClass;
 import com.akouma.veyuzwebapp.repository.UserRepository;
 import com.akouma.veyuzwebapp.utils.Upload;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -74,16 +76,19 @@ public class UserService implements UserDetailsService {
             System.out.println("User not found! " + username);
             throw new UsernameNotFoundException("User " + username + " was not found in the database");
         }
+
         System.out.println(appUser);
-        List<String> roleNames = this.appRoleRepository.getRoleNames(appUser.getId());
+        Set<AppRole> roleNames = appUser.getAppRoles();
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-        System.out.println("ROLE USER  sont vite CONNECTE ******************************************** : " + username + " --" + roleNames);
+
 
         if (roleNames != null) {
-            for (String role : roleNames) {
-                System.out.println("ROLE USER CONNECTE ******************************************** : " + role);
-                GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
+            System.out.println("ROLE USER  sont vite CONNECTE" +
+                    "" +
+                    " ******************************************** : " + username + " --"+roleNames );
+            for (AppRole role : roleNames) {
+                GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRoleName());
                 grantedAuthorities.add(grantedAuthority);
             }
         }

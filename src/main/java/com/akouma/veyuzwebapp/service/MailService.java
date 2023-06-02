@@ -7,6 +7,7 @@ import com.akouma.veyuzwebapp.repository.MailRepository;
 import com.akouma.veyuzwebapp.utils.CryptoUtils;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,16 @@ public class MailService {
     @Autowired
     private CryptoUtils cryptoUtils;
 
+    @Value("${spring.mail.from}")
+    private   String fromMail;
+
     public void sendSimpleMessage(
             String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
+        message.setFrom(fromMail);
         try {
             emailSender.send(message);
             Mail mail=new Mail();
@@ -40,7 +45,7 @@ public class MailService {
             mail.setSubject(cryptoUtils.encrypt(subject));
             mailRepository.save(mail);
         }catch (Exception e){
-            e.getStackTrace();
+         System.out.println("********************************* "+e.getMessage());   ;
         }
     }
 

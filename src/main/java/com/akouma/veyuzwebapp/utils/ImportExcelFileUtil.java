@@ -268,7 +268,7 @@ public class ImportExcelFileUtil {
                     agence.setLabel(String.valueOf(getCellValue(row.getCell(0), workbook)));
                     agence.setStatus(true);
                     agence.setPhone(String.valueOf(getCellValue(row.getCell(2), workbook)));
-                    agence.setAddress(String.valueOf(getCellValue(row.getCell(0), workbook)));
+                    agence.setAddress(String.valueOf(getCellValue(row.getCell(1), workbook)));
                     agencyArrayList.add(agence);
                 }
                 pos++;
