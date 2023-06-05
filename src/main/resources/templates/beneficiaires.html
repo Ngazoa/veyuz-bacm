@@ -80,10 +80,11 @@
 
                                             </div>
                                         </div>
-
+                                        <th:block th:if="${#authorization.expression('!hasRole(''ROLE_CONTROLLER'')')}">
                                         <div class="mb-3">
                                             <button type="submit" class="btn btn-primary">Enregistrer</button>
                                         </div>
+                                        </th:block>
                                     </form>
                                 </div>
                             </div>

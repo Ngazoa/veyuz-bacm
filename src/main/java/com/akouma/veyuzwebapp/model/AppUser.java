@@ -9,17 +9,23 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  *
  * @author Sensei237
  */
-@Data
+
+@Transactional
 @DynamicUpdate
 @Entity
 @Table(name = "veyuz_user", uniqueConstraints = { @UniqueConstraint(columnNames = {"client_id"})})
@@ -29,15 +35,11 @@ public class AppUser {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "utilisateur")
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, mappedBy = "utilisateur")
     @JsonBackReference
     private Collection<Notification> notifications;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appUser")
-    @JsonBackReference
-    private Collection<UserRole> userRoles;
-    
     @JoinColumn(name = "banque_id", referencedColumnName = "id")
     @ManyToOne
     @JsonManagedReference
@@ -65,9 +67,13 @@ public class AppUser {
 
     private String prenom;
 
-    public Long getId() {
-        return id;
-    }
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "veyuz_user_app_roles",
+            joinColumns = @JoinColumn(name = "app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "app_roles_id"))
+    private Set<AppRole> appRoles = new LinkedHashSet<>();
+
+    @JsonBackReference
 
     public void setId(Long id) {
         this.id = id;
@@ -79,14 +85,6 @@ public class AppUser {
 
     public void setNotifications(Collection<Notification> notifications) {
         this.notifications = notifications;
-    }
-
-    public Collection<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(Collection<UserRole> userRoles) {
-        this.userRoles = userRoles;
     }
 
     public Banque getBanque() {
@@ -229,27 +227,47 @@ public class AppUser {
     @Column(nullable = false, unique = true, length = 25)
     private String userName;
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public Long getId() {
+        return id;
     }
 
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AppUser)) {
-            return false;
-        }
-        AppUser other = (AppUser) object;
-        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+    public Agence getAgence() {
+        return agence;
     }
 
-    @Override
-    public String toString() {
-        return "com.example.demo.model.User[ id=" + id + " ]";
+    public void setAgence(Agence agence) {
+        this.agence = agence;
     }
-    
+
+    public Set<AppRole> getAppRoles() {
+        return appRoles;
+    }
+
+    public void setAppRoles(Set<AppRole> appRoles) {
+        this.appRoles = appRoles;
+    }
+
+    public String getCodeAuthentication() {
+        return codeAuthentication;
+    }
+
+    public void setCodeAuthentication(String codeAuthentication) {
+        this.codeAuthentication = codeAuthentication;
+    }
+
+    public LocalDateTime getDateCodeAuthentication() {
+        return dateCodeAuthentication;
+    }
+
+    public void setDateCodeAuthentication(LocalDateTime dateCodeAuthentication) {
+        this.dateCodeAuthentication = dateCodeAuthentication;
+    }
+
+    public boolean isStatusCodeAuth() {
+        return statusCodeAuth;
+    }
+
+    public void setStatusCodeAuth(boolean statusCodeAuth) {
+        this.statusCodeAuth = statusCodeAuth;
+    }
 }

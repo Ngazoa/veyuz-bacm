@@ -3,7 +3,6 @@ package com.akouma.veyuzwebapp.restcontroller;
 import com.akouma.veyuzwebapp.form.UserRoleForm;
 import com.akouma.veyuzwebapp.model.AppRole;
 import com.akouma.veyuzwebapp.model.AppUser;
-import com.akouma.veyuzwebapp.model.UserRole;
 import com.akouma.veyuzwebapp.service.AppRoleService;
 import com.akouma.veyuzwebapp.service.UserRoleService;
 import com.akouma.veyuzwebapp.service.UserService;
@@ -12,26 +11,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 public class AppUserRestController {
 
     @Autowired
+    TemplateEngine templateEngine;
+    @Autowired
     private UserService userService;
-
     @Autowired
     private AppRoleService appRoleService;
-
     @Autowired
     private UserRoleService userRoleService;
-
-    @Autowired
-    TemplateEngine templateEngine;
 
     @PostMapping("/configure/user/access")
     public ResponseEntity<?> configUserAccess(@ModelAttribute UserRoleForm userRoleForm) {
@@ -47,13 +42,13 @@ public class AppUserRestController {
 
         Map<String, Object> data = new HashMap<>();
         Iterable<AppRole> roles = appRoleService.getRoles();
-        Collection<UserRole> userRoles = appUser.getUserRoles();
-        String htmlContent = "<input type='hidden' name='appUser' value='" + appUser.getId() +"'>";
+        Set<AppRole> userRoles = appUser.getAppRoles();
+        String htmlContent = "<input type='hidden' name='appUser' value='" + appUser.getId() + "'>";
         for (AppRole role : roles) {
             if (role.isVisible()) {
                 String checked = "";
-                UserRole ur = userRoleService.getUserRole(appUser, role);
-                if (ur != null) {
+                boolean ur = userRoles.stream().anyMatch(r->r.getRoleName().equals(role.getRoleName()));
+                if (ur) {
                     checked = "checked=true";
                 }
                 String classAdmin = "";

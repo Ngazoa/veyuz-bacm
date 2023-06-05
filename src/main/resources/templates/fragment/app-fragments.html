@@ -97,9 +97,7 @@
                 </a>
             </li>
         </th:block>
-        <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
             <li class="nav-item">
                 <a th:href="@{/clients}" class="nav-link" title="Nouveau client">
                     <i class="fas fa-user-shield"></i>

@@ -21,12 +21,12 @@ public class MalConfig {
     public MalConfig() {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         // Access your environment variables using dotenv.get("KEY")
-        dbUsername = dotenv.get("usernameMail");
-        dbPassword = dotenv.get("passwordMail");
-        host = dotenv.get("hostMail");
-        port = Integer.parseInt(dotenv.get("portMail"));
-        enableTls=dotenv.get("enableTls");
-        enableAuth=dotenv.get("enableAuth");
+        dbUsername = dotenv.get("USERNAME_MAIL");
+        dbPassword = dotenv.get("PASS_MAIL");
+        host = dotenv.get("HOST_MAIL");
+        port = Integer.parseInt(dotenv.get("PORT_MAIL"));
+        enableTls=dotenv.get("ENABLE_TLS");
+        enableAuth=dotenv.get("ENABLE_AUTH");
     }
 
     @Bean

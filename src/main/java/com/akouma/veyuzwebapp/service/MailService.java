@@ -38,7 +38,7 @@ public class MailService {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
-        message.setFrom(Objects.requireNonNull(environment.getProperty("project.from")));
+        message.setFrom(Objects.requireNonNull(environment.getProperty("spring.mail.from")));
         try {
             emailSender.send(message);
             Mail mail=new Mail();
@@ -47,7 +47,7 @@ public class MailService {
             mail.setSubject(cryptoUtils.encrypt(subject));
             mailRepository.save(mail);
         }catch (Exception e){
-            e.getStackTrace();
+            System.out.println("********************************* "+e.getMessage());   ;
         }
     }
 

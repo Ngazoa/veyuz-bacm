@@ -8,10 +8,7 @@ import com.akouma.veyuzwebapp.repository.AgenceRepository;
 import com.akouma.veyuzwebapp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AgenceService {
@@ -45,15 +42,11 @@ public class AgenceService {
     public void saveAgence(Agence agence) {
         Agence agency = agenceRepository.save(agence);
         for (AppUser a :
-                agence.getAppUsers()) {
-            Collection<UserRole> userRoles = new ArrayList<>();
-            UserRole userRole = new UserRole();
-
-            userRole.setAppUser(a);
-            userRole.setAppRole(appRole.getRoleByName("ROLE_AGENCE"));
-            userRoles.add(userRole);
-            a.setUserRoles(userRoles);
+                agency.getAppUsers()) {
+            Set<AppRole> userRoles = new HashSet<>();
+            userRoles.add(appRole.getRoleByName("ROLE_AGENCE"));
             a.setAgence(agency);
+            a.setAppRoles(userRoles);
             userRepository.save(a);
         }
     }
