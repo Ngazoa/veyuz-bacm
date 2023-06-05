@@ -3,6 +3,7 @@ package com.akouma.veyuzwebapp;
 import com.akouma.veyuzwebapp.graphique.Fenetre;
 import com.akouma.veyuzwebapp.property.FileStorageProperties;
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvEntry;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,23 +20,19 @@ public class VeyuzwebappApplication extends Fenetre {
 	public static void main(String[] args) {
 
 		Dotenv dotenv = Dotenv.load();
-		// Retrieve database connection properties
-		String dbUrl = dotenv.get("DB_URL");
-		String dbUsername = dotenv.get("DB_USERNAME");
-		String dbPassword = dotenv.get("DB_PASSWORD");
+		for (DotenvEntry entry : dotenv.entries()) {
+			System.setProperty(entry.getKey(), entry.getValue());
+		}
 
-		// Set database connection properties as system properties
-		System.setProperty("DB_URL", dbUrl);
-		System.setProperty("DB_USERNAME", dbUsername);
-		System.setProperty("DB_PASSWORD", dbPassword);
+		String port = System.getProperty("APP_PORT");
 
 		var ctx = new SpringApplicationBuilder(VeyuzwebappApplication.class)
 				.headless(true).run(args);
 
-
 		EventQueue.invokeLater(() -> {
-
 			var ex = ctx.getBean(VeyuzwebappApplication.class);
+			ex.setPort(port);
+			ex.initComponents();
 			ex.setVisible(true);
 		});
 	}
