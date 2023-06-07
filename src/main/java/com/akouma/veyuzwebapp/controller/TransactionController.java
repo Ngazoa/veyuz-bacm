@@ -3,6 +3,7 @@ package com.akouma.veyuzwebapp.controller;
 import com.akouma.veyuzwebapp.dto.TransactionDto;
 import com.akouma.veyuzwebapp.form.*;
 import com.akouma.veyuzwebapp.model.*;
+import com.akouma.veyuzwebapp.repository.BanqueCorrespondanteRepository;
 import com.akouma.veyuzwebapp.repository.TypeFinancementRepository;
 import com.akouma.veyuzwebapp.service.*;
 import com.akouma.veyuzwebapp.utils.*;
@@ -72,6 +73,9 @@ public class TransactionController {
     @Autowired
     private AgenceService agenceService;
 
+    @Autowired
+    private BanqueCorrespondanteRepository banqueCorrespondanteRepository;
+
 
     public TransactionController(HttpSession session) {
         this.session = session;
@@ -112,7 +116,7 @@ public class TransactionController {
 
         Agence agence=null;
         if(agenceId!=null){
-            System.out.println("<<<< "+agenceId);
+
             agence=agenceService.getAgenceById(agenceId);
             transactions = transactionService.getPageableTransactionsHasFilesForAgence(banque, agence, true, max, page);
 
@@ -636,7 +640,7 @@ public class TransactionController {
                     calendar.add(Calendar.DATE, 20);
                 }
             }
-            System.out.println("Date d'expiration : " + calendar.getTime());
+
             transaction.setDelay(calendar.getTime());
         }
 
@@ -722,6 +726,7 @@ public class TransactionController {
         model.addAttribute("actions", actions);
         model.addAttribute("uri", "/import-files/" + CryptoUtils.encrypt(transaction.getId()) + "/transaction");
         model.addAttribute("typefinancement", typeFinancementRepository.findAll());
+        model.addAttribute("banquecorrespondant", banqueCorrespondanteRepository.findAllByEnabled(true));
         model.addAttribute("dash", "transaction");
         model.addAttribute("das", "all");
 
@@ -1099,6 +1104,7 @@ public class TransactionController {
             @RequestParam(value = "taux", required = false) String taux,
             @RequestParam(value = "dateValeur", required = false) String dateValeur,
             @RequestParam(value = "batebeac", required = false) String batebeac,
+            @RequestParam(value = "banquecorrespondant", required = false) Long banquecorrespondant,
             RedirectAttributes redirectAttributes, Principal principal, Authentication authentication) throws Exception {
 
         if (authentication.getAuthorities().stream().
@@ -1153,11 +1159,12 @@ public class TransactionController {
             while(transactionService.checkReference(ref)){
                 ref=new ReferenceGenerator().generateReference();
             }
-
+            BanqueCorrespondante bqCrd=banqueCorrespondanteRepository.findById(banquecorrespondant).get();
             transaction.setReference(ref);
             transaction.setDateTransaction(dateOperationTransaction);
             transaction.setStatut(StatusTransaction.VALIDATED);
             transaction.setTaux(taux);
+            transaction.setBanqueCorrespondante(bqCrd);
             transaction.setDateValeur(sdf.parse(dateValeur));
             // on determine la date d'expiration
             Calendar calendar = Calendar.getInstance();

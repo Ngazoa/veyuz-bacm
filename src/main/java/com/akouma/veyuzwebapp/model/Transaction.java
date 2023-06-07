@@ -37,6 +37,10 @@ public class Transaction {
     @JsonBackReference
     private Collection<Fichier> fichiers;
 
+    @ManyToOne
+    @JoinColumn(name = "banque_correspondante_id")
+    private BanqueCorrespondante banqueCorrespondante;
+
     public Long getId() {
         return id;
     }
@@ -225,6 +229,14 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "agence_id")
     private Agence agence;
+
+    public BanqueCorrespondante getBanqueCorrespondante() {
+        return banqueCorrespondante;
+    }
+
+    public void setBanqueCorrespondante(BanqueCorrespondante banqueCorrespondante) {
+        this.banqueCorrespondante = banqueCorrespondante;
+    }
 
     public Agence getAgence() {
         return agence;

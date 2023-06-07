@@ -9,13 +9,15 @@
                 Profile
             </a>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or
+            #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'clients')} ? active : ''" class="list-group-item list-group-item-action"  th:href="@{/clients}" role="tab">
                     Clients
                 </a>
             </th:block>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or
+            #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'trans')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/import-transactions}" role="tab">
                     Transactions
                 </a>
@@ -27,17 +29,20 @@
                 </a>
             </th:block>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or
+            #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'domi')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/admin/domiciliations/import}" role="tab">
                     Domiciliations
                 </a>
             </th:block>
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or
+            #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'benef')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/admin/beneficiaire/import}" role="tab">
                     Beneficiaires
                 </a>
             </th:block>
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or
+            #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'agence')} ? active : ''" class="list-group-item list-group-item-action" th:href="@{/admin/agency/import}" role="tab">
                     Agences
                 </a>
@@ -50,7 +55,8 @@
                 </a>
             </th:block>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or
+            #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:classappend="${#strings.equals(setItem, 'le')} ? active : ''" class="list-group-item list-group-item-action"  href=""  role="tab">
                     Lettre d'engagement
                 </a>

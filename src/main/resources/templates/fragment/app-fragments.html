@@ -300,6 +300,14 @@
                     </a>
                 </li>
             </th:block>
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+                <li class="sidebar-item" th:classappend="${#strings.equals(banque, 'banque')} ? active : ''">
+                    <a class="sidebar-link" th:href="@{/banquecorrespondant/all}">
+                        <i class="align-middle" data-feather="activity"></i> <span
+                            class="align-middle">Banque  correspondance</span>
+                    </a>
+                </li>
+            </th:block>
             <th:block th:unless="${#authorization.expression('hasRole(''ROLE_CLIENT'')')}">
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="">

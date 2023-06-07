@@ -1,5 +1,6 @@
 package com.akouma.veyuzwebapp.service;
 
+import com.akouma.veyuzwebapp.VeyuzwebappApplication;
 import com.akouma.veyuzwebapp.dto.ClientDto;
 import com.akouma.veyuzwebapp.form.ClientForm;
 import com.akouma.veyuzwebapp.form.ImportFileForm;
@@ -11,10 +12,12 @@ import com.akouma.veyuzwebapp.repository.UserRoleRepository;
 import com.akouma.veyuzwebapp.utils.CryptoUtils;
 import com.akouma.veyuzwebapp.utils.Upload;
 import lombok.Data;
+import org.apache.logging.log4j.LogManager;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 @Data
 @Service
 public class ClientService {
+
 
     private static String UPLOAD_DIR = "/kyc";
     @Autowired
@@ -97,13 +101,32 @@ public class ClientService {
         return clientRepository.findByBanquesAndAgenceOrderByUser_NomAsc(banque,agence, PageRequest.of(page, maxResults));
     }
 
-    public Iterable<Client> searchClients(Banque banque, String nom) {
+    public Iterable<ClientDto> searchClients(Banque banque, String nom) {
         List<Client> clienRenvoye = new ArrayList<>();
         Client clientFound = clientRepository.findByTelephone(nom);
         if (clientFound != null) {
             clienRenvoye.add(clientFound);
         }
-        return clienRenvoye;
+        return clienRenvoye.stream().map(
+                client -> {
+                    ClientDto client1 = new ClientDto();
+                    client1.setTelephone(client.getTelephone());
+                    try {
+                        client1.setId(cryptoUtils.encrypt(client.getId()));
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    client1.setUser(client.getUser());
+                    client1.setDomiciliations(client.getDomiciliations());
+                    client1.setKyc(client.getKyc());
+                    client1.setDenomination(client.getDenomination());
+                    client1.setReference(client.getReference());
+                    client1.setNumeroContribuable(client.getNumeroContribuable());
+                    client1.setTypeClient(client.getTypeClient());
+                    return client1;
+                }
+        ).collect(Collectors.toList());
     }
 
 
@@ -114,11 +137,30 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public List<Client> searchClientsByName(Banque banque, String query) {
+    public List<ClientDto> searchClientsByName(Banque banque, String query) {
         List<Client> clients = clientRepository.
                 findByUser_BanqueLikeOrTelephoneContainingOrDenominationContainingOrReferenceContaining(banque,
                         query, query, query);
-        return clients;
+        return clients.stream().map(
+                client -> {
+                    ClientDto client1 = new ClientDto();
+                    client1.setTelephone(client.getTelephone());
+                    try {
+                        client1.setId(cryptoUtils.encrypt(client.getId()));
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    client1.setUser(client.getUser());
+                    client1.setDomiciliations(client.getDomiciliations());
+                    client1.setKyc(client.getKyc());
+                    client1.setDenomination(client.getDenomination());
+                    client1.setReference(client.getReference());
+                    client1.setNumeroContribuable(client.getNumeroContribuable());
+                    client1.setTypeClient(client.getTypeClient());
+                    return client1;
+                }
+        ).collect(Collectors.toList());
 
     }
 

@@ -42,10 +42,6 @@ public class UserRoleService {
             return null;
         }
         appUser.setAppRoles(userRoleForm.getAppRoles());
-
-        System.out.println("****  *    "+appUser);
-        System.out.println("****  *    "+appUser.getAppRoles());
-
         //    Iterable<UserRole> userRoles = userRoleRepository.findByAppUser(appUser);
 //        if (userRoles != null) {
 //            for (UserRole ur : userRoles) {

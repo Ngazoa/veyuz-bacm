@@ -92,13 +92,13 @@ public class ClientController {
         }
         page--;
         Page pagesClients = null;
-//        if (loggedUser.getAgence() != null) {
-//            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
-//
-//        } else {
+        if (loggedUser.getAgence() != null) {
+            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
+
+        } else {
             pagesClients = clientService.getClients(banque, 50, page);
 
-//        }
+        }
 
         int nbPages = pagesClients.getTotalPages();
         if (nbPages > 1) {
@@ -165,7 +165,7 @@ public class ClientController {
 
         Banque banque = (Banque) session.getAttribute("banque");
 
-        Iterable<Client> Clients = clientService.searchClients(banque, telephone);
+        Iterable<ClientDto> Clients = clientService.searchClients(banque, telephone);
 
         model.addAttribute("clientTransactionUri", "/transactions/{client_id}-client");
         model.addAttribute("initierTransactionUri", "/transaction/new/{client_id}/client/{type}");
@@ -177,8 +177,6 @@ public class ClientController {
         model.addAttribute("profile", null);
         model.addAttribute("uri", "/clients/page={page}");
         model.addAttribute("dash", "params");
-        System.out.println("--------861");
-
 
         return "parametres";
     }
@@ -191,7 +189,7 @@ public class ClientController {
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
         }
-        Iterable<Client> Clients = null;
+        Iterable<ClientDto> Clients = null;
         Banque banque = (Banque) session.getAttribute("banque");
         //     AppUser loggedUser = userService.getLoggedUser(principal);
 

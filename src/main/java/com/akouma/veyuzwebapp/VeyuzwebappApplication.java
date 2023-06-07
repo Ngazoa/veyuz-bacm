@@ -24,8 +24,10 @@ public class VeyuzwebappApplication extends Fenetre {
 		String dbUsername = dotenv.get("DB_USERNAME");
 		String dbPassword = dotenv.get("DB_PASSWORD");
 		String mailFrom = dotenv.get("mailFrom");
+		String ServerPort = dotenv.get("ServerPort");
 		// Set database connection properties as system properties
 
+		System.setProperty("ServerPort", ServerPort);
 		System.setProperty("mailFrom", mailFrom);
 		System.setProperty("DB_URL", dbUrl);
 		System.setProperty("DB_USERNAME", dbUsername);
@@ -33,10 +35,7 @@ public class VeyuzwebappApplication extends Fenetre {
 
 		var ctx = new SpringApplicationBuilder(VeyuzwebappApplication.class)
 				.headless(true).run(args);
-
-
 		EventQueue.invokeLater(() -> {
-
 			var ex = ctx.getBean(VeyuzwebappApplication.class);
 			ex.setVisible(true);
 		});

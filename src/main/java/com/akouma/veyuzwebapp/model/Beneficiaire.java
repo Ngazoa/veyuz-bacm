@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -24,6 +25,8 @@ import java.util.Date;
 @Data
 @DynamicUpdate
 @Entity
+
+@Transactional
 @Table(name = "veyuz_beneficiaire")
 public class Beneficiaire {
 
@@ -37,7 +40,7 @@ public class Beneficiaire {
     @JoinColumn(name = "banque_id")
     private Banque banque;
 
-    @Column(name = "client_id",columnDefinition = "bigint default 7")
+    @Column(name = "client_id",columnDefinition = "bigint default 7",nullable = true)
     private Long clientId;
 
     public Long getId() {

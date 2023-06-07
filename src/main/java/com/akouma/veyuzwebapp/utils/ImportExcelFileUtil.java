@@ -12,6 +12,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +43,9 @@ public class ImportExcelFileUtil {
     private final  ClientService clientService;
 
     private final  AgenceService agenceService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ImportExcelFileUtil(FileStorageService fileStorageService,
                                ClientRepository clientRepository,
@@ -165,9 +170,9 @@ public class ImportExcelFileUtil {
 
     }
 
-    public List<Beneficiaire> readExcelBeneficiaireFile(MultipartFile file, Banque banque) {
+    public List<Beneficiaire> readExcelBeneficiaireFile(MultipartFile file, Banque bank) {
         List<Beneficiaire> beneficiaryList = new ArrayList<>();
-
+        Banque banque = entityManager.find(Banque.class, bank.getId());
         try {
             InputStream inputStream = file.getInputStream();
             Workbook workbook = new XSSFWorkbook(inputStream);
@@ -181,10 +186,13 @@ public class ImportExcelFileUtil {
             for (Row row : sheet) {
                 if (pos > 0) {
                     Beneficiaire beneficiaire = new Beneficiaire();
+                    beneficiaire.setClientId(10L);
                     beneficiaire.setBanque(banque);
-                    beneficiaire.setId(Long.valueOf(String.valueOf(getCellValue(row.getCell(2), workbook))));
                     beneficiaire.setName(String.valueOf(getCellValue(row.getCell(1), workbook)));
                     beneficiaire.setReference((String) getCellValue(row.getCell(0), workbook));
+
+                    System.out.println(" Benef " + beneficiaire);
+
                     beneficiaryList.add(beneficiaire);
                 }
                 pos++;
@@ -201,8 +209,9 @@ public class ImportExcelFileUtil {
         return beneficiaryList;
     }
 
-    public List<Domiciliation> readExcelFileDomiciliation(MultipartFile file, Banque banque) {
+    public List<Domiciliation> readExcelFileDomiciliation(MultipartFile file, Banque bank) {
         List<Domiciliation> domiciliationList = new ArrayList<>();
+        Banque banque = entityManager.find(Banque.class, bank.getId());
 
         try {
             InputStream inputStream = file.getInputStream();
@@ -223,14 +232,14 @@ public class ImportExcelFileUtil {
             for (Row row : sheet) {
                 if (pos > 0) {
                     Domiciliation domiciliation = new Domiciliation();
-                    domiciliation.setClient(clientService.findById((Long) getCellValue(row.getCell(1), workbook)));
+                    domiciliation.setClient(clientService.findById(Long.parseLong(String.valueOf(getCellValue(row.getCell(1), workbook)))));
                     domiciliation.setBanque(banque);
-                    domiciliation.setDevise(deviseRepository.findFirstByCode((String) getCellValue(row.getCell(2), workbook)));
-                    domiciliation.setMontant((Float) getCellValue(row.getCell(3), workbook));
+                    domiciliation.setDevise(deviseRepository.findFirstByCode(String.valueOf(getCellValue(row.getCell(2), workbook))));
+                    domiciliation.setMontant(Float.parseFloat(String.valueOf(getCellValue(row.getCell(3), workbook))));
                     domiciliation.setReference(String.valueOf(getCellValue(row.getCell(4), workbook)));
                     domiciliation.setDateCreation((Date) getCellValue(row.getCell(5), workbook));
-                    domiciliation.setImportation((Boolean) getCellValue(row.getCell(6), workbook));
-                    domiciliation.setTypeDeTransaction(typeDeTransactionRepository.findFirstByCode((String) getCellValue(row.getCell(7), workbook)));
+                    domiciliation.setImportation(Boolean.valueOf(String.valueOf(getCellValue(row.getCell(6), workbook))));
+                    domiciliation.setTypeDeTransaction(typeDeTransactionRepository.findFirstByCode(String.valueOf(getCellValue(row.getCell(7), workbook))));
                     domiciliation.setBeneficiaire(beneficiaireRepository.findFirstByReference(String.valueOf(getCellValue(row.getCell(0), workbook))));
                     domiciliationList.add(domiciliation);
                 }
@@ -285,8 +294,10 @@ public class ImportExcelFileUtil {
         return agencyArrayList;
     }
 
-    public List<Client> readExcelFileClient(MultipartFile file, Banque banque) {
+    public List<Client> readExcelFileClient(MultipartFile file, Banque bank) {
         List<Client> clientList = new ArrayList<>();
+        Banque banque = entityManager.find(Banque.class, bank.getId());
+
         List<Banque> banqueList = new ArrayList<>();
         banqueList.add(banque);
         try {
@@ -326,8 +337,9 @@ public class ImportExcelFileUtil {
         return clientList;
     }
 
-    public List<Transaction> readExcelFileTransactionClient(MultipartFile file, Banque banque) {
+    public List<Transaction> readExcelFileTransactionClient(MultipartFile file, Banque bank) {
         List<Transaction> transactionList = new ArrayList<>();
+        Banque banque = entityManager.find(Banque.class, bank.getId());
 
         try {
             InputStream inputStream = file.getInputStream();

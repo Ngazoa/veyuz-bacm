@@ -4,7 +4,7 @@
  */
 package com.akouma.veyuzwebapp.graphique;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  *
@@ -42,6 +42,9 @@ public class Fenetre extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        ImageIcon icon = new ImageIcon(Fenetre.class.getResource("/stack-logo-blue.png"));
+        setIconImage(icon.getImage());
         setTitle("Veyuz Banking");
         setIconImage(getIconImage());
         setIconImages(null);
@@ -72,7 +75,7 @@ public class Fenetre extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder(new java.awt.Color(204, 204, 204), new java.awt.Color(153, 153, 153)));
 
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("Veyuz Bankin a bien démarré sur le port 700");
+        jLabel5.setText("Veyuz Banking a bien démarré sur le port 700");
 
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Eviter de fermer cette fenêtre car celà arrêtera ");
@@ -106,7 +109,7 @@ public class Fenetre extends javax.swing.JFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jButton2.setText("Lancer le navigateur");
+        jButton2.setText("Demarrer le navigateur");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -115,7 +118,7 @@ public class Fenetre extends javax.swing.JFrame {
 
         jButton3.setBackground(new java.awt.Color(255, 153, 153));
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Quitter");
+        jButton3.setText("Arreter");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -196,6 +199,11 @@ public class Fenetre extends javax.swing.JFrame {
         );
 
         pack();
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -206,13 +214,18 @@ public class Fenetre extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         try {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create("http://127.0.0.1:7000/"));
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create("http://localhost:7000/"));
         }
         catch (Exception e){
             JOptionPane.showMessageDialog(null,e.getMessage());
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
 
+        ImageIcon img = new ImageIcon(getClass().getResource("/stack-logo-blue.png"));
+        this.setIconImage(img.getImage());
+        // TODO add your handling code here:
+    }
     /**
      * @param args the command line arguments
      */
