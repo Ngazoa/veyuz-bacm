@@ -124,6 +124,7 @@ public class ClientService {
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
+                    client1.setNiu(client.getNiu());
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -158,6 +159,7 @@ public class ClientService {
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
+                    client1.setNiu(client.getNiu());
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -405,6 +407,7 @@ public class ClientService {
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
+                    client1.setNiu(client.getNiu());
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -429,6 +432,7 @@ public class ClientService {
         client1.setReference(client.getReference());
         client1.setNumeroContribuable(client.getNumeroContribuable());
         client1.setTypeClient(client.getTypeClient());
+        client1.setNiu(client.getNiu());
         return client1;
     }
 
@@ -442,6 +446,12 @@ public class ClientService {
         }
         List<ClientDto> clients = getClients(banque);
         return clients.size();
+    }
+
+    public Client findByNiu(String niu) {
+        return clientRepository.findByNiu(niu).orElseThrow(
+                () -> new NoSuchElementException("Le client dont le NIU est " + niu + " n'existe pas!")
+        );
     }
 
     public class ClientSpecifications {

@@ -40,7 +40,7 @@ public class Beneficiaire {
     @JoinColumn(name = "banque_id")
     private Banque banque;
 
-    @Column(name = "client_id",columnDefinition = "bigint default 7",nullable = true)
+    @Column(name = "client_id",columnDefinition = "bigint default 7")
     private Long clientId;
 
     public Long getId() {

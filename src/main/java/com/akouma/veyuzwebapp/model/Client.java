@@ -155,6 +155,8 @@ public class Client {
     @Column(nullable = false, unique = true, length = 100)
     private String codeVeyuz;
 
+    private String niu;
+
 
     @Override
     public int hashCode() {

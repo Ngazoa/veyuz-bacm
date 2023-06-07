@@ -3,11 +3,11 @@ package com.akouma.veyuzwebapp.service;
 import com.akouma.veyuzwebapp.model.Agence;
 import com.akouma.veyuzwebapp.model.AppRole;
 import com.akouma.veyuzwebapp.model.AppUser;
-import com.akouma.veyuzwebapp.model.UserRole;
 import com.akouma.veyuzwebapp.repository.AgenceRepository;
 import com.akouma.veyuzwebapp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -37,6 +37,12 @@ public class AgenceService {
     public Agence getAgenceById(Long id) {
         return agenceRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Agence not found with id: " + id));
+    }
+
+    public Agence findByCode(String code) {
+        return agenceRepository.findByCode(code).orElseThrow(
+                () -> new NoSuchElementException("Agence not found with code: " + code)
+        );
     }
 
     public void saveAgence(Agence agence) {

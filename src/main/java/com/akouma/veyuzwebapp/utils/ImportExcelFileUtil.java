@@ -19,10 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class ImportExcelFileUtil {
@@ -209,6 +206,12 @@ public class ImportExcelFileUtil {
         return beneficiaryList;
     }
 
+    /**
+     * Lorsqu'on importe les domiciliations, on créé également les bénéficiaire si ceux-ci n'existe pas encore
+     * @param file
+     * @param bank
+     * @return
+     */
     public List<Domiciliation> readExcelFileDomiciliation(MultipartFile file, Banque bank) {
         List<Domiciliation> domiciliationList = new ArrayList<>();
         Banque banque = entityManager.find(Banque.class, bank.getId());
@@ -217,30 +220,60 @@ public class ImportExcelFileUtil {
             InputStream inputStream = file.getInputStream();
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
-            /*
-             * code beneficiaire 0
-             *id  client 1
-             * code devise 2
-             * montant 3
-             * reference 4
-             * dateCreation 5
-             * false or true typeImportation 6
-             *  code typeTransaction 7
-             *
-             * */
             int pos = 0;
             for (Row row : sheet) {
                 if (pos > 0) {
                     Domiciliation domiciliation = new Domiciliation();
-                    domiciliation.setClient(clientService.findById(Long.parseLong(String.valueOf(getCellValue(row.getCell(1), workbook)))));
+
+                    String codeBenef = String.valueOf(getCellValue(row.getCell(0), workbook));
+                    String nomBenef = String.valueOf(getCellValue(row.getCell(1), workbook));
+                    Beneficiaire beneficiaire = beneficiaireRepository.findFirstByReference(codeBenef);
+                    if (beneficiaire == null) {
+                        beneficiaire = new Beneficiaire();
+                        beneficiaire.setBanque(banque);
+                        beneficiaire.setName(nomBenef);
+                        beneficiaire.setReference(codeBenef);
+                        beneficiaire = beneficiaireRepository.save(beneficiaire);
+                    }
+                    domiciliation.setBeneficiaire(beneficiaire);
+
+                    domiciliation.setClient(clientService.findByNiu(String.valueOf(getCellValue(row.getCell(2), workbook))));
+
                     domiciliation.setBanque(banque);
-                    domiciliation.setDevise(deviseRepository.findFirstByCode(String.valueOf(getCellValue(row.getCell(2), workbook))));
-                    domiciliation.setMontant(Float.parseFloat(String.valueOf(getCellValue(row.getCell(3), workbook))));
-                    domiciliation.setReference(String.valueOf(getCellValue(row.getCell(4), workbook)));
-                    domiciliation.setDateCreation((Date) getCellValue(row.getCell(5), workbook));
-                    domiciliation.setImportation(Boolean.valueOf(String.valueOf(getCellValue(row.getCell(6), workbook))));
-                    domiciliation.setTypeDeTransaction(typeDeTransactionRepository.findFirstByCode(String.valueOf(getCellValue(row.getCell(7), workbook))));
-                    domiciliation.setBeneficiaire(beneficiaireRepository.findFirstByReference(String.valueOf(getCellValue(row.getCell(0), workbook))));
+
+                    domiciliation.setDevise(deviseRepository.findFirstByCode(String.valueOf(getCellValue(row.getCell(3), workbook))));
+
+                    Float montant = Float.parseFloat(String.valueOf(getCellValue(row.getCell(4), workbook)));
+                    domiciliation.setMontant(montant);
+
+                    domiciliation.setReference(String.valueOf(getCellValue(row.getCell(5), workbook)));
+
+                    // Date
+                    Date date = new Date();
+                    if (getCellValue(row.getCell(6), workbook) != null || getCellValue(row.getCell(6), workbook) != "") {
+                        date = (Date) getCellValue(row.getCell(6), workbook);
+                    }
+                    domiciliation.setDateCreation(date);
+
+
+                    boolean isImportation = String.valueOf(getCellValue(row.getCell(7), workbook)).equalsIgnoreCase("oui");
+                    domiciliation.setImportation(isImportation);
+
+                    domiciliation.setTypeDeTransaction(typeDeTransactionRepository.findFirstByCode(String.valueOf(getCellValue(row.getCell(8), workbook))));
+
+                    // Date
+                    Date date2 = null;
+                    if (getCellValue(row.getCell(9), workbook) != null || getCellValue(row.getCell(9), workbook) != "") {
+                        date2 = (Date) getCellValue(row.getCell(9), workbook);
+                    }
+                    domiciliation.setDateExpiration(date2);
+
+                    float montantRestant = montant;
+                    if (String.valueOf(getCellValue(row.getCell(10), workbook)) != null) {
+                        montantRestant = Float.parseFloat(String.valueOf(getCellValue(row.getCell(10), workbook)));
+                    }
+                    domiciliation.setMontantRestant(montantRestant);
+
                     domiciliationList.add(domiciliation);
                 }
                 pos++;
@@ -320,7 +353,8 @@ public class ImportExcelFileUtil {
                     client.setBanques(banqueList);
                     client.setNumeroContribuable(String.valueOf(getCellValue(row.getCell(2), workbook)));
                     client.setTelephone(String.valueOf(getCellValue(row.getCell(3), workbook)));
-                    client.setAgence(agenceService.getAgenceById((Long) getCellValue(row.getCell(0), workbook)));
+                    Agence agence = agenceService.findByCode(String.valueOf(getCellValue(row.getCell(0), workbook)));
+                    client.setAgence(agence);
                     clientList.add(client);
                 }
                 pos++;

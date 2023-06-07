@@ -25,7 +25,7 @@
                             <table class="table table-striped" style="width:100%">
                                 <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>Code</th>
                                     <th>Label</th>
                                     <th>Responsable</th>
                                     <th>Addresse</th>
@@ -35,7 +35,7 @@
                                 </thead>
                                 <tbody>
                                 <tr th:if="${agences!=null}" th:each="a, state : ${agences}">
-                                    <td th:text="${state.count}"></td>
+                                    <td th:text="${a.code}"></td>
                                     <td th:text="${a.label}"></td>
                                     <td>
                                         <ul>
@@ -85,13 +85,16 @@
                                 <form th:object="${agence}" th:action="@{/agency}" th:if="${agence.id == null}" method="post">
                                     <input class="form-control" type="hidden" th:field="*{id}" required />
                                     <label for="label">Label:</label>
-                                    <input class="form-control"  type="text" th:field="*{label}" required />
+                                    <input id="label" class="form-control"  type="text" th:field="*{label}" required />
+                                    <br />
+                                    <label for="code1">Label:</label>
+                                    <input id="code1" class="form-control"  type="text" th:field="*{label}" required />
                                     <br />
                                     <label for="address">Address:</label>
-                                    <input class="form-control"  type="text" th:field="*{address}"  required/>
+                                    <input id="address" class="form-control"  type="text" th:field="*{address}"  required/>
                                     <br />
                                     <label for="phone">Phone:</label>
-                                    <input class="form-control"  type="text" th:field="*{phone}" required/>
+                                    <input id="phone" class="form-control"  type="text" th:field="*{phone}" required/>
                                     <br>
                                     <label>Selectionner le responsable:</label>
                                     <select class="form-control form-select" th:field="*{appUsers}" required>
@@ -100,7 +103,7 @@
                                     </select>
                                     <br />
                                     <label for="status">Activer:</label>
-                                    <input   type="checkbox" th:field="*{status}" checked />
+                                    <input id="status" type="checkbox" th:field="*{status}" checked />
                                     <br />
                                     <br>
                                     <input class="form-control btn btn-info"  type="submit" value="Sauvegarder" />
@@ -111,6 +114,9 @@
                                     <label for="label">Label:</label>
                                     <input class="form-control"  type="text" th:field="*{label}" required />
                                     <br />
+                                    <label for="code">Code:</label>
+                                    <input id="code" class="form-control"  type="text" th:field="*{code}" required />
+                                    <br>
                                     <label for="address">Address:</label>
                                     <input class="form-control"  type="text" th:field="*{address}" required />
                                     <br />

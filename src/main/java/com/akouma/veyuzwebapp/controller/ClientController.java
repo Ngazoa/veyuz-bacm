@@ -129,6 +129,7 @@ public class ClientController {
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
                     client1.setAgence(client.getAgence());
+                    client1.setNiu(client.getNiu());
                     return client1;
                 }
         ).collect(Collectors.toList());

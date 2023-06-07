@@ -21,6 +21,7 @@ public class ClientForm {
     private String confirmPassword;
     private String codeVeyuz;
     private String typeClient;
+    private String niu;
 
     private MultipartFile avatar;
 
@@ -42,6 +43,7 @@ public class ClientForm {
         this.numeroContribuable = client.getNumeroContribuable();
         this.appUser = null;
         this.agence = client.getAgence();
+        this.niu = client.getNiu();
 //        this.appUser = client.getUser();
 
     }

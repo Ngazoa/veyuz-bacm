@@ -21,6 +21,8 @@ public class Agence {
 
     private String label;
 
+    private String code;
+
     private String address;
     private String phone;
     private boolean status;
@@ -87,5 +89,13 @@ public class Agence {
 
     public void setClients(Collection<Client> clients) {
         this.clients = clients;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
     }
 }

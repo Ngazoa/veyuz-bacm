@@ -9,7 +9,7 @@
     <table id="datatables-reponsive" class="table table-striped" style="width:100%">
         <thead>
         <tr>
-            <th>#Num</th>
+            <th>NIU</th>
             <th>Denomination</th>
             <th>Type</th>
             <th>Telephone</th>
@@ -19,7 +19,7 @@
         </thead>
         <tbody>
         <tr th:each="b, s : ${clients}">
-            <td th:utext="${s.count}"></td>
+            <td th:utext="${b.niu}"></td>
             <td th:utext="${b.Denomination}"></td>
             <td th:utext="${b.typeClient}"></td>
             <td th:text="${b.telephone}"></td>
@@ -85,9 +85,6 @@
     </nav>
 </div>
 
-
-
-
 <div th:fragment="client-form">
     <form class="tab-content" th:object="${clientForm}" enctype="multipart/form-data" method="post" th:action="@{/banque-customers-save}">
         <div class="tab-pane fade show active" role="tabpanel">
@@ -125,6 +122,11 @@
                                     <label class="form-label">Denomination</label>
                                     <input type="text" class="form-control" th:field="*{denomination}" placeholder="Denomination">
                                     <span th:if="${#fields.hasErrors('denomination')}" class="text-danger">Ce champs est obligatoire</span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">NIU</label>
+                                    <input type="text" class="form-control" th:field="*{niu}" placeholder="NIU client">
+                                    <span th:if="${#fields.hasErrors('niu')}" class="text-danger">Ce champs est obligatoire</span>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" >Numero du contribuable</label>

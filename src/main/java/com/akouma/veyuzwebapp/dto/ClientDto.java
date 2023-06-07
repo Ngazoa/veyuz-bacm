@@ -26,5 +26,6 @@ public class ClientDto {
     private String reference;
     private String typeClient;
     private String codeVeyuz;
+    private String niu;
 
 }
