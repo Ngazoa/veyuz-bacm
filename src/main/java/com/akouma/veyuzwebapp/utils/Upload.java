@@ -68,8 +68,6 @@ public class Upload {
         byte[] bytes = file.getBytes();
         Files.write(path, bytes);
 
-        System.out.println("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY - " + path);
-
         return fileName;
     }
 }

@@ -138,6 +138,12 @@
 
     </p>
     <p>
+    <span>Banque Correspondante</span>
+    <b th:if="${transaction.BanqueCorrespondante!=null}" th:utext="${transaction.BanqueCorrespondante.name}"></b>
+    <b th:if="${transaction.BanqueCorrespondante==null}"> **/**</b>
+
+</p>
+    <p>
         <span>Statut</span>
         <b class="chat-message-right mb-4">
             <button class="btn btn-primary" th:if="${transaction.statut == 0}">En attente de traitement</button>
@@ -398,6 +404,14 @@
                                    name="taux" placeholder="0.000"
                                    required style="text-align: right;"
                                    type="text">
+                            <label class="form-label" for="financement">Banque Correspondante:</label>
+                            <div class="d-flex justify-content-center">
+                                <select class="form-control form-select" id="banquecorrespondant" name="banquecorrespondant" required>
+                                    <option value="">Selectionner la banque</option>
+                                    <option th:each="d, state : ${banquecorrespondant}" th:text="${d.name}"
+                                            th:value="${d.id}"></option>
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Fermer</button>

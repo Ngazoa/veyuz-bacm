@@ -266,7 +266,7 @@ public class ApurementRestController {
      */
     @GetMapping("/rest-apurements/{id}/apurer")
     public ResponseEntity<?> apurer(@PathVariable("id")Apurement apurement, Authentication authentication) {
-        System.out.println("\n\n\n==============================\nOn veut apurer\n=======================================");
+
         HashMap<String, Object> response = new HashMap<>();
 
         if(!(authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TRADE_DESK")) ||
