@@ -32,7 +32,7 @@ import java.security.Principal;
 @Controller
 public class ApurementController {
 
-    private final int max = 10;
+    private final int max = 25;
     private final int page = 1;
     @Autowired
     HttpSession session;

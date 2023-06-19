@@ -30,11 +30,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 @Controller
 public class DomiciliationController {
 
-    private final int max = 10;
+    private final int max = 25;
     private final int page = 1;
     @Autowired
     HttpSession session;
@@ -372,6 +373,17 @@ public class DomiciliationController {
 
         return "redirect:/domiciliations";
 
+    }
+
+    @Secured({"ROLE_SUPERADMIN"})
+    @GetMapping("/domiciliations/{id}/delete")
+    public String delete(@PathVariable("id") Long id) throws Exception {
+
+        Optional<Domiciliation> domiciliation = domiciliationService.findById(id);
+
+        domiciliationService.delete(domiciliation.get());
+
+        return "redirect:/domiciliations";
     }
 
 }

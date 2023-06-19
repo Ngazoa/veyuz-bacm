@@ -13,4 +13,6 @@ public interface AgenceRepository  extends CrudRepository<Agence, Long>  {
 
 
     Optional<Agence> findByCode(String code);
+
+    Optional<Agence> findByLabel(String label);
 }

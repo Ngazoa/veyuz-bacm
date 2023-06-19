@@ -124,7 +124,10 @@ public class ClientService {
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
-                    client1.setNiu(client.getNiu());
+                    client1.setNiu(client.getNiu() == null ? client.getNumeroContribuable() : client1.getNiu());
+                    if (client.getNiu() == null) {
+                        saveClient(client);
+                    }
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -135,6 +138,8 @@ public class ClientService {
         if (client.getReference() == null || client.getReference() == "") {
             client.setReference("C-" + new Date().getTime() + "-VEYUZ");
         }
+        client.setNiu(client.getNumeroContribuable());
+
         return clientRepository.save(client);
     }
 
@@ -159,7 +164,10 @@ public class ClientService {
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
-                    client1.setNiu(client.getNiu());
+                    client1.setNiu(client.getNiu() == null ? client.getNumeroContribuable() : client1.getNiu());
+                    if (client.getNiu() == null) {
+                        saveClient(client);
+                    }
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -330,6 +338,7 @@ public class ClientService {
                         case 11:
                             if (client == null || client.getId() == null) {
                                 client.setNumeroContribuable(cell.getStringCellValue());
+                                client.setNiu(cell.getStringCellValue());
                             }
                             break;
                         case 12:
@@ -407,7 +416,10 @@ public class ClientService {
                     client1.setReference(client.getReference());
                     client1.setNumeroContribuable(client.getNumeroContribuable());
                     client1.setTypeClient(client.getTypeClient());
-                    client1.setNiu(client.getNiu());
+                    client1.setNiu(client.getNiu() == null ? client.getNumeroContribuable() : client1.getNiu());
+                    if (client.getNiu() == null) {
+                        saveClient(client);
+                    }
                     return client1;
                 }
         ).collect(Collectors.toList());
@@ -432,7 +444,7 @@ public class ClientService {
         client1.setReference(client.getReference());
         client1.setNumeroContribuable(client.getNumeroContribuable());
         client1.setTypeClient(client.getTypeClient());
-        client1.setNiu(client.getNiu());
+        client1.setNiu(client.getNiu() == null ? client.getNumeroContribuable() : client1.getNiu());
         return client1;
     }
 
@@ -452,6 +464,10 @@ public class ClientService {
         return clientRepository.findByNiu(niu).orElseThrow(
                 () -> new NoSuchElementException("Le client dont le NIU est " + niu + " n'existe pas!")
         );
+    }
+
+    public void delete(Client client) {
+        clientRepository.delete(client);
     }
 
     public class ClientSpecifications {

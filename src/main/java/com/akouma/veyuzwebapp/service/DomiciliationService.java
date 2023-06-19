@@ -23,6 +23,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Data
 @Service
@@ -215,5 +217,15 @@ public class DomiciliationService {
 
     public Iterable<Domiciliation> getAllBanqueDomiciliations(Banque banque) {
         return domiciliationRepository.findByBanque(banque);
+    }
+
+    public Optional<Domiciliation> findById(Long id) {
+        return Optional.of(domiciliationRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException("Agence not found with id: " + id)
+        ));
+    }
+
+    public void delete(Domiciliation domiciliation) {
+        domiciliationRepository.delete(domiciliation);
     }
 }

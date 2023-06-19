@@ -227,7 +227,7 @@ public class ImportExcelFileUtil {
 
                     String codeBenef = String.valueOf(getCellValue(row.getCell(0), workbook));
                     String nomBenef = String.valueOf(getCellValue(row.getCell(1), workbook));
-                    Beneficiaire beneficiaire = beneficiaireRepository.findFirstByReference(codeBenef);
+                    Beneficiaire beneficiaire = beneficiaireRepository.findFirstByName(nomBenef);
                     if (beneficiaire == null) {
                         beneficiaire = new Beneficiaire();
                         beneficiaire.setBanque(banque);
@@ -273,6 +273,8 @@ public class ImportExcelFileUtil {
                         montantRestant = Float.parseFloat(String.valueOf(getCellValue(row.getCell(10), workbook)));
                     }
                     domiciliation.setMontantRestant(montantRestant);
+
+                    domiciliation.setReferenceInterne(String.valueOf(getCellValue(row.getCell(11), workbook)));
 
                     domiciliationList.add(domiciliation);
                 }
@@ -352,9 +354,11 @@ public class ImportExcelFileUtil {
                     client.setDenomination(String.valueOf(getCellValue(row.getCell(1), workbook)));
                     client.setBanques(banqueList);
                     client.setNumeroContribuable(String.valueOf(getCellValue(row.getCell(2), workbook)));
+                    client.setNiu(client.getNumeroContribuable());
                     client.setTelephone(String.valueOf(getCellValue(row.getCell(3), workbook)));
-                    Agence agence = agenceService.findByCode(String.valueOf(getCellValue(row.getCell(0), workbook)));
+                    Agence agence = agenceService.findByLabel(String.valueOf(getCellValue(row.getCell(0), workbook)).toUpperCase());
                     client.setAgence(agence);
+                    client.setTypeClient(String.valueOf(getCellValue(row.getCell(4), workbook)));
                     clientList.add(client);
                 }
                 pos++;

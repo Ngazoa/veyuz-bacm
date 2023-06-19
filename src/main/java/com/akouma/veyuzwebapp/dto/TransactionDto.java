@@ -38,5 +38,6 @@ public class TransactionDto {
 
     private TypeFinancement typeFinancement;
 
+    private Boolean isRenvoye;
 
 }

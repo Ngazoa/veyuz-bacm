@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @Controller
 public class TransactionController {
 
-    private final int max = 10;
+    private final int max = 25;
     private final int page = 1;
     @Autowired
     NotificationService notificationService;
@@ -101,6 +101,8 @@ public class TransactionController {
             Model model, Authentication authentication, Principal principal,
             @PathVariable(required = false,value = "agence") Long agenceId) {
 
+        System.out.println("\n========================\nICI TRANSACTIONS\n===================");
+
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
             return "redirect:/";
@@ -115,34 +117,37 @@ public class TransactionController {
         page--;
 
         Agence agence=null;
-        if(agenceId!=null){
-
-            agence=agenceService.getAgenceById(agenceId);
-            transactions = transactionService.getPageableTransactionsHasFilesForAgence(banque, agence, true, max, page);
-
-            SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
-            searchTransactionForm.setBanque(banque);
-
-            String uri = "/transactions-"+agenceId+"/page={page}";
-            model.addAttribute("uri", uri);
-
-            addTransactionViewData(null, model, banque, transactions, searchTransactionForm, uri);
-            model.addAttribute("dash", "transaction");
-            model.addAttribute("das", "all");
-
-            return "transactionslist";
-
-        }
+//        if(agenceId!=null){
+//
+//            agence=agenceService.getAgenceById(agenceId);
+//            transactions = transactionService.getPageableTransactionsHasFilesForAgence(banque, agence, true, max, page);
+//
+//            SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
+//            searchTransactionForm.setBanque(banque);
+//
+//            String uri = "/transactions-"+agenceId+"/page={page}";
+//            model.addAttribute("uri", uri);
+//
+//            addTransactionViewData(null, model, banque, transactions, searchTransactionForm, uri);
+//            model.addAttribute("dash", "transaction");
+//            model.addAttribute("das", "all");
+//
+//            return "transactionslist";
+//
+//        }
 
         AppUser loggedUser = userService.getLoggedUser(principal);
         // On verifie le role du user qui est connectee. si c'est un client alors on lui retourne la liste de ses transactions
         if (loggedUser.getClient() != null) {
             transactions = transactionService.getPageableTransactionsForClient(banque, loggedUser.getClient(), max, page);
-
-        } else if (loggedUser.getAgence()!=null) {
-            transactions = transactionService.getAllTransactionsForBanqueAgence(banque, loggedUser.getAgence(), max, page);
+            System.out.println("\nICI TRANSACTIONS DANS LE IF CLIENT\n===================");
+        } else if (loggedUser.getAgence() != null) {
+//            transactions = transactionService.getAllTransactionsForBanqueAgence(banque, loggedUser.getAgence(), max, page);
+            transactions = transactionService.findByBanqueAndAgence(banque, loggedUser.getAgence(), max, page);
+            System.out.println("\nICI TRANSACTIONS DANS LE ELSE IF AGENCE\n===================");
         } else {
             transactions = transactionService.getAllTransactionsForBanque(banque, max, page);
+            System.out.println("\nICI TRANSACTIONS DANS LE ELSE\n===================");
         }
         SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
         searchTransactionForm.setBanque(banque);
@@ -305,7 +310,7 @@ public class TransactionController {
             return "redirect:/";
         }
 
-        Iterable<Transaction> transactions = null;
+        List<Transaction> transactions = null;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date1 = null;
@@ -358,9 +363,35 @@ public class TransactionController {
 
         model.addAttribute("message", message);
         addTransactionViewData(searchTransactionForm.getClient(), model, searchTransactionForm.getBanque(), null, searchTransactionForm, null);
-        model.addAttribute("transactions", transactions);
+        assert transactions != null;
+        model.addAttribute("transactions", fromEntitiesToDTO(transactions));
         return "transactionslist";
     }
+
+    private List<TransactionDto> fromEntitiesToDTO(List<Transaction> transactions) {
+
+        return transactions.stream().map(
+                transaction -> {
+                    TransactionDto tdo = new TransactionDto();
+                    tdo.setBeneficiaire(transaction.getBeneficiaire());
+                    try {
+                        tdo.setId(CryptoUtils.encrypt(transaction.getId()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    tdo.setAppUser(transaction.getAppUser());
+                    tdo.setClient(transaction.getClient());
+                    tdo.setMontant(transaction.getMontant());
+                    tdo.setDateTransaction(transaction.getDateTransaction());
+                    tdo.setReference(transaction.getReference());
+                    tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
+                    tdo.setStatut(transaction.getStatut());
+                    tdo.setDateCreation(transaction.getDateCreation());
+                    return tdo;
+                }
+        ).collect(Collectors.toList());
+    }
+
     private void addTransactionViewDataAgence(Agence agence, Model model, Banque banque,
                                         Page<Transaction> transactions,
                                         String uri) {

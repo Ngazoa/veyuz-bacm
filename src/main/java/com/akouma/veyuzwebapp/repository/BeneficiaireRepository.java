@@ -14,4 +14,6 @@ public interface BeneficiaireRepository extends CrudRepository<Beneficiaire, Lon
     List<Beneficiaire> findByBanque(Banque banque);
 
     Beneficiaire findByName(String codeBenef);
+
+    Beneficiaire findFirstByName(String name);
 }

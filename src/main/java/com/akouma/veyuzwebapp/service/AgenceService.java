@@ -66,4 +66,10 @@ public class AgenceService {
         agence1.setStatus(false);
         agenceRepository.save(agence1);
     }
+
+    public Agence findByLabel(String label) {
+        return agenceRepository.findByLabel(label).orElseThrow(
+                () -> new NoSuchElementException("Agence not found with code: " + label)
+        );
+    }
 }

@@ -74,6 +74,10 @@
                             Solde sopra
                             <i class="fas text-end"></i>
                         </a>
+                        <div class="dropdown-divider"></div>
+                        <a  th:href="@{/clients/{id}/delete(id=${b.id})}" class="dropdown-item text-danger" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
                     </div>
                 </div>
             </td>
@@ -81,7 +85,7 @@
         </tbody>
     </table>
     <nav id="pagination" th:if="${nbPages != null and nbPages > 1 }" th:data-pages="${nbPages}" th:data-uri="${uri}" th:data-current="${currentPage}" aria-label="Page navigation example">
-        <div th:replace="~{/pagination::pagination}"></div>
+        <div th:replace="~{./pagination::pagination}"></div>
     </nav>
 </div>
 
@@ -123,11 +127,11 @@
                                     <input type="text" class="form-control" th:field="*{denomination}" placeholder="Denomination">
                                     <span th:if="${#fields.hasErrors('denomination')}" class="text-danger">Ce champs est obligatoire</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">NIU</label>
-                                    <input type="text" class="form-control" th:field="*{niu}" placeholder="NIU client">
-                                    <span th:if="${#fields.hasErrors('niu')}" class="text-danger">Ce champs est obligatoire</span>
-                                </div>
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">NIU</label>-->
+<!--                                    <input type="text" class="form-control" th:field="*{niu}" placeholder="NIU client">-->
+<!--                                    <span th:if="${#fields.hasErrors('niu')}" class="text-danger">Ce champs est obligatoire</span>-->
+<!--                                </div>-->
                                 <div class="mb-3">
                                     <label class="form-label" >Numero du contribuable</label>
                                     <input type="text" class="form-control" th:field="*{numeroContribuable}" placeholder="numero du contribuable">

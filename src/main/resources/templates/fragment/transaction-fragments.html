@@ -280,76 +280,83 @@
     <div>
         <hr>
         <th:block th:if="${#authorization.expression('!hasRole(''ROLE_CONTROLLER'')')}">
-        <th:block th:if="${!transaction.cycleNormalAcheve}">
-            <th:block sec:authorize="hasRole('ROLE_MACKER')">
-                <button class="btn btn-secondary" data-bs-target="#defaultModalPrimary" data-bs-toggle="modal"
-                        th:if="${transaction.statut == W or transaction == SM}" type="button">
-                    Rejeter
-                </button>
-            </th:block>
+            <th:block th:if="${!transaction.cycleNormalAcheve}">
+                <th:block sec:authorize="hasRole('ROLE_MACKER')">
+                    <button class="btn btn-secondary" data-bs-target="#defaultModalPrimary" data-bs-toggle="modal"
+                            th:if="${transaction.statut == W or transaction == SM}" type="button">
+                        Rejeter
+                    </button>
+                </th:block>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')
-            or #authorization.expression('hasRole(''ROLE_CHECKER'')')
-             or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
-                <button class="btn btn-warning send-back" data-bs-target="#modalRenvoyer"
-                        data-bs-toggle="modal"
-                        th:href="@{/send-back-to-customer/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SCSTR})}"
-                        th:if="${transaction.statut == W or transaction.statut == SM}" type="button">
-                    Renvoyer
-                </button>
-            </th:block>
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_MACKER'')') or
-             #authorization.expression('hasRole(''ROLE_CHECKER'')')} ">
-                <button class="btn btn-danger send-back" data-bs-target="#modalRenvoyer"
-                        data-bs-toggle="modal"
-                        th:href="@{/send-back-to-macker/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SMSTR})}"
-                        th:if="${transaction.statut == M or transaction.statut >1
-                     and transaction.statut!=9}" type="button">
-                    << Renvoyer
-                </button>
-            </th:block>
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_CHECKER'')') or
-              #authorization.expression('hasRole(''ROLE_MACKER'')')} ">
-                <a class="btn btn-success make-transaction-action"
-                   th:href="@{/macked-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${MSTR})}"
-                   th:if="${transaction.statut == W }">Approuver</a>
-            </th:block>
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
-                <a class="btn btn-success make-transaction-action"
-                   th:href="@{/check-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${CSTR})}"
-                   th:if="${transaction.statut >=1 and transaction.statut < 9 and transaction.statut!=3}">Approuver
-                    >></a>
-            </th:block>
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_CHECKER'')')
+                or #authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+                 or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
+                    <button class="btn btn-warning send-back" data-bs-target="#modalRenvoyer"
+                            data-bs-toggle="modal"
+                            th:href="@{/send-back-to-customer/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SCSTR})}"
+                            th:if="${transaction.statut == W or transaction.statut == SM}" type="button">
+                        Renvoyer
+                    </button>
+                </th:block>
 
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_TREASURY'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
-                <a class="btn btn-success make-transaction-action"
-                   th:href="@{/valider-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${VSTR})}"
-                   th:if="${transaction.statut == C and transaction.statut == 8}">Valider</a>
-            </th:block>
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_MACKER'')') or
+                 #authorization.expression('hasRole(''ROLE_CHECKER'')')} ">
+                    <button class="btn btn-danger send-back" data-bs-target="#modalRenvoyer"
+                            data-bs-toggle="modal"
+                            th:href="@{/send-back-to-macker/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${SMSTR})}"
+                            th:if="${transaction.statut == M or transaction.statut > 1
+                         and transaction.statut!=9}" type="button">
+                        << Renvoyer
+                    </button>
+                </th:block>
 
-            <th:block
-                    th:if="${#authorization.expression('hasRole(''ROLE_TREASURY'')') and transaction.statut == 9}">
-                <br>
-                <button class="btn btn-primary" data-bs-target="#defaultModalPrimary1" data-bs-toggle="modal"
-                        type="button">
-                    Valider pour débit
-                </button>
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+                or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+                 or #authorization.expression('hasRole(''ROLE_CHECKER'')') or
+                  #authorization.expression('hasRole(''ROLE_MACKER'')')} ">
+                    <a class="btn btn-success make-transaction-action"
+                       th:href="@{/macked-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${MSTR})}"
+                       th:if="${transaction.statut == W }">Approuver</a>
+                </th:block>
 
-            </th:block>
-            <th:block th:if="${#authorization.expression('hasRole(''ROLE_AGENCE'')')
-            or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
-             or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
-                <a style="float:right;" th:href="@{${uri}}"
-                   th:if="${transaction.statut != V or transaction.statut != R}">Ajouter les documents</a>
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+                or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+                 or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
+                    <a class="btn btn-success make-transaction-action"
+                       th:href="@{/check-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${CSTR})}"
+                       th:if="${transaction.statut >=1 and transaction.statut < 9 and transaction.statut!=3}">Approuver
+                        >></a>
+                </th:block>
+
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_TREASURY'')')
+                or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+                 or #authorization.expression('hasRole(''ROLE_CHECKER'')')}">
+                    <a class="btn btn-success make-transaction-action"
+                       th:href="@{/valider-transaction/{id}/{user_id}/{status}(id=${transaction.id}, user_id=${#authentication.getPrincipal().getId()}, status=${VSTR})}"
+                       th:if="${transaction.statut == C and transaction.statut == 8}">Valider</a>
+                </th:block>
+
+                <th:block
+                        th:if="${#authorization.expression('hasRole(''ROLE_TREASURY'')') and transaction.statut == 9}">
+                    <br>
+                    <button class="btn btn-primary" data-bs-target="#defaultModalPrimary1" data-bs-toggle="modal"
+                            type="button">
+                        Valider pour débit
+                    </button>
+
+                </th:block>
+
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_AGENCE'')')
+                or #authorization.expression('hasRole(''ROLE_MAKER_TO'')')
+                 or #authorization.expression('hasRole(''ROLE_MACKER'')')}">
+                    <a style="float:right;" th:href="@{${uri}}"
+                       th:if="${transaction.statut != V or transaction.statut != R}">Ajouter les documents</a>
+                </th:block>
+
             </th:block>
         </th:block>
-        </th:block>
+
         <div aria-hidden="true" class="modal fade" id="defaultModalPrimary1" role="dialog" tabindex="-1">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

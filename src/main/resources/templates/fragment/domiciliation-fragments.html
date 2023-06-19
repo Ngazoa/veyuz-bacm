@@ -10,7 +10,7 @@
         <table id="datatables-reponsive" class="table table-striped" style="width:100%">
             <thead>
                 <tr>
-                    <th>Reference</th>
+                    <th>Reference Interne</th>
                     <th>Type</th>
                     <th>Client</th>
                     <th>Beneficiaire</th>
@@ -24,7 +24,7 @@
             </thead>
             <tbody>
                 <tr th:each="d, state : ${domiciliations}">
-                    <td th:utext="${d.reference}"></td>
+                    <td th:utext="${d.referenceInterne}"></td>
                     <td th:utext="${d.typeDeTransaction.name}"></td>
                     <td th:utext="${d.client.denomination}"></td>
                     <td th:utext="${d.beneficiaire.name}"></td>
@@ -41,6 +41,10 @@
                             </button>
                             <div class="dropdown-menu" style="">
                                 <a class="dropdown-item" th:href="@{/domiciliation-{id}/details(id=${d.id})}">Afficher les details</a>
+                                <div class="dropdown-divider"></div>
+                                <a  th:href="@{/domiciliations/{id}/delete(id=${d.id})}" class="dropdown-item text-danger" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
                             </div>
                         </div>
                     </td>
@@ -73,6 +77,10 @@
     </table>
 
     <div th:fragment="details" class="col-md-5">
+        <p>
+            <span>Reference Interne</span>
+            <b th:utext="${domiciliation.referenceInterne}"></b>
+        </p>
         <p>
             <span>Reference</span>
             <b th:utext="${domiciliation.reference}"></b>

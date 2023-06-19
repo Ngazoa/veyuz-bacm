@@ -371,10 +371,11 @@ public class TransactionRestController {
                 if (roleMacker != null) {
                     Object userRole = appUser.getAppRoles().contains(roleMacker);
                     if (userRole != null) {
-                        transaction.setStatut(StatusTransaction.SENDBACK_CUSTOMER);
+                        transaction.setStatut(StatusTransaction.WAITING);
+                        transaction.setRenvoye(true);
                         this.saveTransactionAndAction(transaction, appUser, status, commentaire);
                         isChange = true;
-                        message = "L'operation a ete prise en compte ! la transaction a été renvoyée au client pour complement.";
+                        message = "L'opération a été prise en compte ! la transaction a été renvoyée à l'agence pour modification.";
 //                        Notification notification = new Notification();
 //                        notification.setMessage("Une de vos transactions  vous a été renvoyée pour complément ! Voir l'historique en cliquant sur le lien precedent pour connaitre les motifs de ce renvoie.");
 //                        notification.setRead(false);

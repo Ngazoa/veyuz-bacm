@@ -177,6 +177,8 @@ public class Domiciliation {
 
     private boolean isImportation; // Permet de connaitre le type de domiciliation
 
+    private  String referenceInterne;
+
 
     @Override
     public int hashCode() {

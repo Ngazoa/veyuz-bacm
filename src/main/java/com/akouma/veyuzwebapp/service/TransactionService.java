@@ -125,7 +125,7 @@ public class TransactionService {
      * @return
      */
     public Page<Transaction> getAllTransactionsForBanque(Banque banque, int maxResults, int page) {
-        return transactionRepository.findByBanqueAndHasFilesOrderByDateCreationDesc(banque, true, PageRequest.of(page, maxResults));
+        return transactionRepository.findByBanqueOrderByDateCreationDesc(banque, PageRequest.of(page, maxResults));
     }
 
     public Page<Transaction> getAllTransactionsForBanqueAgence(Banque banque, Agence user, int maxResults, int page) {
@@ -141,7 +141,7 @@ public class TransactionService {
      * @param page
      * @return
      */
-    public Iterable<Transaction> getAllTransactionsForBanqueBeforeDate(Banque banque, Date date, int maxResults, int page) {
+    public List<Transaction> getAllTransactionsForBanqueBeforeDate(Banque banque, Date date, int maxResults, int page) {
         return transactionRepository.findByBanqueAndDateCreationBeforeOrderByDateCreationDesc(banque, date);
     }
 
@@ -200,7 +200,7 @@ public class TransactionService {
      * @param page
      * @return
      */
-    public Iterable<Transaction> getAllTransactionsForBanqueAfterDate(Banque banque, Date date, int maxResults, int page) {
+    public List<Transaction> getAllTransactionsForBanqueAfterDate(Banque banque, Date date, int maxResults, int page) {
         return transactionRepository.findByBanqueAndDateCreationAfterOrderByDateCreationDesc(banque, date);
     }
 
@@ -214,7 +214,7 @@ public class TransactionService {
      * @param page
      * @return
      */
-    public Iterable<Transaction> getAllTransactionsForBanqueBetweenDates(Banque banque, Date dateInf, Date dateSup, int maxResults, int page) {
+    public List<Transaction> getAllTransactionsForBanqueBetweenDates(Banque banque, Date dateInf, Date dateSup, int maxResults, int page) {
         return transactionRepository.findByBanqueAndDateCreationBetweenOrderByDateCreationDesc(banque, dateInf, dateSup);
     }
 
@@ -701,4 +701,7 @@ public class TransactionService {
     }
 
 
+    public Page<Transaction> findByBanqueAndAgence(Banque banque, Agence agence, int max, Integer page) {
+        return transactionRepository.findByBanqueAndAgenceOrderByDateCreationDesc(banque, agence, PageRequest.of(page, max));
+    }
 }

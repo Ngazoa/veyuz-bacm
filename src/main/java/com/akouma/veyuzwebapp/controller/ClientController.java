@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Controller
 public class ClientController {
 
-    private final int max = 10;
+    private final int max = 25;
     private final int page = 1;
     @Autowired
     HttpSession session;
@@ -91,14 +91,14 @@ public class ClientController {
             page = this.page;
         }
         page--;
-        Page pagesClients = null;
-        if (loggedUser.getAgence() != null) {
-            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
-
-        } else {
-            pagesClients = clientService.getClients(banque, 50, page);
-
-        }
+        Page pagesClients = clientService.getClients(banque, max, page);
+//        if (loggedUser.getAgence() != null) {
+//            pagesClients = clientService.findAllClientAgence(loggedUser.getAgence(), banque, 50, page);
+//
+//        } else {
+//            pagesClients = clientService.getClients(banque, 50, page);
+//
+//        }
 
         int nbPages = pagesClients.getTotalPages();
         if (nbPages > 1) {
@@ -386,6 +386,17 @@ public class ClientController {
         model.addAttribute("dash", "client");
         model.addAttribute("setItem", "clients");
         return "parametres";
+    }
+
+    @Secured({"ROLE_SUPERADMIN"})
+    @GetMapping("/clients/{id}/delete")
+    public String delete(@PathVariable("id") String clt) throws Exception {
+
+        Client client = clientService.findById(cryptoUtils.decrypt(clt));
+
+        clientService.delete(client);
+
+        return "redirect:/clients";
     }
 
 }

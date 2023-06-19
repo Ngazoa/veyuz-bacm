@@ -30,11 +30,11 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
 
     Page<Transaction> findByBanqueAndClientAndDomiciliationOrderByDateCreationDesc(Banque banque, Client client, Domiciliation domiciliation, Client client1, Pageable pageable);
 
-    Iterable<Transaction> findByBanqueAndDateCreationAfterOrderByDateCreationDesc(Banque banque, Date date);
+    List<Transaction> findByBanqueAndDateCreationAfterOrderByDateCreationDesc(Banque banque, Date date);
 
-    Iterable<Transaction> findByBanqueAndDateCreationBeforeOrderByDateCreationDesc(Banque banque, Date date);
+    List<Transaction> findByBanqueAndDateCreationBeforeOrderByDateCreationDesc(Banque banque, Date date);
 
-    Iterable<Transaction> findByBanqueAndDateCreationBetweenOrderByDateCreationDesc(Banque banque, Date dateInf, Date dateSup);
+    List<Transaction> findByBanqueAndDateCreationBetweenOrderByDateCreationDesc(Banque banque, Date dateInf, Date dateSup);
 
     Page<Transaction> findByBanqueAndStatutOrderByDateCreationAsc(Banque banque, int status, Pageable pageable);
 
@@ -162,4 +162,6 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     Page<Transaction> findByBanqueAndAgenceAndStatutOrderByDateCreationDesc(Banque banque, Agence agence, int statut, Pageable pageable);
 
     Transaction findByReference(String ref);
+
+    Page<Transaction> findByBanqueAndAgenceOrderByDateCreationDesc(Banque banque, Agence agence, Pageable pageable);
 }
