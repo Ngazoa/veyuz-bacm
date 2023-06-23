@@ -286,8 +286,6 @@
                     </li>.
                 </ul>
             </li>
-
-<<<<<<< HEAD
             <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
                 <a data-bs-target="#transfinanciere" data-bs-toggle="collapse" class="sidebar-link collapsed">
@@ -309,7 +307,7 @@
 
 
             <li class="sibebar-item" th:classappend="${#strings.equals(dash, 'domiciliation')} ? active : ''">
-=======
+
             <li th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                     or #authorization.expression('hasRole(''ROLE_AGENCE'')')
                     or #authorization.expression('hasRole(''ROLE_TRADE_DESK'')')
@@ -318,7 +316,6 @@
                     or #authorization.expression('hasRole(''ROLE_MACKER'')')
                     or #authorization.expression('hasRole(''ROLE_MACKER_TO'')')
                     or #authorization.expression('hasRole(''ROLE_CONTROLLER'')') }" class="sibebar-item" th:classappend="${#strings.equals(dash, 'domiciliation')} ? active : ''">
->>>>>>> 7316113be63b6d5a04ff81442aac1be954f362c5
                 <a class="sidebar-link" th:href="@{/domiciliations}">
                     <i class="align-middle" data-feather="corner-right-down"></i> <span class="align-middle">Domiciliations</span>
                 </a>
