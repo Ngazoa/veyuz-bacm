@@ -22,6 +22,8 @@ public class LettreEngagement {
 
     public byte[] getImportationBiens(Transaction transaction, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+
+
         WebContext context = new WebContext(request, response, request.getServletContext());
 
         context.setVariable("date", new SimpleDateFormat("dd/MM/yyyy").format(new Date()));

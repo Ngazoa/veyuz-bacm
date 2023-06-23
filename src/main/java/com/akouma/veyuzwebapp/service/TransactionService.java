@@ -588,18 +588,18 @@ public class TransactionService {
         }
 
         if (client == null && dateMin == null && dateMax == null && statut == null) {
-            transactions = transactionRepository.findByBanqueAndHasFiles(banque, hasFiles);
+            transactions = transactionRepository.findByBanque(banque);
         } else if (client != null && statut == null) {
-            transactions = transactionRepository.findByBanqueAndClientAndHasFiles(banque, client, hasFiles);
+            transactions = transactionRepository.findByBanqueAndClient(banque, client);
         } else if (client != null && statut != null) {
-            transactions = transactionRepository.findByBanqueAndClientAndHasFilesAndStatut(banque, client, hasFiles, state);
+            transactions = transactionRepository.findByBanqueAndClientAndStatut(banque, client, state);
         } else if (statut != null && dateMax == null && dateMin == null && client == null) {
-            transactions = transactionRepository.findByBanqueAndHasFilesAndStatut(banque, hasFiles, state);
+            transactions = transactionRepository.findByBanqueAndStatut(banque, state);
         } else if (dateMin != null && dateMax != null && client == null && statut == null) {
 //            findByBanqueAndDateCreationBetweenOrderByDateCreationDesc
-            transactions = transactionRepository.findByBanqueAndHasFilesAndDateCreationBetween(banque, hasFiles, dateMin, dateMax);
+            transactions = transactionRepository.findByBanqueAndDateCreationBetween(banque, dateMin, dateMax);
         } else if (dateMin != null && dateMax != null && client == null && statut != null) {
-            transactions = transactionRepository.findByBanqueAndHasFilesAndStatutAndDateCreationBetween(banque, hasFiles, state, dateMin, dateMax);
+            transactions = transactionRepository.findByBanqueAndStatutAndDateCreationBetween(banque, state, dateMin, dateMax);
         } else if (client == null && statut != null && dateMin != null && dateMax == null) {
 
         } else if (client == null && statut == null && dateMin != null && dateMax == null) {

@@ -36,7 +36,7 @@
                     <div class="col-md-6" id="details-transaction">
                         <div th:replace="fragment/transaction-fragments::details"></div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" th:if="${transaction.useManyDomiciliations == null or transaction.useManyDomiciliations == false or (transaction.useManyDomiciliations and not #lists.isEmpty(transaction.domiciliationTransactions))}">
                         <p th:if="${transaction.typeDeTransaction.type != null}">
                             Télécharger la lettre d'<a th:href="${lettreUri}" target="_blank">engagement ici</a> et ajoutez
                             là parmis les fichiers requis si celà est necessaire
@@ -46,6 +46,53 @@
                         </div>
                         <div id="result" class="mt-3"></div>
                     </div>
+                    <div th:if="${transaction.useManyDomiciliations and #lists.isEmpty(transaction.domiciliationTransactions)}" class="col-md-6">
+                        <h3>Cochez les domiciliations à utiliser</h3>
+                        <hr>
+                        <table class="table" id="domiciliations-table" th:data-montant-transaction="${transaction.montant}">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Reference domiciliation</th>
+                                    <th>Devise</th>
+                                    <th>Beneficiaire</th>
+                                    <th>Montant Disponible</th>
+                                    <th>Montant à débiter</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="d, i : ${domiciliations}"  th:id="'ligne-' + ${i.index}">
+                                    <td>
+                                        <input type="checkbox" value="" th:data-target="'form-' + ${i.index}" class="check-domiciliation">
+                                    </td>
+                                    <td th:utext="${d.reference}"></td>
+                                    <td th:utext="${d.devise.name}"></td>
+                                    <td th:utext="${d.beneficiaire.name}"></td>
+                                    <td  class="montant_format" th:utext="${d.montantRestant}"></td>
+                                    <td>
+                                        <form action="/domiciliation-transaction" class="form-domiciliation-transaction" method="get" th:id="'form-' + ${i.index}">
+                                            <input disabled="true" type="text" name="montant" class="form-control montant">
+                                            <div>
+                                                <div>
+                                                    <div>
+                                                        <input type="hidden" name="transactionId" th:value="${transaction.id}">
+                                                        <input type="hidden" name="domiciliationId" th:value="${d.id}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="6">
+                                        <button type="button" id="domiciliations-save-btn" class="btn btn-primary">Enregistrer</button>
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,6 +100,71 @@
     </div>
 
     <th:block id="others-js">
+        <script>
+            $('.check-domiciliation').each(function(){
+                $(this).on('click', function(e){
+                    const target = "#" + e.currentTarget.dataset.target;
+                    if ($(this).is(':checked')) {
+                        $(target + ' .montant').attr('disabled', false)
+                    } else {
+                        $(target + ' .montant').val('').attr('disabled', true)
+                    }
+                })
+            })
+
+            $('#domiciliations-save-btn').on('click', function(el){
+                const montant = parseFloat($('#domiciliations-table').data('montant-transaction'))
+                let enterValues = 0;
+                let hasError = false;
+                $('.check-domiciliation').each(function(e){
+                    const target = "#" + $(this).data('target');
+                    if ($(this).is(':checked')) {
+                        const newMont = parseFloat($(target + ' .montant').val());
+                        if (newMont <= 0) {
+                           hasError = true;
+                        }else {
+                            enterValues += newMont;
+                        }
+                    }
+                })
+                if (hasError) {
+                    alert("Des erreurs figurent dans les montant saisis")
+                }else {
+                    setTimeout(function(){
+                        if (montant == enterValues) {
+                            submitDomiciliationTransactionForm();
+                            setTimeout(function(){
+                                window.location.reload();
+                            }, 500)
+                        }else {
+                            alert("Les montants saisis ne correspondent pas au montant de la transaction");
+                        }
+                    }, 500)
+                }
+            })
+
+            function submitDomiciliationTransactionForm() {
+                $('form.form-domiciliation-transaction').each(function(e){
+                    const form = $(this)
+                    const montantInput = $(this).find('.form-control.montant')
+                    if (montantInput.val() != "" && montantInput.val() > 0) {
+                        $.ajax({
+                            url: form.attr('action'),
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: $(form).serialize(),
+                            success: function(response) {
+
+                            },
+                            error: function() {
+                                Alert("Une erreur est survenue !")
+                            }
+                        })
+                    }
+                })
+            }
+
+        </script>
         <script>
             $('.make-transaction-action").on("click", function(e){
                 e.preventDefault();

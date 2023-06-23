@@ -6,11 +6,13 @@ import com.akouma.veyuzwebapp.service.TypeDeTransactionService;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class TransactionForm {
@@ -162,6 +164,11 @@ public class TransactionForm {
     private String dateTransactionStr;
     private String motif;
 
+    @Transient
+    private Set<DomiciliationTransaction> domiciliationTransactions;
+
+    Boolean useManyDomiciliations = false;
+
 
     public TransactionForm() {
     }
@@ -181,9 +188,14 @@ public class TransactionForm {
         client = transaction.getClient();
         typeDeTransaction = transaction.getTypeDeTransaction();
         this.transaction = transaction;
+        useManyDomiciliations = transaction.getUseManyDomiciliations();
 
         reference = transaction.getReference();
-        dateTransactionStr = new SimpleDateFormat("dd-MM-yyyy").format(transaction.getDateTransaction());
+        Date date = transaction.getDateTransaction();
+        if (date == null) {
+            date = transaction.getDateCreation();
+        }
+        dateTransactionStr = new SimpleDateFormat("dd-MM-yyyy").format(date);
         this.type = type;
         motif = transaction.getMotif();
     }

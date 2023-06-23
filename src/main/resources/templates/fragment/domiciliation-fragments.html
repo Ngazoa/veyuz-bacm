@@ -110,6 +110,12 @@
             <span>Montant Restant</span>
             <b class="montant_format" style="color:blue" th:text="${domiciliation.montantRestant}"></b>
         </p>
+
+        <div th:if="${isEmpty}">
+            <p>
+                <a class="btn btn-secondary" th:href="@{/domiciliations-{id}/edit(id=${domiciliation.id})}">Modifier</a>
+            </p>
+        </div>
     </div>
 
     <div th:fragment="form">
@@ -122,6 +128,7 @@
                 </select>
                 <span th:if="${#fields.hasErrors('importation')}" style="float:right;margin-top:-24px" class="text-danger">Ce champ est obligatoire</span>
                 <input type="hidden" name="banque" th:value="${banque.id}">
+                <input type="hidden" th:field="*{domiciliation}">
             </div>
             <div class="mb-3">
                 <label>Date de creation</label>
@@ -138,8 +145,9 @@
             </div>
             <div class="mb-3">
                 <label>Montant (conformément à la dévise)</label>
+                <b class="montant_format" style="display:none;" id="montant-edit" th:text="${montantEdit}"></b>
                 <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
-                                             'groupSeparator': ',', 'digits': 2,
+                                             'groupSeparator': ',', 'digits': 3,
                                             'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
                        placeholder="">
 <!--                <input placeholder="Montant" type="number" class="form-control" th:field="*{montant}">-->
@@ -190,7 +198,7 @@
             </div>
             <th:block th:if="${#authorization.expression('!hasRole(''ROLE_CONTROLLER'')')}">
 
-            <button type="submit" class="btn btn-primary">Créer</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
             </th:block>
         </form>
     </div>

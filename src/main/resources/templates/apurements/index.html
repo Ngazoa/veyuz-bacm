@@ -235,7 +235,19 @@
                             <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                     or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${ap.referenceTransaction}"></td>
     <!--                        <td th:text="${ap.motif}"></td>-->
-                            <td th:text="${ap.transaction.domiciliation.reference}"></td>
+                            <td>
+                                <th:block th:if="${ap.transaction.domiciliation != null}">
+                                    <span th:text="${ap.transaction.domiciliation.reference}"></span>
+                                </th:block>
+                                <th:block th:unless="${ap.transaction.domiciliation != null}">
+                                    <ul>
+                                        <li th:each="dt, item : ${ap.transaction.domiciliationTransactions}">
+                                            <span th:text="${dt.domiciliation.reference}"></span>
+                                        </li>
+                                    </ul>
+
+                                </th:block>
+                            </td>
                             <td th:text="${ap.client.denomination}"></td>
                             <td th:text="${ap.beneficiaire}"></td>
                             <td th:text="${ap.devise}"></td>

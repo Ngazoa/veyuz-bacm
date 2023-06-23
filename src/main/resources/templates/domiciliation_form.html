@@ -40,6 +40,8 @@
             $(document).ready(function(){
                 $("#domiciliation_clients #client").trigger("change");
                 $("#typeDomiciliation").trigger("change");
+                const montantTexte = $("#montant-edit").text();
+                $("form #montantTexte").val(montantTexte);
             });
 
             $("#domiciliation_clients #client").on("change", function(e){

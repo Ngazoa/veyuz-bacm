@@ -21,10 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Data
 @Service
@@ -202,7 +199,7 @@ public class DomiciliationService {
         domiciliation.setTypeDeTransaction(domiciliationForm.getTypeDeTransaction());
         domiciliation.setDevise(domiciliationForm.getDevise());
         domiciliation.setDateExpiration(domiciliationForm.getDateExpiration());
-        domiciliation.setMontantRestant(domiciliationForm.getMontantRestant());
+        domiciliation.setMontantRestant(domiciliationForm.getMontant());
         domiciliation.setDateCreation(domiciliationForm.getDateCreation());
         domiciliation.setImportation(domiciliationForm.isImportation());
 
@@ -227,5 +224,13 @@ public class DomiciliationService {
 
     public void delete(Domiciliation domiciliation) {
         domiciliationRepository.delete(domiciliation);
+    }
+
+    public List<Domiciliation> findBy(TypeDeTransaction typeDeTransaction, Beneficiaire beneficiaire, Devise devise, Client client) {
+        return domiciliationRepository.findByClientAndBeneficiaireAndDeviseAndTypeDeTransaction(client, beneficiaire, devise, typeDeTransaction);
+    }
+
+    public List<Domiciliation> findBy(Devise devise, Client client) {
+        return domiciliationRepository.findByClientAndDevise(client, devise);
     }
 }

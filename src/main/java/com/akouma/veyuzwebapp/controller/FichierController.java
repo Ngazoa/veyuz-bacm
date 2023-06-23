@@ -6,6 +6,7 @@ import com.akouma.veyuzwebapp.form.SearchTransactionForm;
 import com.akouma.veyuzwebapp.model.Fichier;
 import com.akouma.veyuzwebapp.model.Transaction;
 import com.akouma.veyuzwebapp.repository.TransactionRepository;
+import com.akouma.veyuzwebapp.service.DomiciliationService;
 import com.akouma.veyuzwebapp.service.FichierService;
 
 import com.akouma.veyuzwebapp.service.TransactionService;
@@ -39,6 +40,9 @@ public class FichierController {
     private FichierService fichierService;
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    private DomiciliationService domiciliationService;
 
     @Autowired
     HttpSession session;
@@ -75,6 +79,8 @@ public class FichierController {
                String id= CryptoUtils.encrypt(transaction.getId());
                String lettreUri = "/" +id  + "-lettre-engagement";
                model.addAttribute("lettreUri", lettreUri);
+               model.addAttribute("domiciliations", domiciliationService.findBy(transaction.getDevise(), transaction.getClient()));
+//               model.addAttribute("domiciliations", domiciliationService.findBy(transaction.getTypeDeTransaction(), transaction.getBeneficiaire(), transaction.getDevise(), transaction.getClient()));
 
         return "transaction_files_form";
     }

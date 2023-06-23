@@ -164,4 +164,12 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
     Transaction findByReference(String ref);
 
     Page<Transaction> findByBanqueAndAgenceOrderByDateCreationDesc(Banque banque, Agence agence, Pageable pageable);
+
+    Iterable<Transaction> findByBanqueAndClientAndStatut(Banque banque, Client client, int state);
+
+    Iterable<Transaction> findByBanqueAndStatut(Banque banque, int state);
+
+    Iterable<Transaction> findByBanqueAndDateCreationBetween(Banque banque, Date dateMin, Date dateMax);
+
+    Iterable<Transaction> findByBanqueAndStatutAndDateCreationBetween(Banque banque, int state, Date dateMin, Date dateMax);
 }

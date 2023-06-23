@@ -39,7 +39,7 @@ public class DomiciliationValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "devise", "NotEmpty.empty");
 
         if (!errors.hasFieldErrors("reference")) {
-            if (!domiciliationService.getByReference(domiciliationForm.getReference())) {
+            if (domiciliationForm.getDomiciliation() == null && !domiciliationService.getByReference(domiciliationForm.getReference())) {
                 errors.rejectValue("reference", "Duplicate.domiciliationForm.reference");
             }
         }

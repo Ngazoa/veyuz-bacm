@@ -148,7 +148,7 @@ public class ImportExcelFileUtil {
                         transaction.setBeneficiaire(beneficiaireRepository.findFirstByReference(cell.getStringCellValue()));
                         break;
                     case 7:
-                        transaction.setDomiciliation(domiciliationRepository.findFirstByReference(cell.getStringCellValue()));
+//                        transaction.setDomiciliation(domiciliationRepository.findFirstByReference(cell.getStringCellValue()));
                         break;
                     case 8:
                         transaction.setDateCreation(cell.getDateCellValue());

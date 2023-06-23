@@ -25,10 +25,15 @@
                     <div class="card-body">
                         <form method="POST" id="transactionForm" action="/save-transaction" th:object="${transactionForm}">
                             <span th:text="${typeDomiciliation}"></span>
-                            <input type="hidden" th:field="*{banque}">
-                            <input type="hidden" th:field="*{client}">
-                            <input type="hidden" th:field="*{transaction}">
-                            <input type="hidden" th:field="*{type}">
+                            <div>
+                                <div>
+                                    <input type="hidden" th:field="*{banque}">
+                                    <input type="hidden" th:field="*{client}">
+                                    <input type="hidden" th:field="*{transaction}">
+                                    <input type="hidden" th:field="*{type}">
+                                    <input type="hidden" th:field="*{useManyDomiciliations}">
+                                </div>
+                            </div>
                             <div th:if="${type}==${normal}">
                                 <h3>
                                     Transaction Finanière
@@ -92,42 +97,48 @@
                                     <small><a th:href="@{${newTransactionLink}(type='normal')}"> Passer en mode Transaction Financiere
                                         (non domiciliée)</a></small>
                                 </h3>
-                                <div class="input-group mb-3">
-                                    <div class="mb-3">
-                                        <label class="form-label">Domiciliation</label>
-                                    <select class="form-control form-select" th:field="*{domiciliation}" required>
-                                        <option value="">Selectionner la domiciliation</option>
-                                        <option th:each="d, state : ${client.domiciliations}" th:value="${d.id}" th:utext="${d}"></option>
-                                    </select>
-                                    </div>
-                                </div>
-                                <div class="input-group mb-3">
-                                    <div class="mb-3">
-                                        <label class="form-label">Nature de la transaction</label>
-                                    <input type="hidden" th:field="*{typeDeTransaction}" class="form-control" required>
-                                    <input type="text" th:value="*{typeDeTransactionName}" id="typeDeTransactionV" disabled class="form-control" required>
-                                    </div>
-                                </div>
 
-                                <div class="input-group mb-3">
-                                    <div class="mb-3">
-                                        <label class="form-label">Bénéficiaire transaction</label>
-                                    <input type="hidden" th:field="*{beneficiaire}" class="form-control" required>
-                                    <input type="text" th:value="*{beneficiaireName}" disabled id="beneficiaireV" class="form-control" required>
+                                <th:block th:if="${!useManyDomiciliations}">
+                                    <div class="input-group mb-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Domiciliation</label>
+                                            <select class="form-control form-select" th:field="*{domiciliation}" required>
+                                                <option value="">Selectionner la domiciliation</option>
+                                                <option th:each="d, state : ${client.domiciliations}" th:value="${d.id}" th:utext="${d}"></option>
+                                            </select>
+                                            <a th:if="${!useManyDomiciliations}" href="?domiciliations=true">Utiliser plusieurs domiciliations</a>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="input-group mb-3">
-                                    <div class="mb-3">
-                                    <label class="form-label">Devise transaction</label>
-                                    <input type="hidden" th:field="*{devise}" class="form-control" required>
-                                    <input type="text" th:value="*{deviseName}" disabled id="deviseV" class="form-control" required>
+
+                                    <div class="input-group mb-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nature de la transaction</label>
+                                        <input type="hidden" th:field="*{typeDeTransaction}" class="form-control" required>
+                                        <input type="text" th:value="*{typeDeTransactionName}" id="typeDeTransactionV" disabled class="form-control" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Motif / Objet de la transaction</label>
-                                    <input type="text" required th:field="*{motif}" class="form-control">
-                                </div>
-                                <div class="form-group mb-3">
+
+                                    <div class="input-group mb-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Bénéficiaire transaction</label>
+                                        <input type="hidden" th:field="*{beneficiaire}" class="form-control" required>
+                                        <input type="text" th:value="*{beneficiaireName}" disabled id="beneficiaireV" class="form-control" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="input-group mb-3">
+                                        <div class="mb-3">
+                                        <label class="form-label">Devise transaction</label>
+                                        <input type="hidden" th:field="*{devise}" class="form-control" required>
+                                        <input type="text" th:value="*{deviseName}" disabled id="deviseV" class="form-control" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Motif / Objet de la transaction</label>
+                                        <input type="text" required th:field="*{motif}" class="form-control">
+                                    </div>
+                                    <div class="form-group mb-3">
                                     <label class="form-label">Montant (En devise de la transaction)</label>
                                     <small class="text-info" th:text="*{montantMax}"></small>
                                     <div class="mb-3">
@@ -140,6 +151,63 @@
                                         <!-- <input type="number" min="0" disabled max="" th:field="*{montant}" class="form-control" required>-->
                                     </div>
                                 </div>
+                                </th:block>
+
+                                <th:block th:if="${useManyDomiciliations}">
+                                    <div id="for-many-domiciliations">
+                                        <div class="input-group mb-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nature de la transaction</label>
+                                                <select class="form-control form-select" th:field="*{typeDeTransaction}" required>
+                                                    <option value="">Selectionner la nature de la transaction</option>
+                                                    <option th:each="tt, state : ${typeTransactions}" th:value="${tt.id}" th:utext="${tt.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="input-group mb-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Bénéficiaire</label>
+                                                <select class="form-control form-select" th:field="*{beneficiaire}" required>
+                                                    <option value="">Sélectionner le bénéficiaire</option>
+                                                    <option th:each="b, state : ${listbeneficiaires}" th:value="${b.id}" th:utext="${b.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="input-group mb-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Dévise</label>
+                                                <select class="form-control form-select" th:field="*{devise}" required>
+                                                    <option value="">Selectionner la dévise</option>
+                                                    <option th:each="d, state : ${listDevises}" th:value="${d.id}" th:utext="${d.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="domiciliations-list">
+
+                                        </div>
+                                    </div>
+                                    <div id="transaction-object">
+                                        <div class="mb-3">
+                                            <label class="form-label">Motif / Objet de la transaction</label>
+                                            <input type="text" required th:field="*{motif}" class="form-control">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Montant (En devise de la transaction)</label>
+                                            <small class="text-info" th:text="*{montantMax}"></small>
+                                            <div class="mb-3">
+                                                <input type="text" required th:field="*{montantTexte}" class="form-control" data-inputmask="'alias': 'numeric',
+                                         'groupSeparator': ',', 'digits':3,
+                                        'digitsOptional': false, 'prefix': '', 'placeholder': '0'" style="text-align: right;" inputmode="decimal"
+                                                       placeholder="0.000">
+                                                <br>
+                                                <span th:if="${#fields.hasErrors('montantTexte')}" style="float:right;margin-top:-24px" class="text-danger">Vous devez saisir un montant valide</span>
+                                                <!-- <input type="number" min="0" disabled max="" th:field="*{montant}" class="form-control" required>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
                             </div>
 
                             <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN2'')')}">
@@ -175,6 +243,40 @@
                 var elt = $(this);
                 findDomiciliationInfo(elt);
             })
+
+            $("#for-many-domiciliation #typeDeTransaction, #for-many-domiciliation #beneficiaire, #for-many-domiciliation #devise").on("change", function(e){
+                findDomiciliations();
+            })
+
+            function findDomiciliations() {
+                const tt = $("#for-many-domiciliations #typeDeTransaction").val();
+                const b = $("#for-many-domiciliations #beneficiaire").val();
+                const d = $("#for-many-domiciliations #devise").val();
+                const c = $("#transactionForm #client").val();
+                if (tt != "" && b != "" && d != "") {
+                    $.ajax({
+                        url: "/rest-domiciliations/" + c + "/"+ d +"/" + b + "/" + tt,
+                        type: "GET",
+                        dataType: "JSON",
+                        beforeSend: function() {
+
+                        },
+                        success: function(response) {
+                            if (response.isEmpty) {
+                                showNotif("Aucune domiciliation n'a été trouvée !", "danger", 10000);
+                            }
+                            else {
+                                showNotif("Cochez les domiciliations que vous souhaitez utiliser !", "success", 10000);
+                                $("#domiciliations-list").html(response.table)
+                                $("#submitButton").prop("disabled", false);
+                            }
+                        },
+                        error: function() {
+                            $("#submitButton").prop("disabled", false);
+                        }
+                    })
+                }
+            }
 
             function findDomiciliationInfo(elt) {
                 var dm = $(elt).val();
