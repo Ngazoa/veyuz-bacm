@@ -41,6 +41,10 @@
             <div class="row">
                 <div class="col-md-6" id="details-transaction">
                     <div th:replace="fragment/transaction-fragments::details"></div>
+                    <div th:if="${transaction.statut == 0}">
+                        <a class="btn btn-secondary" th:href="@{/transaction/{id}/edit(id=${encryptedId})}"><i class="fas fa-pencil"></i> Modifier</a>
+                        <a class="btn btn-danger" onclick="return confirm('Etes-vous sûre de vouloir supprimer définitivement cette opération ? Cette action est irreversible !')" th:href="@{/transactions/{id}/delete(id=${encryptedId})}"><i class="fas fa-trash"></i> Supprimer</a>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <div th:replace="fragment/transaction-fragments::transaction-files">

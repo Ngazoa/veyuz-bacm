@@ -13,7 +13,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
@@ -75,6 +74,9 @@ public class TransactionController {
 
     @Autowired
     private BanqueCorrespondanteRepository banqueCorrespondanteRepository;
+
+    @Autowired
+    private DomiciliationTransactionService domiciliationTransactionService;
 
 
     public TransactionController(HttpSession session) {
@@ -161,6 +163,7 @@ public class TransactionController {
 
         return "transactionslist";
     }
+
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions/{agence_id}-agence", "/transactions/{agence_id}-agence/page={page}"})
     public String getTransactionsClient(
@@ -387,6 +390,7 @@ public class TransactionController {
                     tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                     tdo.setStatut(transaction.getStatut());
                     tdo.setDateCreation(transaction.getDateCreation());
+                    tdo.setDevise(transaction.getDevise());
                     return tdo;
                 }
         ).collect(Collectors.toList());
@@ -471,6 +475,7 @@ public class TransactionController {
                         tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                         tdo.setStatut(transaction.getStatut());
                         tdo.setDateCreation(transaction.getDateCreation());
+                        tdo.setDevise(transaction.getDevise());
                         return tdo;
                     }
             ).collect(Collectors.toList());
@@ -513,7 +518,7 @@ public class TransactionController {
                 return "error/403";
             }
         }
-        setFormTransactionData(banque, client, type, transaction, model);
+        setFormTransactionData(banque, client, type, transaction, model, false);
         model.addAttribute("dash", "transaction");
         model.addAttribute("das", "all");
 
@@ -523,10 +528,11 @@ public class TransactionController {
     @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
     @GetMapping(value = "/transaction/new/{client_id}/client/{type}")
     public String initierTransactionPourClient(@PathVariable("client_id") String clt,
-                                               @PathVariable("type") String type,
-                                               @PathVariable(value = "transaction_id", required = false) Transaction transaction,
-                                               Model model, Principal principal, RedirectAttributes redirectAttributes) throws Exception {
-
+        @PathVariable("type") String type,
+        @PathVariable(value = "transaction_id", required = false) Transaction transaction,
+        Model model, Principal principal, RedirectAttributes redirectAttributes,
+        @RequestParam(value = "domiciliations", required = false) Boolean isManyDomiciliation
+    ) throws Exception {
 
         Client client = clientService.findById(CryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
@@ -547,19 +553,56 @@ public class TransactionController {
                 return "redirect:/clients";
             }
         }
-        setFormTransactionData(banque, client, type, transaction, model);
+        boolean useManyDomiciliations = isManyDomiciliation != null;
+
+        setFormTransactionData(banque, client, type, transaction, model, useManyDomiciliations);
         model.addAttribute("dash", "transaction");
         model.addAttribute("das", "all");
+
+        model.addAttribute("useManyDomiciliations", useManyDomiciliations);
 
         return "edit_transaction_form";
     }
 
-    private void setFormTransactionData(Banque banque, Client client, String type, Transaction transaction, Model model) throws Exception {
+    @Secured({"ROLE_ADMIN", "ROLE_CLIENT", "ROLE_TREASURY_OPS", "ROLE_AGENCE", "ROLE_TRADE_DESK"})
+    @GetMapping(value = "/transaction/{id}/edit")
+    public String editTransaction(@PathVariable("id") String id, Model model, Principal principal, RedirectAttributes redirectAttributes) throws Exception {
+
+        Transaction transaction = transactionService.getTransaction(CryptoUtils.decrypt(id)).get();
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session) || principal == null) {
+            return "redirect:/";
+        }
+
+        if (transaction.getStatut() != StatusTransaction.WAITING) {
+            redirectAttributes.addFlashAttribute("flashMessage", "Cette transaction ne peut plus être modifiée !");
+            return "/transaction-" + id + "/details";
+        }
+
+        Banque banque = (Banque) session.getAttribute("banque");
+        String type = "normal";
+        if (transaction.getDomiciliation() != null || transaction.getUseManyDomiciliations()) {
+            type = "domiciliation";
+        }
+
+        boolean useManyDomiciliations = transaction.getUseManyDomiciliations();
+
+        setFormTransactionData(banque, transaction.getClient(), type, transaction, model, useManyDomiciliations);
+        model.addAttribute("dash", "transaction");
+        model.addAttribute("das", "all");
+
+        model.addAttribute("useManyDomiciliations", useManyDomiciliations);
+
+        return "edit_transaction_form";
+    }
+
+    private void setFormTransactionData(Banque banque, Client client, String type, Transaction transaction, Model model, Boolean useManyDomiciliations) throws Exception {
         TransactionForm transactionForm;
         if (transaction != null) {
             transactionForm = new TransactionForm(transaction, type);
         } else {
             transactionForm = new TransactionForm(banque, client, type);
+            transactionForm.setUseManyDomiciliations(useManyDomiciliations);
         }
         String id = CryptoUtils.encrypt(client.getId());
 
@@ -586,6 +629,7 @@ public class TransactionController {
         model.addAttribute("client", client);
         model.addAttribute("activeMenu", 2);
         model.addAttribute("actiSub", 1);
+        model.addAttribute("type", type);
     }
 
 
@@ -629,10 +673,12 @@ public class TransactionController {
             return new ModelAndView("edit_transaction_form");
         }
 
+        boolean isEditMode = false;
         Transaction transaction = new Transaction();
         if (transactionForm.getTransaction() != null) {
             // on cree une nouvelle transaction
             transaction = transactionForm.getTransaction();
+            isEditMode = true;
         }
 
         transaction.setReference(transactionForm.getReference());
@@ -650,6 +696,7 @@ public class TransactionController {
         transaction.setDomiciliation(transactionForm.getDomiciliation());
         transaction.setBeneficiaire(transactionForm.getBeneficiaire());
         transaction.setMotif(transactionForm.getMotif());
+        transaction.setUseManyDomiciliations(transactionForm.getUseManyDomiciliations());
         transaction.setAgence(transactionForm.getClient().getAgence());
         transaction.setAppUser(userService.getLoggedUser(principal));// Permet de recuperer l'initiateur de l'operation
 
@@ -694,6 +741,11 @@ public class TransactionController {
         }
         Transaction saved = transactionService.saveTransaction(transaction);
         String id = CryptoUtils.encrypt(saved.getId());
+        if (transaction.getUseManyDomiciliations() && isEditMode) {
+            for (DomiciliationTransaction dt : transaction.getDomiciliationTransactions()) {
+                domiciliationTransactionService.delete(dt);
+            }
+        }
 
         String lettreUri = "/" + id + "-lettre-engagement";
 
@@ -730,6 +782,11 @@ public class TransactionController {
             return "error/403";
         }
 
+        if (transaction.getUseManyDomiciliations() != null && transaction.getUseManyDomiciliations()) {
+            if (transaction.getDomiciliationTransactions().isEmpty()) {
+                return "redirect:/import-files/" + transactionId + "/transaction";
+            }
+        }
 
         Iterable<ActionTransaction> actions = actionTransactionService.getActionsTransaction(transaction);
 
@@ -760,6 +817,7 @@ public class TransactionController {
         model.addAttribute("banquecorrespondant", banqueCorrespondanteRepository.findAllByEnabled(true));
         model.addAttribute("dash", "transaction");
         model.addAttribute("das", "all");
+        model.addAttribute("encryptedId", transactionId);
 
         return "transaction_details";
     }
@@ -818,6 +876,8 @@ public class TransactionController {
 
         return "redirect:/transaction-" + id + "/details";
     }
+
+
 
     /**
      * SEULES LES TRANSACTIONS DE TYPES IMPORTATION SERONT LISTEES ICI
@@ -883,7 +943,7 @@ public class TransactionController {
     }
 
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_TRADE_DESK", "ROLE_CONTROLLER"})
     @GetMapping({"/reporting", "/reporting/page={page}"})
     public String reporting(
             @PathVariable(value = "page", required = false) Integer page,
@@ -1323,5 +1383,28 @@ public class TransactionController {
                 apurementFichierManquantService.saveFichierManquant(fichierManquant);
             }
         }
+    }
+
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN"})
+    @GetMapping("/transactions/{id}/delete")
+    public ModelAndView deleteTransaction(@PathVariable("id") String id, RedirectAttributes redirectAttributes) throws Exception {
+        Transaction transaction = transactionService.getTransaction(CryptoUtils.decrypt(id)).get();
+
+        if (transaction.getStatut() != StatusTransaction.WAITING) {
+            redirectAttributes.addFlashAttribute("flashMessage", "Impossible de supprimer cette opération !");
+            return new ModelAndView("redirect:/transactions");
+        }
+
+        for (DomiciliationTransaction dt : transaction.getDomiciliationTransactions()) {
+            domiciliationTransactionService.delete(dt);
+        }
+
+        for (Fichier f : transaction.getFichiers()) {
+            fichierService.delete(f);
+        }
+
+        transactionService.deleteTransaction(transaction);
+
+        return new ModelAndView("redirect:/transactions");
     }
 }

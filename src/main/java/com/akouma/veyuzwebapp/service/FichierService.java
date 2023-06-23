@@ -34,4 +34,8 @@ public class FichierService {
     public Iterable<Fichier> getFichiersTransaction(Transaction t) {
         return fichierRepository.findByTransaction(t);
     }
+
+    public void delete(Fichier f) {
+        fichierRepository.delete(f);
+    }
 }

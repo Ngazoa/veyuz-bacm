@@ -387,13 +387,27 @@ public class ApurementRestController {
 
         Transaction transaction = apurement.getTransaction();
 
-        if (date != null && transaction != null && transaction.getDomiciliation() != null) {
+        if (date != null && transaction != null && (transaction.getDomiciliation() != null || transaction.getUseManyDomiciliations())) {
             // On commence par nous rassurer que la domiciliation a un montant suffisant
-            float newAmontDomiciliation = transaction.getDomiciliation().getMontantRestant() - transaction.getMontant();
-            if (newAmontDomiciliation < 0) {
-                hashMap.put("errorMessage", "Opération impossible le montant de la domiciliation est insuffisant");
-                hashMap.put("isChanged", isChanged);
-                return new ResponseEntity<>(hashMap, HttpStatus.OK);
+            if (transaction.getUseManyDomiciliations()) {
+                for (DomiciliationTransaction dt : transaction.getDomiciliationTransactions()) {
+                    float newAmontDomiciliation = dt.getDomiciliation().getMontantRestant() - dt.getMontant();
+                    if (newAmontDomiciliation < 0) {
+                        hashMap.put("errorMessage", "Opération impossible le montant de l'une des domiciliations utilisées est insuffisant");
+                        hashMap.put("isChanged", false);
+                        return new ResponseEntity<>(hashMap, HttpStatus.OK);
+                    }
+                    dt.getDomiciliation().setMontantRestant(newAmontDomiciliation);
+                }
+            } else {
+                float newAmontDomiciliation = transaction.getDomiciliation().getMontantRestant() - transaction.getMontant();
+                if (newAmontDomiciliation < 0) {
+                    hashMap.put("errorMessage", "Opération impossible le montant de la domiciliation est insuffisant");
+                    hashMap.put("isChanged", false);
+                    return new ResponseEntity<>(hashMap, HttpStatus.OK);
+                }
+                // On décrémente la domiciliation
+                transaction.getDomiciliation().setMontantRestant(newAmontDomiciliation);
             }
             // on determine la date d'expiration
             Calendar calendar = Calendar.getInstance();
@@ -409,9 +423,6 @@ public class ApurementRestController {
             } else {
                 calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
             }
-
-            // On décrémente la domiciliation
-            transaction.getDomiciliation().setMontantRestant(newAmontDomiciliation);
 
             // On met à jour l'apurement
             apurement.setDateExpiration(calendar.getTime());

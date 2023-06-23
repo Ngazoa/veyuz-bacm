@@ -9,18 +9,18 @@
     <div th:fragment="table">
         <table id="datatables-reponsive" class="table table-striped" style="width:100%">
             <thead>
-            <tr>
-                <th>Reference</th>
-                <th>Nbre jours</th>
-                <th>Type</th>
-                <th>Client</th>
-                <th>Beneficiaire</th>
-                <th>Date expiration</th>
-                <th>Devise</th>
-                <th>Montant</th>
-                <th>Statut</th>
-                <th th:if="${show != null}">Action</th>
-            </tr>
+                <tr>
+                    <th>Reference</th>
+                    <th>Nbre jours</th>
+                    <th>Type</th>
+                    <th>Client</th>
+                    <th>Beneficiaire</th>
+                    <th>Date expiration</th>
+                    <th>Devise</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th th:if="${show != null}">Action</th>
+                </tr>
             </thead>
             <tbody>
             <tr th:each="ap, state : ${appurements.appurements}">

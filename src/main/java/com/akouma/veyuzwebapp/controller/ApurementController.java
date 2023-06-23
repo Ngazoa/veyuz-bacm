@@ -299,7 +299,7 @@ public class ApurementController {
         importFile.setBanque(banque);
 
         model.addAttribute("importFile", importFile);
-        model.addAttribute("dash", "apurments");
+        model.addAttribute("dash", "transaction");
         String uri = "/apurments-treasury-approved/page={page}";
         model.addAttribute("uri", uri);
         model.addAttribute("das", "apwd");

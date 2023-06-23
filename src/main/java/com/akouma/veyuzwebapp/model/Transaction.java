@@ -17,6 +17,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Sensei237
@@ -89,13 +91,17 @@ public class Transaction {
         this.devise = devise;
     }
 
-    public Domiciliation getDomiciliation() {
-        return domiciliation;
-    }
+//    public Domiciliation getDomiciliation() {
+//        return domiciliation;
+//    }
+//
+//    public void setDomiciliation(Domiciliation domiciliation) {
+//        this.domiciliation = domiciliation;
+//    }
 
-    public void setDomiciliation(Domiciliation domiciliation) {
-        this.domiciliation = domiciliation;
-    }
+    @OneToMany(mappedBy = "transaction")
+    @JsonBackReference
+    private Set<DomiciliationTransaction> domiciliationTransactions = new LinkedHashSet<>();
 
     public TypeDeTransaction getTypeDeTransaction() {
         return typeDeTransaction;
@@ -225,6 +231,9 @@ public class Transaction {
     }
 
     private String refValeurBeac;
+
+    @Column(name = "use_many_domiciliations", nullable = false)
+    private Boolean useManyDomiciliations = false;
 
     @ManyToOne
     @JoinColumn(name = "agence_id")

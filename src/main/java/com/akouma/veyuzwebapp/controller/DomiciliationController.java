@@ -54,6 +54,9 @@ public class DomiciliationController {
     @Autowired
     private CryptoUtils cryptoUtils;
 
+    @Autowired
+    private DomiciliationTransactionService domiciliationTransactionService;
+
     public DomiciliationController(HttpSession session) {
         this.session = session;
     }
@@ -161,8 +164,11 @@ public class DomiciliationController {
             return "error/403";
         }
 
+        boolean isEmpty = domiciliation.getTransactions().isEmpty() && domiciliationTransactionService.findByDomiciliation(domiciliation).isEmpty();
+
         model.addAttribute("domiciliation", domiciliation);
         model.addAttribute("dash", "domi");
+        model.addAttribute("isEmpty", isEmpty);
 
         return "domiciliation_details";
     }
@@ -205,6 +211,51 @@ public class DomiciliationController {
 
         return "domiciliation_form";
     }
+
+    @Secured({"ROLE_CLIENT", "ROLE_ADMIN", "ROLE_SUPERADMIN", "ROLE_AGENCE"})
+    @GetMapping({"/domiciliations-{id}/edit"})
+    public String editDomiciliation(@PathVariable("id") Domiciliation domiciliation, Model model, Principal principal, Authentication authentication, RedirectAttributes redirectAttributes) {
+
+        // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
+        if (!CheckSession.checkSessionData(session) || principal == null) {
+            return "redirect:/";
+        }
+
+        Banque banque = (Banque) session.getAttribute("banque");
+
+        AppUser loggedUser = userService.getLoggedUser(principal);
+        Client client = loggedUser.getClient();
+
+        // SI TON COMPTE A LE ROLE DE CLIENT ET QUE TON COMPTE NE FAIT PAS DE REFERENCE A L'ENTITE CLIENT ON REVOIE UNE ERREUR 403
+        if (authentication.getAuthorities().contains("ROLE_CLIENT")) {
+            if (client == null) {
+                return "error/403";
+            }
+        }
+
+        // SI TON COMPTE RENVOIE A UN COMPTE ADMIN OU SUPERADMIN ET QUE TU N'ES LIE A AUCUNE BANQUE ALORS ON RENVOIE UNE ERREUR 403
+        if (authentication.getAuthorities().contains("ROLE_ADMIN") || authentication.getAuthorities().contains("ROLE_SUPERADMIN")) {
+            if (!banque.equals(loggedUser.getBanque())) {
+                return "error/403";
+            }
+        }
+
+        if (!domiciliation.getTransactions().isEmpty() || !domiciliationTransactionService.findByDomiciliation(domiciliation).isEmpty()) {
+            redirectAttributes.addFlashAttribute("flashMessage", "Vous ne pouvez pas modifier cette domiciliation car elle est déjà utilisée poour effectuer des opérations");
+            return "redirect:/domiciliation-" + domiciliation.getId() + "/details";
+        }
+
+        DomiciliationForm domiciliationForm = new DomiciliationForm(domiciliation);
+        model.addAttribute("domiciliationForm", domiciliationForm);
+        model.addAttribute("montantEdit", domiciliation.getMontant());
+        setModelData(model, banque, client);
+        model.addAttribute("dash", "domiciliation");
+//        model.addAttribute("domiciliation",domiciliationService.getDomiciliationsClient(banque,client));
+
+        return "domiciliation_form";
+    }
+
+
 
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO"})
     @GetMapping({"/domiciliations/new/{id}"})
@@ -284,7 +335,7 @@ public class DomiciliationController {
         Domiciliation saved = domiciliationService.saveDomiciliation(domiciliationForm);
         String redirectUri = "redirect:/domiciliation-" + saved.getId() + "/details";
 
-        String msg = "La domiciliation que vous avez ajoute a été enregistrée avec success. Veuillez  ajouter la documentation necessaire ";
+        String msg = "La domiciliation que vous avez ajouté a été enregistrée avec success. Veuillez  ajouter la documentation necessaire ";
         redirectAttributes.addFlashAttribute("flashMessage", msg);
         model.addAttribute("dash", "domi");
 
@@ -377,11 +428,13 @@ public class DomiciliationController {
 
     @Secured({"ROLE_SUPERADMIN"})
     @GetMapping("/domiciliations/{id}/delete")
-    public String delete(@PathVariable("id") Long id) throws Exception {
+    public String delete(@PathVariable("id") Domiciliation domiciliation, RedirectAttributes redirectAttributes) {
+        if (!domiciliation.getTransactions().isEmpty() || !domiciliationTransactionService.findByDomiciliation(domiciliation).isEmpty()) {
+            redirectAttributes.addFlashAttribute("flashMessage", "Vous ne pouvez pas supprimer cette domiciliation car elle est déjà utilisée poour effectuer des opérations");
+            return "redirect:/domiciliation-" + domiciliation.getId() + "/details";
+        }
 
-        Optional<Domiciliation> domiciliation = domiciliationService.findById(id);
-
-        domiciliationService.delete(domiciliation.get());
+        domiciliationService.delete(domiciliation);
 
         return "redirect:/domiciliations";
     }

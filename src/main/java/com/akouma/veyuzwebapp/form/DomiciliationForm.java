@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -70,7 +71,8 @@ public class DomiciliationForm {
         this.dateExpiration = domiciliation.getDateExpiration();
         this.isImportation = domiciliation.isImportation();
         this.domiciliation = domiciliation;
-        this.dateCreationStr = new SimpleDateFormat("dd-MM-yy").format(dateCreation);
+        this.dateCreationStr = new SimpleDateFormat("yyyy-MM-dd").format(dateCreation);
+        this.montantTexte = changeMontantToString(domiciliation.getMontant());
     }
     private float TransformTextMontantToFloat(String montant) {
         if (montant != null) {
@@ -78,5 +80,14 @@ public class DomiciliationForm {
             return Float.parseFloat(montant.replaceAll(",", ""));
         }
         return 0;
+    }
+
+    private String changeMontantToString(Float montant) {
+        final NumberFormat numberFormat = NumberFormat.getCompactNumberInstance();
+        numberFormat.setGroupingUsed(true);
+
+        System.out.println("======================= " + montant + " ==========================");
+
+        return numberFormat.format(montant);
     }
 }

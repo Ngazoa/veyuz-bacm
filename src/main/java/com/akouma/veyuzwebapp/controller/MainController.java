@@ -20,9 +20,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.lang.reflect.Array;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -93,13 +95,13 @@ public class MainController {
         appUser.setDateCodeAuthentication(localDateTime);
         appUser.setStatusCodeAuth(true);
         userService.saveUser(appUser);
-        try{
-            mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
-                    "Quelqu'un essaie de se connecter sur veyuz banking en utilisant vos identifiants. " +
-                    "Entrer le code suivant pour confirmer qu'il s'agit bien de vous. CODE  : " + code);
-        }catch (Exception e){
-            e.getStackTrace();
-        }
+//        try{
+//            mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
+//                    "Quelqu'un essaie de se connecter sur veyuz banking en utilisant vos identifiants. " +
+//                    "Entrer le code suivant pour confirmer qu'il s'agit bien de vous. CODE  : " + code);
+//        }catch (Exception e){
+//            e.getStackTrace();
+//        }
         System.out.println("CODE = " + code);
         return "code-authentication";
     }

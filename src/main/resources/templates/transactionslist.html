@@ -130,6 +130,7 @@
                             <th>Beneficiaire</th>
                             <th>Date Creat</th>
                             <th>Montant</th>
+                            <th>Devise</th>
                             <th>Agence</th>
                             <th>Initiateur</th>
                             <th>Statut</th>
@@ -145,6 +146,7 @@
                             <td th:utext="${transaction.beneficiaire.name}"></td>
                             <td th:text="${transaction.dateCreation}" />
                             <td class="montant_format" th:text="${transaction.montant}"></td>
+                            <td th:text="${transaction.devise.name}"></td>
                             <td th:text="${transaction.client.agence != null ? transaction.client.agence.label : ''}"></td>
                             <td th:if="${transaction.appUser!=null}" th:text="${transaction.appUser.nom}"></td>
                             <td th:if="${transaction.appUser==null}">/</td>
@@ -167,9 +169,16 @@
                                     </button>
                                     <div class="dropdown-menu" style="">
                                         <a  class="dropdown-item" th:href="@{/transaction-{id}/details(id=${transaction.id})}">Afficher les details</a>
-                                        <div class="dropdown-divider"></div>
+                                        <th:block th:if="${transaction.statut == 0}">
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" th:href="@{/transaction/{id}/edit(id=${transaction.id})}"><i class="fas fa-pencil"></i> Modifier</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item text-danger" onclick="return confirm('Etes-vous sûre de vouloir supprimer définitivement cette opération ? Cette action est irreversible !')" th:href="@{/transactions/{id}/delete(id=${transaction.id})}"><i class="fas fa-trash"></i> Supprimer</a>
+                                        </th:block>
+
                                         <th:block th:if="${#authorization.expression('hasRole(''ROLE_CLIENT'')')}">
-                                        <a th:if="${transaction.statut <1}" class="dropdown-item delete-transaction" th:href="@{/delete-transaction-{id}(id=${transaction.id})}">Supprimer la transaction</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a th:if="${transaction.statut < 1}" class="dropdown-item delete-transaction" th:href="@{/delete-transaction-{id}(id=${transaction.id})}">Supprimer la transaction</a>
                                         </th:block>
                                     </div>
                                 </div>
