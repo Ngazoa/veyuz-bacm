@@ -117,7 +117,7 @@ public class ClientController {
                     ClientDto client1 = new ClientDto();
                     client1.setTelephone(client.getTelephone());
                     try {
-                        client1.setId(cryptoUtils.encrypt(client.getId()));
+                        client1.setId(CryptoUtils.encrypt(client.getId()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -221,7 +221,7 @@ public class ClientController {
             Model model, Principal principal) throws Exception {
         Client client = null;
         if (clt != null) {
-            client = clientService.findById(cryptoUtils.decrypt(clt));
+            client = clientService.findById(CryptoUtils.decrypt(clt));
         }
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
@@ -312,7 +312,7 @@ public class ClientController {
     public String blockClient(@PathVariable("id") String clt, Principal principal, RedirectAttributes redirectAttributes
             , Model model) throws Exception {
 
-        Client client = clientService.findById(cryptoUtils.decrypt(clt));
+        Client client = clientService.findById(CryptoUtils.decrypt(clt));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session)) {
             return "redirect:/";
@@ -392,7 +392,7 @@ public class ClientController {
     @GetMapping("/clients/{id}/delete")
     public String delete(@PathVariable("id") String clt) throws Exception {
 
-        Client client = clientService.findById(cryptoUtils.decrypt(clt));
+        Client client = clientService.findById(CryptoUtils.decrypt(clt));
 
         clientService.delete(client);
 

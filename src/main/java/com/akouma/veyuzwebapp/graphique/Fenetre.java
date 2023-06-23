@@ -230,7 +230,7 @@ public class Fenetre extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -272,17 +272,17 @@ public class Fenetre extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private final javax.swing.JButton jButton2;
+    private final javax.swing.JButton jButton3;
+    private final javax.swing.JLabel jLabel1;
+    private final javax.swing.JLabel jLabel2;
+    private final javax.swing.JLabel jLabel3;
+    private final javax.swing.JLabel jLabel4;
+    private final javax.swing.JLabel jLabel5;
+    private final javax.swing.JLabel jLabel6;
+    private final javax.swing.JLabel jLabel7;
+    private final javax.swing.JPanel jPanel1;
+    private final javax.swing.JPanel jPanel2;
+    private final javax.swing.JPanel jPanel3;
     // End of variables declaration//GEN-END:variables
 }

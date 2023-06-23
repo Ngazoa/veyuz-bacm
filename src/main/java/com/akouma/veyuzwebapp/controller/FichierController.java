@@ -52,7 +52,7 @@ public class FichierController {
 
     @GetMapping("/import-files/{id}/transaction")
     public String getFormAddFilesToTransaction(@PathVariable("id") String transact, Model model) throws Exception {
-        Transaction transaction =transactionRepository.findById(cryptoUtils.decrypt(String.valueOf(transact))).orElse(null);
+        Transaction transaction =transactionRepository.findById(CryptoUtils.decrypt(String.valueOf(transact))).orElse(null);
 
                // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
                if (!CheckSession.checkSessionData(session)) {
@@ -72,7 +72,7 @@ public class FichierController {
                model.addAttribute("fileslist", transaction.getFichiers());
                model.addAttribute("banque", transaction.getBanque());
                model.addAttribute("client", transaction.getClient());
-               String id=cryptoUtils.encrypt(transaction.getId());
+               String id= CryptoUtils.encrypt(transaction.getId());
                String lettreUri = "/" +id  + "-lettre-engagement";
                model.addAttribute("lettreUri", lettreUri);
 

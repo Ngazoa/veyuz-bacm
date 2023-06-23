@@ -112,7 +112,7 @@ public class ClientService {
                     ClientDto client1 = new ClientDto();
                     client1.setTelephone(client.getTelephone());
                     try {
-                        client1.setId(cryptoUtils.encrypt(client.getId()));
+                        client1.setId(CryptoUtils.encrypt(client.getId()));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -152,7 +152,7 @@ public class ClientService {
                     ClientDto client1 = new ClientDto();
                     client1.setTelephone(client.getTelephone());
                     try {
-                        client1.setId(cryptoUtils.encrypt(client.getId()));
+                        client1.setId(CryptoUtils.encrypt(client.getId()));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -404,7 +404,7 @@ public class ClientService {
                     ClientDto client1 = new ClientDto();
                     client1.setTelephone(client.getTelephone());
                     try {
-                        client1.setId(cryptoUtils.encrypt(client.getId()));
+                        client1.setId(CryptoUtils.encrypt(client.getId()));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -432,7 +432,7 @@ public class ClientService {
         ClientDto client1 = new ClientDto();
         client1.setTelephone(client.getTelephone());
         try {
-            client1.setId(cryptoUtils.encrypt(client.getId()));
+            client1.setId(CryptoUtils.encrypt(client.getId()));
 
         } catch (Exception e) {
             e.printStackTrace();

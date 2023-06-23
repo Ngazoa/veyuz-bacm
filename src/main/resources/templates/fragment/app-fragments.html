@@ -254,6 +254,26 @@
                 </ul>
             </li>
 
+            <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
+                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
+                <a data-bs-target="#transfinanciere" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                    <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">End Tran. Financiere</span>
+                </a>
+                <ul id="transfinanciere" class="sidebar-dropdown list-unstyled collapse "
+                    th:classappend="${#strings.equals(dash, 'transfinanciere')} ? show : ''" data-bs-parent="#sidebar">
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'trf')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/transactions-fin-attente}">En attente</a>
+                    </li>
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'trm')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/transactions-financ/fin/operation}">Terminees</a>
+                    </li>
+                    <li class="sidebar-item" th:classappend="${#strings.equals(das, 'rjt')} ? active : ''">
+                        <a class="sidebar-link" th:href="@{/transactions-fina/rejet/operation}">Rejets</a>
+                    </li>
+                </ul>
+            </li>
+
+
             <li class="sibebar-item" th:classappend="${#strings.equals(dash, 'domiciliation')} ? active : ''">
                 <a class="sidebar-link" th:href="@{/domiciliations}">
                     <i class="align-middle" data-feather="corner-right-down"></i> <span class="align-middle">Domiciliations</span>

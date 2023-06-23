@@ -68,6 +68,18 @@ color: #1ab7ea;
    z-index: 9999;
    display: none;
  }
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-div {
+  align-self: flex-end;
+}
+
+.right-button {
+  align-self: flex-start;
+}
 
  @keyframes spin {
    0% { transform: rotate(0deg); }

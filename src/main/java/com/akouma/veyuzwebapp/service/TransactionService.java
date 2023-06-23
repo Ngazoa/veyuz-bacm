@@ -148,10 +148,7 @@ public class TransactionService {
     public boolean checkReference(String ref) {
         Transaction transaction
                 = transactionRepository.findByReference(ref);
-        if (transaction == null) {
-            return false;
-        }
-        return true;
+        return transaction != null;
     }
 
     public String generateTransactionNumber(Banque banque) {
@@ -186,7 +183,6 @@ public class TransactionService {
 
         // Generate the transaction number by concatenating the formatted serial number with the last 2 digits of the current year
         String transactionNumber = formattedSerialNumber + currentYear;
-        System.out.println("*** "+transactionNumber);
 
         return "TT"+transactionNumber+"BA";
     }

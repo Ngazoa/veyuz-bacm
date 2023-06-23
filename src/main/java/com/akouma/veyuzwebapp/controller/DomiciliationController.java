@@ -211,7 +211,7 @@ public class DomiciliationController {
     public String showDomiciliationFormAd(
             Model model,
             @PathVariable("id") String id) throws Exception {
-        Client client = clientService.findById(cryptoUtils.decrypt(id));
+        Client client = clientService.findById(CryptoUtils.decrypt(id));
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
 
         Banque banque = (Banque) session.getAttribute("banque");

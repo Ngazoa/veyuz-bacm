@@ -193,7 +193,7 @@ public class DomiciliationService {
             domiciliation = new Domiciliation();
         }
 
-        Client client=clientRepository.findById(cryptoUtils.decrypt(domiciliationForm.getClient())).orElse(null);
+        Client client=clientRepository.findById(CryptoUtils.decrypt(domiciliationForm.getClient())).orElse(null);
         domiciliation.setClient(client);
         domiciliation.setMontant(domiciliationForm.getMontant());
         domiciliation.setBeneficiaire(domiciliationForm.getBeneficiaire());

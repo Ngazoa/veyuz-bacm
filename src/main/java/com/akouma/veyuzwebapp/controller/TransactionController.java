@@ -4,6 +4,8 @@ import com.akouma.veyuzwebapp.dto.TransactionDto;
 import com.akouma.veyuzwebapp.form.*;
 import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.BanqueCorrespondanteRepository;
+import com.akouma.veyuzwebapp.repository.TransFinanciereRepository;
+import com.akouma.veyuzwebapp.repository.TransactionRepository;
 import com.akouma.veyuzwebapp.repository.TypeFinancementRepository;
 import com.akouma.veyuzwebapp.service.*;
 import com.akouma.veyuzwebapp.utils.*;
@@ -13,7 +15,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
@@ -72,6 +73,8 @@ public class TransactionController {
     private ClientService clientService;
     @Autowired
     private AgenceService agenceService;
+    @Autowired
+    private TransFinanciereRepository transFinanciereRepository;
 
     @Autowired
     private BanqueCorrespondanteRepository banqueCorrespondanteRepository;
@@ -94,12 +97,12 @@ public class TransactionController {
         }
     }
 
-    @GetMapping({"/transactions", "/transactions/page={page}","/transactions-{agence}"
+    @GetMapping({"/transactions", "/transactions/page={page}", "/transactions-{agence}"
             , "/transactions-{agence}/page={page}",})
     public String getTransactions(
             @PathVariable(value = "page", required = false) Integer page,
             Model model, Authentication authentication, Principal principal,
-            @PathVariable(required = false,value = "agence") Long agenceId) {
+            @PathVariable(required = false, value = "agence") Long agenceId) {
 
         System.out.println("\n========================\nICI TRANSACTIONS\n===================");
 
@@ -116,7 +119,7 @@ public class TransactionController {
         }
         page--;
 
-        Agence agence=null;
+        Agence agence = null;
 //        if(agenceId!=null){
 //
 //            agence=agenceService.getAgenceById(agenceId);
@@ -161,6 +164,7 @@ public class TransactionController {
 
         return "transactionslist";
     }
+
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions/{agence_id}-agence", "/transactions/{agence_id}-agence/page={page}"})
     public String getTransactionsClient(
@@ -185,11 +189,11 @@ public class TransactionController {
 
         String uri = "/transactions/" + agence.getId() + "-agence/page={page}";
         model.addAttribute("clients", clientService.countClientAgence(agence));
-        model.addAttribute("transactionsCount", transactionService.getcountByAgence(banque,agence));
+        model.addAttribute("transactionsCount", transactionService.getcountByAgence(banque, agence));
         model.addAttribute("transactionApur",
-                transactionService.getcountByAgenceAndStatut(banque,agence, StatusTransaction.VALIDATED));
+                transactionService.getcountByAgenceAndStatut(banque, agence, StatusTransaction.VALIDATED));
         model.addAttribute("transactionWait",
-                transactionService.getcountByAgenceAndStatut(banque,agence, StatusTransaction.WAITING));
+                transactionService.getcountByAgenceAndStatut(banque, agence, StatusTransaction.WAITING));
         addTransactionViewDataAgence(agence, model, banque, transactions, uri);
         model.addAttribute("dash", "transaction");
         return "agence-detail";
@@ -230,14 +234,14 @@ public class TransactionController {
         return "transactionslist";
     }
 
-    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
+    @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_TREASURY", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
     @GetMapping({"/transactions/{status}/page={page}", "/transactions/{status}",
-            "/transactions-state/{agence}/{status}/page={page}","/transactions-state/{agence}/{status}"})
+            "/transactions-state/{agence}/{status}/page={page}", "/transactions-state/{agence}/{status}"})
     public String getTransactionsByStatus(
             @PathVariable("status") String status,
             @PathVariable(value = "page", required = false) Integer page,
-            @PathVariable(required = false,value = "agence") Long agenceId,
-    Model model, Authentication authentication, Principal principal) {
+            @PathVariable(required = false, value = "agence") Long agenceId,
+            Model model, Authentication authentication, Principal principal) {
 
         // ON VERIFIE QUE LA BANQUE EST DANS LA SESSION AVANT DE CONTINUER
         if (!CheckSession.checkSessionData(session) || principal == null) {
@@ -249,15 +253,15 @@ public class TransactionController {
             page = this.page;
         }
         page--;
-        Agence agence=null;
-        if(agenceId!=null){
-            agence=agenceService.getAgenceById(agenceId);
+        Agence agence = null;
+        if (agenceId != null) {
+            agence = agenceService.getAgenceById(agenceId);
             transactions = transactionService.getTransactionsByStatus(banque, status, max, page, null,
                     agence);
 
             SearchTransactionForm searchTransactionForm = new SearchTransactionForm();
             searchTransactionForm.setBanque(banque);
-            String uri = "/transactions-state/"+agenceId+"/" + status + "/page={page}";
+            String uri = "/transactions-state/" + agenceId + "/" + status + "/page={page}";
             model.addAttribute("uri", uri);
             model.addAttribute("withStatus", status);
             addTransactionViewData(null, model, banque, transactions, searchTransactionForm, uri);
@@ -279,7 +283,8 @@ public class TransactionController {
             }
         }
 
-        if (loggedUser.getAgence()!=null) {
+        if (loggedUser.getAgence() != null && authentication.getAuthorities().stream().
+                anyMatch(a -> a.getAuthority().equals("ROLE_AGENCE"))) {
             transactions = transactionService.getTransactionsByStatus(banque, status, max, page, client, loggedUser.getAgence());
 
         } else {
@@ -300,7 +305,7 @@ public class TransactionController {
 
 
     @Secured({"ROLE_MACKER", "ROLE_CHECKER", "ROLE_AGENCE", "ROLE_CHECKER_TO", "ROLE_MAKER_TO", "ROLE_SUPERADMIN", "ROLE_SUPERUSER", "ROLE_CONTROLLER"})
-    @PostMapping({ "/search-transactions-results","/search-transactions-results/{agence}" })
+    @PostMapping({"/search-transactions-results", "/search-transactions-results/{agence}"})
     public String getPeriodiqueTransactions(
             @ModelAttribute SearchTransactionForm searchTransactionForm,
             Model model, RedirectAttributes redirectAttributes, Principal principal) throws ParseException {
@@ -386,6 +391,7 @@ public class TransactionController {
                     tdo.setReference(transaction.getReference());
                     tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                     tdo.setStatut(transaction.getStatut());
+                    tdo.setDevise(transaction.getDevise());
                     tdo.setDateCreation(transaction.getDateCreation());
                     return tdo;
                 }
@@ -393,8 +399,8 @@ public class TransactionController {
     }
 
     private void addTransactionViewDataAgence(Agence agence, Model model, Banque banque,
-                                        Page<Transaction> transactions,
-                                        String uri) {
+                                              Page<Transaction> transactions,
+                                              String uri) {
         model.addAttribute("banque", banque);
         if (transactions != null) {
             int nbPages = transactions.getTotalPages();
@@ -423,6 +429,8 @@ public class TransactionController {
                         tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                         tdo.setStatut(transaction.getStatut());
                         tdo.setDateCreation(transaction.getDateCreation());
+                        tdo.setDevise(transaction.getDevise());
+
                         return tdo;
                     }
             ).collect(Collectors.toList());
@@ -438,8 +446,11 @@ public class TransactionController {
         model.addAttribute("agence", agence);
         model.addAttribute("searchTransactionUri", "/search-transactions-results");
         model.addAttribute("dash", "transaction");
+        model.addAttribute("banquecorrespondant", banqueCorrespondanteRepository.findAllByEnabled(true));
+
 
     }
+
     private void addTransactionViewData(Client client, Model model, Banque banque,
                                         Page<Transaction> transactions, SearchTransactionForm searchTransactionForm,
                                         String uri) {
@@ -471,6 +482,8 @@ public class TransactionController {
                         tdo.setTypeDeTransaction(transaction.getTypeDeTransaction());
                         tdo.setStatut(transaction.getStatut());
                         tdo.setDateCreation(transaction.getDateCreation());
+                        tdo.setDevise(transaction.getDevise());
+
                         return tdo;
                     }
             ).collect(Collectors.toList());
@@ -487,6 +500,8 @@ public class TransactionController {
         model.addAttribute("client", client);
         model.addAttribute("searchTransactionUri", "/search-transactions-results");
         model.addAttribute("dash", "transaction");
+        model.addAttribute("banquecorrespondant", banqueCorrespondanteRepository.findAllByEnabled(true));
+
 
     }
 
@@ -1186,11 +1201,11 @@ public class TransactionController {
             Date dateOperationTransaction = new Date();
             Banque banque = (Banque) session.getAttribute("banque");
 
-            String ref=transactionService.generateTransactionNumber(banque);
-            while(transactionService.checkReference(ref)){
-                ref=new ReferenceGenerator().generateReference();
+            String ref = transactionService.generateTransactionNumber(banque);
+            while (transactionService.checkReference(ref)) {
+                ref = new ReferenceGenerator().generateReference();
             }
-            BanqueCorrespondante bqCrd=banqueCorrespondanteRepository.findById(banquecorrespondant).get();
+            BanqueCorrespondante bqCrd = banqueCorrespondanteRepository.findById(banquecorrespondant).get();
             transaction.setReference(ref);
             transaction.setDateTransaction(dateOperationTransaction);
             transaction.setStatut(StatusTransaction.VALIDATED);
@@ -1210,19 +1225,15 @@ public class TransactionController {
                 }
             }
             String message = "L'operation a ete prise en compte ! la transaction a été approuvée et validée par la trésorerie. Puis transmise pour apurement !";
-            // message = "L'opération a été transmise à la trésorerie !";
-//            Notification notification = new Notification();
-//            notification.setMessage(message);
-//            notification.setRead(false);
-//            notification.setUtilisateur(transaction.getClient().getUser());
-//            notification.setHref("/transaction-" + CryptoUtils.encrypt(transaction.getId()) + "/details");
-//            notificationService.save(notification);
+
             transaction.setDelay(calendar.getTime());
             transaction.setCycleNormalAcheve(true);
-            transactionService.saveTransaction(transaction);
+           Transaction tr= transactionService.saveTransaction(transaction);
             if (transaction.getTypeDeTransaction().isImport()) {
                 // Je deplace la transaction en question dans la table apurement
                 removeFromApurement(transaction);
+            }else {
+                removeFromTransactionFinancierEnd(tr);
             }
 
             ActionTransaction actionTransaction = new ActionTransaction();
@@ -1323,5 +1334,86 @@ public class TransactionController {
                 apurementFichierManquantService.saveFichierManquant(fichierManquant);
             }
         }
+    }
+
+    @GetMapping("/validate/many/transactions")
+    @Secured("ROLE_TREASURY")
+    public String registerMultipleTreasury(@RequestParam("taux") String taux,
+                                           @RequestParam("dateValeur") String DateValeur,
+                                           @RequestParam("transactions") String[] tnsc,
+                                           @RequestParam("banquecorrespondant") Long banqueCorrespondanteId
+            , Principal principal) {
+        BanqueCorrespondante banqueCorrespondante = banqueCorrespondanteRepository.getById(banqueCorrespondanteId);
+        Banque banque = (Banque) session.getAttribute("banque");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> transactions = Arrays.asList(tnsc);
+        transactions.forEach(t -> {
+            try {
+                Transaction transaction = transactionService.getTransaction(CryptoUtils.decrypt(t)).get();
+
+                Date dateOperationTransaction = new Date();
+                String ref = transactionService.generateTransactionNumber(banque);
+                while (transactionService.checkReference(ref)) {
+                    ref = new ReferenceGenerator().generateReference();
+                }
+                transaction.setReference(ref);
+                transaction.setDateTransaction(dateOperationTransaction);
+                transaction.setStatut(StatusTransaction.VALIDATED);
+                transaction.setTaux(taux);
+                transaction.setBanqueCorrespondante(banqueCorrespondante);
+                transaction.setDateValeur(sdf.parse(DateValeur));
+                // on determine la date d'expiration
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(dateOperationTransaction);
+                if (transaction.getTypeDeTransaction().getType() != null) {
+                    if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_BIENS)) {
+                        calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_BIENS);
+                    } else if (transaction.getTypeDeTransaction().getType().equals(StatusTransaction.IMP_SERVICES)) {
+                        calendar.add(Calendar.DATE, StatusTransaction.DELAY_TRANSACTION_IMPORTATION_SERVICES);
+                    } else {
+                        calendar.add(Calendar.DATE, 20);
+                    }
+                }
+                String message = "L'operation a ete prise en compte ! la transaction a été approuvée et validée par la trésorerie. Puis transmise pour apurement !";
+                transaction.setDelay(calendar.getTime());
+                transaction.setCycleNormalAcheve(true);
+               Transaction tr= transactionService.saveTransaction(transaction);
+                if (transaction.getTypeDeTransaction().isImport()) {
+                    // Je deplace la transaction en question dans la table apurement
+                    removeFromApurement(transaction);
+                }else {
+                    removeFromTransactionFinancierEnd(tr);
+                }
+
+                ActionTransaction actionTransaction = new ActionTransaction();
+                actionTransaction.setTransaction(transaction);
+                actionTransaction.setAction("Date d'exécution et référence");
+                AppUser loggedUser = userService.getLoggedUser(principal);
+                actionTransaction.setAppUser(loggedUser);
+                actionTransaction.setCommentaire("Ajout de la date de valeur de la transaction");
+                actionTransactionService.saveActionTransaction(actionTransaction);
+
+                transactionService.saveTransaction(transaction);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return "redirect:/transactions";
+    }
+
+    private boolean removeFromTransactionFinancierEnd(Transaction transaction) {
+        Date utilDate = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+        TransFinanciere transFinanciere = new
+                TransFinanciere();
+        transFinanciere.setStatus(-111);// -111 veut dire transaction financiere en attente de date de debit
+        transFinanciere.setDateCreated(sqlDate);
+        transFinanciere.setRejected(false);
+        transFinanciere.setTransaction(transaction);
+        if (transFinanciereRepository.save(transFinanciere) != null) {
+            return true;
+        }
+        return false;
     }
 }

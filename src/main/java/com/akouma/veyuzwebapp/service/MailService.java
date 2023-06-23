@@ -42,12 +42,12 @@ public class MailService {
         try {
             emailSender.send(message);
             Mail mail=new Mail();
-            mail.setMessage(cryptoUtils.encrypt(text));
+            mail.setMessage(CryptoUtils.encrypt(text));
             mail.setReceiver(to);
-            mail.setSubject(cryptoUtils.encrypt(subject));
+            mail.setSubject(CryptoUtils.encrypt(subject));
             mailRepository.save(mail);
         }catch (Exception e){
-            System.out.println("********************************* "+e.getMessage());   ;
+            System.out.println("********************************* "+e.getMessage());
         }
     }
 

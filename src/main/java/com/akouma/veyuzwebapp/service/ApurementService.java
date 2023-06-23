@@ -2,6 +2,8 @@ package com.akouma.veyuzwebapp.service;
 
 import com.akouma.veyuzwebapp.model.*;
 import com.akouma.veyuzwebapp.repository.ApurementRepositoy;
+import com.akouma.veyuzwebapp.repository.TransFinanciereRepository;
+import com.akouma.veyuzwebapp.repository.TransactionRepository;
 import com.akouma.veyuzwebapp.utils.StatusTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,8 +16,13 @@ public class ApurementService {
 
     @Autowired
     private ApurementRepositoy apurementRepositoy;
+    @Autowired
+    TransFinanciereRepository transFinanciereRepository;
 
+    public Page<TransFinanciere> getTransFinancierFrApurements(int status,  int max, Integer page, boolean isApured) {
 
+        return transFinanciereRepository.findByStatusAndIsRejected(status, isApured, PageRequest.of(page, max));
+    }
     public Page<Apurement> getApurements(Banque banque, Client client, int max, Integer page, boolean isApured) {
         if (client == null) {
             return apurementRepositoy.findByBanqueAndIsApuredOrderByIsApuredAsc(banque, isApured, PageRequest.of(page, max));

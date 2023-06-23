@@ -171,15 +171,10 @@ function hideLoader() {
     </script>
     <!-- JavaScript code to select all checkboxes on click of "select all" checkbox -->
     <script>
-  // Get the "select all" checkbox element
   let selectAllCheckbox = document.getElementById("select-all");
-
-  // Add a click event listener to the "select all" checkbox
   selectAllCheckbox.addEventListener("click", function() {
     // Get all other checkboxes on the page
     let checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#select-all)');
-
-    // Set the "checked" property of all other checkboxes to the same value as the "select all" checkbox
     checkboxes.forEach(function(checkbox) {
       checkbox.checked = selectAllCheckbox.checked;
       toggleInputDisplay(checkbox);
