@@ -137,6 +137,143 @@
             })
         });
     </script>
+
+    <script>
+    function toggleInputDisplay(checkbox) {
+        var inputId =checkbox.id);
+                console.log(inputId + ', ========================\\\ ' + inputId )
+
+        let input = document.getElementById(inputId);
+        if (!checkbox.checked) {
+            input.style.display = 'block';
+            input.setAttribute("required", true);
+            input.required = true;
+        } else {
+             input.removeAttribute("required");
+             input.required = false;
+             input.value = "";
+            input.style.display = 'none';
+        }
+    }
+
+
+
+    </script>
+    <script>
+  // Get the "select all" checkbox element
+  let selectAllCheckbox = document.getElementById("select-all");
+
+  selectAllCheckbox.addEventListener("click", function() {
+    // Get all other checkboxes on the page
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#select-all)');
+
+    // Set the "checked" property of all other checkboxes to the same value as the "select all" checkbox
+    checkboxes.forEach(function(checkbox) {
+      checkbox.checked = selectAllCheckbox.checked;
+      //toggleInputDisplay(checkbox);
+    });
+  });
+
+
+    </script>
+
+
+    <script>
+  // Get references to the checkboxes and the button
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const button = document.getElementById('select-multiple');
+
+  // Function to check if any checkbox is checked
+  function anyCheckboxChecked() {
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Function to handle checkbox changes
+  function handleCheckboxChange() {
+    if (anyCheckboxChecked()) {
+      button.disabled = false; // Enable the button
+    } else {
+      button.disabled = true; // Disable the button
+    }
+  }
+
+  // Add event listeners to checkboxes
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', handleCheckboxChange);
+  });
+
+
+    </script>
+    <script>
+   $(document).ready(function() {
+  $('#select-multiple').click(function(e) {
+    e.preventDefault();
+
+    // Check if all selected checkboxes have the same value
+    var selectedValues = [];
+    $('input[type="checkbox"]:checked').each(function() {
+      selectedValues.push($(this).val());
+    });
+
+    if (selectedValues.length === 0) {
+      // No checkboxes selected
+      alert('Please select at least one checkbox.');
+    } else if (selectedValues.every(function(value) {
+      return value === selectedValues[0]&& $('[data-status="1"]').length > 0  ;
+    })) {
+      // All selected checkboxes have the same value
+      $('#formDebit').modal('show');
+    } else {
+      // Selected checkboxes have different values
+      $('#coloredModalDanger').modal('show');
+    }
+  });
+});
+
+
+    </script>
+
+    <script>
+ document.getElementById("myForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Retrieve the selected checkbox data
+    var datasCheck = [];
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#select-all)');
+    checkboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+            datasCheck.push(checkbox.id);
+        }
+    });
+
+    var dateValeur = document.querySelector('input[name="dateeffctive"]').value;
+
+    // Construct the 'selectedData' object
+    var hiddenInput = document.createElement('input');
+    hiddenInput.setAttribute('type', 'hidden');
+    hiddenInput.setAttribute('name', 'transactions');
+    hiddenInput.setAttribute('value', JSON.stringify(datasCheck));
+    this.appendChild(hiddenInput);
+    var checkedValue = hiddenInput.value;
+
+    var selectedData = {
+        dateValeur: dateValeur,
+        transactions: checkedValue
+    };
+
+    // Use the 'selectedData' object as needed (e.g., send it to the server)
+
+    // Proceed with form submission if necessary
+    this.submit();
+});
+
+
+    </script>
 </th:block>
 
 <div id="main-content">
@@ -160,7 +297,15 @@
                 </div>
             </form>
         </div>
-
+        <div class="card-body" th:if="${errorMessage!=null}">
+            <div class="alert alert-primary alert-dismissible" role="alert">
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                        type="button"></button>
+                <div class="alert-message">
+                    <strong th:text="${errorMessage}">Accès refusé...</strong>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="miseDemeure" role="dialog" aria-modal="true" tabindex="-1">
             <div class="modal-dialog modal-md" role="document">
                 <form th:if="${importFile != null}" class="modal-content" id="apurementForm" th:action="@{/rest-apurements/mise-demeure}" enctype="multipart/form-data" th:object="${importFile}" method="post">
@@ -207,12 +352,21 @@
         <div class="card-header">
             <h5 class="card-title">Apurements</h5>
             <h6 class="card-subtitle text-muted"></h6>
+            <br>
+            <button class="btn btn-primary right-button" disabled id="select-multiple" type="submit">Valider multiple Dates Debit</button>
+
         </div>
         <div class="card-body">
             <div>
                 <table  class="table table-striped table-responsive" style="width:100%">
                     <thead>
                     <tr>
+                        <th>
+                            <label class="form-check form-check-inline">
+                                <input class="form-check-input" id="select-all" type="checkbox">
+                                <span class="form-check-label"></span>
+                            </label>
+                        </th>
                         <th title="Reference de la transaction" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                 or #authorization.expression('hasRole(''ROLE_AGENCE'')')
                  or #authorization.expression('hasRole(''ROLE_MACKER'')') }">Ref Trans</th>
@@ -232,6 +386,12 @@
                     </thead>
                     <tbody>
                         <tr th:each="ap, s : ${apurements}" th:id="'ligne' + ${ap.id}" class="" th:classappend="${ap.isApured == false and ap.isExpired == true ? 'bg-danger' : ''}">
+                            <td>
+                                <label class="form-check form-check-inline">
+                                    <input class="form-check-input" th:id="${ap.id}" th:data-status="${ap.status}" th:value="${ap.transaction.devise.code}" type="checkbox">
+                                    <span class="form-check-label"></span>
+                                </label>
+                            </td>
                             <td th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
                     or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:text="${ap.referenceTransaction}"></td>
     <!--                        <td th:text="${ap.motif}"></td>-->
@@ -392,6 +552,50 @@
                             <div class="modal-footer">
                                 <button class="btn btn-default btn-sm" data-bs-dismiss="modal">Fermer</button>
                                 <button type="submit" class="btn btn-success btn-sm">Enregistrer la date et Transmettre</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="modal modal-colored modal-danger fade" id="coloredModalDanger" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ooops..... Une erreur s'est glissee</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body m-3">
+                                <h5 class="modal-title">Les transactions selectionnees doivent etre initiees avec la meme devise Ou doivent avoir le statut En cours de date de debit.</h5>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div data-ref="" class="modal fade" id="formDebit" role="dialog" aria-modal="true" tabindex="-1">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <form class="modal-content" action="/add-apurement-effective-date/multiples" data-ref="" id="myForm">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Transmettre à l'agence</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info">
+                                    <p>Cette transaction a été validée par le trésorier ! Entrer la date effective de débit et trasmettez à l'agence afin qui'il procède à l'upload des fichiers d'apurement</p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="date" required class="form-control" name="dateeffctive" id="dateeffective" />
+                                </div>
+                                <div class="loader"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-default btn-sm" data-bs-dismiss="modal">Fermer</button>
+                                <button type="submit" class="btn btn-success btn-sm" th:disabled="${#authorization.expression('hasRole(''ROLE_AGENCE'')')}">
+                                    Enregistrer la date et Transmettre
+                                </button>
                             </div>
                         </form>
                     </div>

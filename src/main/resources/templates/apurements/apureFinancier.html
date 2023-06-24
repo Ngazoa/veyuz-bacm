@@ -223,7 +223,7 @@
       // No checkboxes selected
       alert('Please select at least one checkbox.');
     } else if (selectedValues.every(function(value) {
-      return value === selectedValues[0] ;
+      return value === selectedValues[0]&& $('[data-status="-111"]').length > 0 ;
     })) {
       // All selected checkboxes have the same value
       $('#modal-transmettre-date-debit').modal('show');
@@ -273,7 +273,18 @@
 
 
     </script>
-
+    <script>
+    function loadModal(id) {
+        var modalId = '#confirmModal' + id;
+        $(modalId).modal('show');
+    }
+</script>
+    <script>
+    function loadModalMotif(id) {
+        var modalId = '#confirmModalMotif' + id;
+        $(modalId).modal('show');
+    }
+</script>
 </th:block>
 
 <div id="main-content">
@@ -283,12 +294,10 @@
                     or #authorization.expression('hasRole(''ROLE_TRADE_DESK'')')}">
         <div class="d-flex">
             <div style="text-align: right; margin-right: 10px;" class="mr-3">
-                <button class="btn btn-primary" data-bs-target="#miseDemeure" data-bs-toggle="modal">
-                    Envoyer les mises en demeure
-                </button>
-                <a th:if="${exportUri != null}" th:href="@{${exportUri}}" class="btn btn-success mr-3">
-                    <i class="fas fa-file-excel"></i> Exporter sur excel
-                </a>
+
+<!--                <a th:if="${exportUri != null}" th:href="@{${exportUri}}" class="btn btn-success mr-3">-->
+<!--                    <i class="fas fa-file-excel"></i> Exporter sur excel-->
+<!--                </a>-->
             </div>
             <form th:if="${searchUri != null}" th:action="@{${searchUri}}" method="get" class="form-inline ml-5">
                 <div class="input-group">
@@ -370,7 +379,7 @@
                     <tr th:each="ap, s : ${apurements}" th:id="'ligne' + ${ap.id}" class="">
                         <td>
                             <label class="form-check form-check-inline">
-                                <input class="form-check-input" th:id="${ap.id}" th:value="${ap.transaction.devise.code}" type="checkbox">
+                                <input class="form-check-input" th:id="${ap.id}" th:data-status="${ap.status}" th:value="${ap.transaction.devise.code}" type="checkbox">
                                 <span class="form-check-label"></span>
                             </label>
                         </td>
@@ -393,14 +402,69 @@
                         </td>
                         <td>
                             <div class="d-inline">
-                                <a th:if="${ap.status == -111}" th:data-parent-id="${ap.id}" class="btn btn-danger btn-sm annuler-definitivement-transaction" title="Annuler la transaction" data-toggle="modal" data-target="#confirmModal">
+                                <a th:if="${!ap.isRejected and ap.status == -111 }" href="#" class="btn btn-danger btn-sm" title="Annuler la transaction" data-toggle="modal"   th:onclick="'loadModal(\'' + ${ap.id} + '\')'">
                                     <i class="fas fa-trash"></i>
                                 </a>
+
+                                <div class="modal fade" th:id="'confirmModal' + ${ap.id}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <form method="get" th:action="@{/annuler/trans/financiere/}">
+
+                                            <div class="modal-body">
+                                                Are you sure you want to cancel this transaction ? Please fill motif
+                                                <br>
+                                                <input type="text" name="motif" placeholder="Motif of reject" required class="form-control">
+
+                                            </div>
+                                                <input type="text" hidden name="id" th:value="${ap.id}">
+                                            <div class="modal-footer">
+                                                <a type="button" href="" class="btn btn-secondary" data-dismiss="modal">Cancel</a>
+                                                <button type="submit" class="btn btn-danger">Confirm</button>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="d-inline" th:if="${(#authorization.expression('hasRole(''ROLE_SUPERADMIN'')') or #authorization.expression('hasRole(''ROLE_AGENCE'')'))}">
-                                <a th:if="${ap.status == -500}" th:data-ref="${ap.id}" th:data-parent-id="'ligne' + ${ap.id}" href="#" class="btn btn-warning btn-sm apurement-btn-action" data-bs-toggle="tooltip" title="Resoumettre les fichiers">
-                                    <i class="fa fa-spinner" aria-hidden="true"></i>
+
+
+                            <div class="d-inline" th:if="${ap.isRejected}" >
+                                <a th:if="${ap.isRejected}" href="#" class="btn btn-primary btn-sm" title="Voir le motif de renvoie" data-toggle="modal"   th:onclick="'loadModalMotif(\'' + ${ap.id} + '\')'">
+                                    <i class="fas fa-eye"></i>
                                 </a>
+
+                                <div class="modal fade" th:id="'confirmModalMotif' + ${ap.id}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmModalLabel1">Confirmation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <form method="get" th:action="@{/annuler/trans/financiere/}">
+
+                                                <div class="modal-body">
+
+                                                    <h2 th:text="${ap.motifReject}"></h2>
+
+                                                </div>
+                                                <input type="text" hidden name="id" th:value="${ap.id}">
+                                                <div class="modal-footer">
+                                                    <a type="button" href="" class="btn btn-secondary" data-dismiss="modal">Cancel</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             </div>
                         </td>
                     </tr>
@@ -412,25 +476,7 @@
                 </nav>
 
                 <!-- Modal -->
-                <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure you want to cancel this transaction?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <a id="confirmBtn" href="#" class="btn btn-danger" >Confirm</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
 
 
 

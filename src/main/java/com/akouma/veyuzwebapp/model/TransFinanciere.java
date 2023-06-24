@@ -16,6 +16,16 @@ public class TransFinanciere {
 
     private Date dateCreated;
 
+    public String getMotifReject() {
+        return motifReject;
+    }
+
+    public void setMotifReject(String motifReject) {
+        this.motifReject = motifReject;
+    }
+
+    private String motifReject;
+
     public Date getDateEffective() {
         return dateEffective;
     }

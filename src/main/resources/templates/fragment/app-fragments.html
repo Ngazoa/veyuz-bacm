@@ -287,7 +287,8 @@
                 </ul>
             </li>
             <li class="sidebar-item" th:if="${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')
-                or #authorization.expression('hasRole(''ROLE_AGENCE'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
+                or #authorization.expression('hasRole(''ROLE_CHECKER_TO'')')
+                 or #authorization.expression('hasRole(''ROLE_CHECKER'')') or #authorization.expression('hasRole(''ROLE_MACKER'')') }" th:classappend="${#strings.equals(dash, 'apurments')} ? active : ''">
                 <a data-bs-target="#transfinanciere" data-bs-toggle="collapse" class="sidebar-link collapsed">
                     <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">End Tran. Financiere</span>
                 </a>
