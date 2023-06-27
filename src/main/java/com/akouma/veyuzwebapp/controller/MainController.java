@@ -87,21 +87,22 @@ public class MainController {
         model.addAttribute("message", message);
 //        model.addAttribute("banquesList", banquesList);
         Random random = new Random();
-        int code = 10000 + random.nextInt(99999); // Génère un nombre aléatoire entre 10000 et 99999
+        int code = 10000 + random.nextInt(999999); // Génère un nombre aléatoire entre 10000 et 99999
         String authCode = userService.generateCodeConnexion(code);
 
         appUser.setCodeAuthentication(authCode);
         LocalDateTime localDateTime = LocalDateTime.now();
         appUser.setDateCodeAuthentication(localDateTime);
         appUser.setStatusCodeAuth(true);
+        model.addAttribute("email",appUser.getEmail());
         userService.saveUser(appUser);
-//        try{
-//            mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
-//                    "Quelqu'un essaie de se connecter sur veyuz banking en utilisant vos identifiants. " +
-//                    "Entrer le code suivant pour confirmer qu'il s'agit bien de vous. CODE  : " + code);
-//        }catch (Exception e){
-//            e.getStackTrace();
-//        }
+        try{
+            mailService.sendSimpleMessage(appUser.getEmail(), "Code de connexion ", "" +
+                    "Quelqu'un essaie de se connecter sur veyuz banking en utilisant vos identifiants. " +
+                    "Entrer le code suivant pour confirmer qu'il s'agit bien de vous. CODE  : " + code);
+        }catch (Exception e){
+            e.getStackTrace();
+        }
         System.out.println("CODE = " + code);
         return "code-authentication";
     }

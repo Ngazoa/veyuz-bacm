@@ -215,7 +215,7 @@ public class Fenetre extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         try {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create("http://127.0.0.1:" + getPort()));
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create("http://localhost:" + getPort()));
         }
         catch (Exception e){
             JOptionPane.showMessageDialog(null,e.getMessage());
@@ -264,7 +264,7 @@ public class Fenetre extends javax.swing.JFrame {
 
     public void setPort(String port) {
         this.port = port;
-        jLabel5.setText("Veyuz Bankin a bien démarré sur le port " + getPort());
+        jLabel5.setText("Veyuz Banking a bien démarré sur le port " + getPort());
     }
 
     public String getPort() {

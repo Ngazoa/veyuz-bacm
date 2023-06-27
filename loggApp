@@ -1,0 +1,18 @@
+2023-06-27 19:06:04.350  INFO 15020 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Starting VeyuzwebappApplication using Java 17 on BENITO-PC with PID 15020 (F:\veyuzwebapp (4)\veyuzwebapp\target\classes started by ASSUS GAMER in F:\veyuzwebapp (4)\veyuzwebapp)
+2023-06-27 19:06:04.355  INFO 15020 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : No active profile set, falling back to default profiles: default
+2023-06-27 19:06:09.398  INFO 15020 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 7000 (http)
+2023-06-27 19:06:20.874  INFO 15020 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 7000 (http) with context path ''
+2023-06-27 19:06:20.886  INFO 15020 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Started VeyuzwebappApplication in 27.869 seconds (JVM running for 30.042)
+2023-06-27 19:08:16.484  INFO 16240 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Starting VeyuzwebappApplication using Java 17 on BENITO-PC with PID 16240 (F:\veyuzwebapp (4)\veyuzwebapp\target\classes started by ASSUS GAMER in F:\veyuzwebapp (4)\veyuzwebapp)
+2023-06-27 19:08:16.486  INFO 16240 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : No active profile set, falling back to default profiles: default
+2023-06-27 19:08:18.719  INFO 16240 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 7000 (http)
+2023-06-27 19:08:41.584  INFO 16240 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 7000 (http) with context path ''
+2023-06-27 19:08:41.595  INFO 16240 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Started VeyuzwebappApplication in 25.643 seconds (JVM running for 26.882)
+2023-06-27 19:13:02.598  INFO 16252 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Starting VeyuzwebappApplication using Java 17 on BENITO-PC with PID 16252 (F:\veyuzwebapp (4)\veyuzwebapp\target\classes started by ASSUS GAMER in F:\veyuzwebapp (4)\veyuzwebapp)
+2023-06-27 19:13:02.601  INFO 16252 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : No active profile set, falling back to default profiles: default
+2023-06-27 19:13:07.861  INFO 16252 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 7000 (http)
+2023-06-27 19:13:30.714  INFO 16252 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 7000 (http) with context path ''
+2023-06-27 19:13:30.727  INFO 16252 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Started VeyuzwebappApplication in 32.258 seconds (JVM running for 33.947)
+2023-06-27 19:18:34.538  INFO 16632 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : Starting VeyuzwebappApplication using Java 17 on BENITO-PC with PID 16632 (F:\veyuzwebapp (4)\veyuzwebapp\target\classes started by ASSUS GAMER in F:\veyuzwebapp (4)\veyuzwebapp)
+2023-06-27 19:18:34.541  INFO 16632 --- [main] c.a.veyuzwebapp.VeyuzwebappApplication   : No active profile set, falling back to default profiles: default
+2023-06-27 19:18:42.005  INFO 16632 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 7000 (http)
